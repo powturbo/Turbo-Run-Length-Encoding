@@ -12,14 +12,15 @@ TurboRLE: Turbo Run Length Encoding
 <p>
 - Order preserving 
 
-<p>
+###### TurboRLE
 - **TRLE**: TurboRLE - Efficient and fast Run Length Encoding
 <p>
 - **SRLE**: TurboRLE Escape - Fast Run Length Encoding with automatic escape determination 
-<p>
+
+###### Functions benchmarked
 - **MRLE**: Mespotine RLE [MRLE](http://encode.ru/threads/2121-No-more-encoding-overhead-in-Run-Length-Encoding-Read-about-Mespotine-RLE-here-)
 <p>
-- **RLE64**: Run Length Encoding - [RLE64](http://sourceforge.net/projects/nikkhokkho/files/RLE64/)#
+- **RLE64**: Run Length Encoding - [RLE64](http://sourceforge.net/projects/nikkhokkho/files/RLE64/)
 
 <p>
 ## Benchmark:
@@ -29,7 +30,7 @@ CPU: Sandy bridge i7-2600k at 4.5GHz, gcc 4.9, ubuntu 14.10
 
 - Text File: [enwik9bwt](http://mattmahoney.net/dc/textdata.html) enwik9 bwt generated w. [libdivsufsort](https://code.google.com/p/libdivsufsort/)
 <table>
-<tr><th>File</th><th>Size</th><th>Ratio in %</th><th>C Time MB/s</th><th>D Time MB/s</th><th>Function</th></tr>
+<tr><th>Size</th><th>Ratio in %</th><th>C Time MB/s</th><th>D Time MB/s</th><th>Function</th></tr>
 <tr><th>378458011</th><th>37.8</th><th>434.12</th><th>1446.38</th><th>trle v15-02</th></tr>
 <tr><th>419346347</th><th>41.9</th><th>456.84</th><th>2167.74</th><th>srle v15-02</th></tr>
 <tr><th>422296231</th><th>42.2</th><th>608.26</th><th>1209.34</th><th>rle64 8 v15-02</th></tr>
@@ -39,7 +40,7 @@ CPU: Sandy bridge i7-2600k at 4.5GHz, gcc 4.9, ubuntu 14.10
 <p>
 - Checkers program "End Game Table Base": [1034.db](http://encode.ru/threads/2077-EGTB-compression?p=41392&viewfull=1#post41392)
 <table>
-<tr><th>File</th><th>Size</th><th>Ratio in %</th><th>C Time MB/s</th><th>D Time MB/s</th><th>Function</th></tr>
+<tr><th>Size</th><th>Ratio in %</th><th>C Time MB/s</th><th>D Time MB/s</th><th>Function</th></tr>
 <tr><th>82452160</th><th>19.7</th><th>560.01</th><th>2427.14</th><th>trle v15-02</th></tr>
 <tr><th>88055360</th><th>21.0</th><th>272.68</th><th>1676.85</th><th>mrle v15-02</th></tr>
 <tr><th>92539187</th><th>22.1</th><th>578.68</th><th>3188.59</th><th>srle v15-02</th></tr>
@@ -49,7 +50,7 @@ CPU: Sandy bridge i7-2600k at 4.5GHz, gcc 4.9, ubuntu 14.10
 <p>
 - BMP File: [girl.bmp](http://sourceforge.net/projects/nikkhokkho/files/RLE64/)
 <table>
-<tr><th>File</th><th>Size</th><th>Ratio in %</th><th>C Time MB/s</th><th>D Time MB/s</th><th>Function</th></tr>
+<tr><th>Size</th><th>Ratio in %</th><th>C Time MB/s</th><th>D Time MB/s</th><th>Function</th></tr>
 <tr><th>3293895</th><th>0.8</th><th>768.58</th><th>13058.49</th><th>trle v15-02</th></tr>
 <tr><th>4482384</th><th>1.1</th><th>356.52</th><th>12899.49</th><th>mrle v15-02</th></tr>
 <tr><th>4821158</th><th>1.2</th><th>770.65</th><th>13535.46</th><th>srle v15-02</th></tr>
@@ -62,4 +63,3 @@ CPU: Sandy bridge i7-2600k at 4.5GHz, gcc 4.9, ubuntu 14.10
 
 ## Usage:
   trle file
-

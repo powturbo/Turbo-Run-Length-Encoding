@@ -31,21 +31,21 @@ CPU: Sandy bridge i7-2600k at 4.5GHz, gcc 4.9, ubuntu 14.10
 - Text File: [enwik9bwt](http://mattmahoney.net/dc/textdata.html) enwik9 bwt generated w. [libdivsufsort](https://code.google.com/p/libdivsufsort/)
 <table>
 <tr><th>Size</th><th>Ratio in %</th><th>C Time MB/s</th><th>D Time MB/s</th><th>Function</th></tr>
-<tr><th> 378458011</th><th> 37.8</th><th> 434.12</th><th>1446.38</th><th>trle v15-02</th></tr>
+<tr><th> 378458011</th><th> 37.8</th><th> 434.12</th><th>1587.76</th><th>trle v15-02</th></tr>
 <tr><th> 419346347</th><th> 41.9</th><th> 456.84</th><th>2167.74</th><th>srle v15-02</th></tr>
 <tr><th> 422296231</th><th> 42.2</th><th> 608.26</th><th>1209.34</th><th>rle64 8 v15-02</th></tr>
 <tr><th> 576619941</th><th> 57.7</th><th> 229.47</th><th> 789.99</th><th>mrle v15-02</th></tr>
-<tr><th>1000000008</th><th>100.0</th><th>5975.00</th><th>5975.00</th><th>memcpy</th></tr>
+<tr><th>1000000008</th><th>100.0</th><th>7950.00</th><th>7975.00</th><th>memcpy</th></tr>
 </table>
 <p>
 - Checkers program "End Game Table Base": [1034.db](http://encode.ru/threads/2077-EGTB-compression?p=41392&viewfull=1#post41392)
 <table>
 <tr><th>Size</th><th>Ratio in %</th><th>C Time MB/s</th><th>D Time MB/s</th><th>Function</th></tr>
-<tr><th> 82452160</th><th> 19.7</th><th> 560.01</th><th>2427.14</th><th>trle v15-02</th></tr>
+<tr><th> 82452160</th><th> 19.7</th><th> 560.01</th><th>2589.77</th><th>trle v15-02</th></tr>
 <tr><th> 88055360</th><th> 21.0</th><th> 272.68</th><th>1676.85</th><th>mrle v15-02</th></tr>
-<tr><th> 92539187</th><th> 22.1</th><th> 578.68</th><th>3188.59</th><th>srle v15-02</th></tr>
+<tr><th> 92539187</th><th> 22.1</th><th> 578.68</th><th>3382.29</th><th>srle v15-02</th></tr>
 <tr><th> 93905323</th><th> 22.4</th><th> 917.00</th><th>1368.14</th><th>rle64 8 v15-02</th></tr>
-<tr><th>419225625</th><th>100.0</th><th>5975.00</th><th>5975.00</th><th>memcpy</th></tr>
+<tr><th>419225625</th><th>100.0</th><th>8010.00</th><th>7950.00</th><th>memcpy</th></tr>
 </table>
 <p>
 - BMP File: [girl.bmp](http://sourceforge.net/projects/nikkhokkho/files/RLE64/)
@@ -55,7 +55,7 @@ CPU: Sandy bridge i7-2600k at 4.5GHz, gcc 4.9, ubuntu 14.10
 <tr><th>  4482384</th><th> 1.1</th><th>  356.52</th><th>12899.49</th><th>mrle v15-02</th></tr>
 <tr><th>  4821158</th><th> 1.2</th><th>  770.65</th><th>13535.46</th><th>srle v15-02</th></tr>
 <tr><th>  8832643</th><th> 2.2</th><th> 1365.06</th><th> 1933.86</th><th>rle64 8 v15-02</th></tr>
-<tr><th>403920054</th><th>100.0</th><th>5942.90</th><th> 5878.68</th><th>memcpy</th></tr> 
+<tr><th>403920054</th><th>100.0</th><th>7910.00</th><th> 7910.00</th><th>memcpy</th></tr> 
 </table>
 
 ## Compile:

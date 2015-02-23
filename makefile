@@ -6,7 +6,7 @@ all: trle
 trled.o: trle_.h trle.h trled.c
 	gcc -O2 $(CFLAGS) -c trled.c
 
-trle:   trlec.o trled.o trle.o
+trle: trlec.o trled.o trle.o
 	gcc trle.o trlec.o trled.o -o trle
  
 .c.o:

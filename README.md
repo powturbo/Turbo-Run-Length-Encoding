@@ -1,4 +1,4 @@
-TurboRLE: Turbo Run Length Encoding 
+TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powturbo/TurboRLE.svg?branch=master)](https://travis-ci.org/powturbo/TurboRLE)
 ===================================
 
 ###### Efficient and fast **Run Length Encoding** library
@@ -29,6 +29,7 @@ CPU: Sandy bridge i7-2600k at 4.5GHz, gcc 4.9, ubuntu 14.10
 - Realistic and practical benchmark with large files
 
 - Text File: [enwik9bwt](http://mattmahoney.net/dc/textdata.html) enwik9 bwt generated w. [libdivsufsort](https://code.google.com/p/libdivsufsort/)
+
 <table>
 <tr><th>Size</th><th>Ratio in %</th><th>C Time MB/s</th><th>D Time MB/s</th><th>Function</th></tr>
 <tr><th> 378458011</th><th> 37.8</th><th> 434.12</th><th>1587.76</th><th>trle v15-02</th></tr>
@@ -39,6 +40,7 @@ CPU: Sandy bridge i7-2600k at 4.5GHz, gcc 4.9, ubuntu 14.10
 </table>
 <p>
 - Checkers program "End Game Table Base": [1034.db](http://encode.ru/threads/2077-EGTB-compression?p=41392&viewfull=1#post41392)
+
 <table>
 <tr><th>Size</th><th>Ratio in %</th><th>C Time MB/s</th><th>D Time MB/s</th><th>Function</th></tr>
 <tr><th> 82452160</th><th> 19.7</th><th> 560.01</th><th>2589.77</th><th>trle v15-02</th></tr>
@@ -48,7 +50,8 @@ CPU: Sandy bridge i7-2600k at 4.5GHz, gcc 4.9, ubuntu 14.10
 <tr><th>419225625</th><th>100.0</th><th>8010.00</th><th>7950.00</th><th>memcpy</th></tr>
 </table>
 <p>
-- BMP File: [girl.bmp](http://sourceforge.net/projects/nikkhokkho/files/RLE64/)
+- BMP File: [girl.bmp in RLE64Samples](http://sourceforge.net/projects/nikkhokkho/files/RLE64/3.00/)
+
 <table>
 <tr><th>Size</th><th>Ratio in %</th><th>C Time MB/s</th><th>D Time MB/s</th><th>Function</th></tr>
 <tr><th>  3293895</th><th> 0.8</th><th>  768.58</th><th>13058.49</th><th>trle v15-02</th></tr>
@@ -59,7 +62,7 @@ CPU: Sandy bridge i7-2600k at 4.5GHz, gcc 4.9, ubuntu 14.10
 </table>
 
 ## Compile:
-  gcc -O3 -march=native trle.c -o trle
+  make
 
 ## Usage:
   trle file

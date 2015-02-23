@@ -32,10 +32,10 @@ CPU: Sandy bridge i7-2600k at 4.5GHz, gcc 4.9, ubuntu 14.10
 
 <table>
 <tr><th>Size</th><th>Ratio in %</th><th>C Time MB/s</th><th>D Time MB/s</th><th>Function</th></tr>
-<tr><th> 378458011</th><th> 37.8</th><th> 434.12</th><th>1587.76</th><th>trle v15-02</th></tr>
-<tr><th> 419346347</th><th> 41.9</th><th> 456.84</th><th>2167.74</th><th>srle v15-02</th></tr>
-<tr><th> 422296231</th><th> 42.2</th><th> 608.26</th><th>1209.34</th><th>rle64 8 v15-02</th></tr>
-<tr><th> 576619941</th><th> 57.7</th><th> 229.47</th><th> 789.99</th><th>mrle v15-02</th></tr>
+<tr><th> 378458011</th><th>  37.8</th><th> 434.12</th><th>1587.76</th><th>trle v15-02</th></tr>
+<tr><th> 419346347</th><th>  41.9</th><th> 456.84</th><th>2167.74</th><th>srle v15-02</th></tr>
+<tr><th> 422296231</th><th>  42.2</th><th> 608.26</th><th>1209.34</th><th>rle64 8 v15-02</th></tr>
+<tr><th> 576619941</th><th>  57.7</th><th> 229.47</th><th> 789.99</th><th>mrle v15-02</th></tr>
 <tr><th>1000000008</th><th>100.0</th><th>7950.00</th><th>7975.00</th><th>memcpy</th></tr>
 </table>
 <p>

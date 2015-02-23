@@ -21,20 +21,22 @@
     - homepage : https://sites.google.com/site/powturbo/
     - twitter  : https://twitter.com/powturbo
 
-    TurboRLE - "Efficient Run Length Encoding"
+    TurboRLE - "Efficient and fast Run Length Encoding"
 **/
 #ifdef __cplusplus
 extern "C" {
 #endif
+// RLE with escape char
+unsigned _srlec(unsigned char *in, unsigned inlen, unsigned char *out, int e);
+unsigned _srled(unsigned char *in,                 unsigned char *out, unsigned outlen, int e);
 
-int _srlec(unsigned char *in, int inlen, unsigned char *out, int e);
-int _srled(unsigned char *in, unsigned char *out, int outlen, int e);
+// RLE w. automatic escape char determination
+unsigned  srlec(unsigned char *in, unsigned inlen, unsigned char *out);
+unsigned  srled(unsigned char *in,                 unsigned char *out, unsigned outlen);
 
-int srlec(unsigned char *in, int inlen, unsigned char *out);
-int srled(unsigned char *in, unsigned char *out, int outlen);
-
-int trlec(unsigned char *in, int inlen, unsigned char *out);
-int trled(unsigned char *in, unsigned char *out, int outlen);
+// Turbo RLE
+unsigned  trlec(unsigned char *in, unsigned inlen, unsigned char *out);
+unsigned  trled(unsigned char *in,                 unsigned char *out, unsigned outlen);
 
 #ifdef __cplusplus
 }

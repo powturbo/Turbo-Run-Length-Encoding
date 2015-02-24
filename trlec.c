@@ -62,34 +62,29 @@ static inline void hist(unsigned char *in, unsigned inlen, unsigned *cc) { // Op
 }
 
 //------------------------------------- RLE with Escape char ------------------------------------------------------------------
-#define SRLEC(pp, ip, op, e) do {\
-  unsigned i = ip - pp, c = *ip;\
-  if(i > 3) { *op++ = e; i -= 3; vbxput(op, i); *op++ = c; }\
-  else if(c == e) {\
-	while(i--) { *op++ = e; vbxput(op, 0); }\
-  } else while(i--) *op++ = c;\
-} while(0)
+#define USIZE 8
+#include "srlec_.h"
 
-unsigned _srlec(unsigned char *in, unsigned inlen, unsigned char* out, int e) {
-  unsigned char *ip, *op = out, *pp = in-1;
-  for(ip = in; ip < in+inlen-1; ip++)
-    if(*ip != *(ip+1)) {
-	  SRLEC(pp,ip, op, e);
-	  pp = ip;
-	}
-  SRLEC(pp, ip, op, e);
-  return op - out;
-}
-  
+#define USIZE 16
+#include "srlec_.h"
+
+#define USIZE 32
+#include "srlec_.h"
+
+#define USIZE 64
+#include "srlec_.h"
+
 unsigned srlec(unsigned char *in,  unsigned inlen, unsigned char *out) {
   unsigned m = 0xffffffffu, mi = 0, i, b[256] = {0}; 
   if(inlen < 1) return 0;
 
   hist(in,inlen,b);  		
   
-  for(i = 0; i < 256; i++) if(b[i] <= m) m = b[i],mi = i;
+  for(i = 0; i < 256; i++) 
+    if(b[i] <= m) 
+	  m = b[i],mi = i;
   *out++ = mi; 
-  return _srlec(in, inlen, out, mi)+1;
+  return _srlec8(in, inlen, out, mi)+1;
 }
 
 //------------------------------------------------- TurboRLE ------------------------------------------
@@ -116,21 +111,31 @@ unsigned trlec(unsigned char *in, unsigned inlen, unsigned char *out) {
   for(i = 0; i < 256; i++) u[i].c = b[i], u[i].i = i,b[i]=0;  	//qsort(u, 256, sizeof(u[0]), (int(*)(const void*,const void*))ucmp);	
   struct u *v;													
   for(v = u + 1; v < u + 256; ++v)
-    if(v->c < v[-1].c) { struct u *w, tmp = *v;
+    if(v->c < v[-1].c) { 
+	  struct u *w, tmp = *v;
       for(w = v; w > u && tmp.c < w[-1].c; --w) *w = w[-1];
       *w = tmp;
     }  															
 																			
-  for(m = -1,i = 0; i < 256 && !u[i].c; i++) b[u[i].i]++, ++m;
+  for(m = -1,i = 0; i < 256 && !u[i].c; i++) 
+    b[u[i].i]++, ++m;
   if(m < 0) { // no unused bytes found
-    *op++ = 1; *op++ = u[0].i; 
-    if((i = _srlec(in, inlen, op, u[0].i)+2) < inlen) return i;
-	out[0] = 0; memcpy(out+1,in,inlen); return inlen+1;
+    *op++ = 1; 
+	*op++ = u[0].i; 
+    if((i = _srlec8(in, inlen, op, u[0].i)+2) < inlen) 
+	  return i;
+	  
+	out[0] = 0; 
+	memcpy(out+1,in,inlen); 
+	return inlen+1;
   } 																		
   
   *op++ = 2; 
   memset(op, 0, 32);
-  for(m = -1,i = 0; i < 256; i++) if(b[i]) { op[i>>3] |= 1<<(i&7); rmap[++m] = i; } 
+  for(m = -1,i = 0; i < 256; i++) 
+    if(b[i]) { 
+      op[i>>3] |= 1<<(i&7); rmap[++m] = i; 
+    } 
   op += 32;
 
   for(ip = in, pp = in-1; ip < in+inlen-1; ip++)
@@ -140,6 +145,10 @@ unsigned trlec(unsigned char *in, unsigned inlen, unsigned char *out) {
 	}
   TRLEC(pp,ip, op);
   
-  if(op - out >= inlen) { out[0] = 0; memcpy(out+1,in,inlen); return inlen+1; }
+  if(op - out >= inlen) { 
+    out[0] = 0; 
+	memcpy(out+1,in,inlen); 
+	return inlen+1; 
+  }
   return op - out;
 }

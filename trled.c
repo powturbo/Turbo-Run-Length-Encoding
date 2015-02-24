@@ -28,20 +28,30 @@
 #include "trle_.h"
          
 //------------------------------------- RLE with Escape char ------------------------------------------------------------------
-unsigned _srled(unsigned char *in, unsigned char *out, unsigned outlen, int e) {
-  unsigned char *ip = in, *op = out; int c;
-  while(op < out+outlen) { 
-    if((c = *ip++) != e) *op++ = c;
-	else { 
-	  int i; vbxget(ip, i);
-	  if(i) { c = *ip++; i+=3; rmemset(op, c, i); }
-	  else *op++ = e;
-    }
-  }
-  return ip - in;
-}
+#define MEMSAFE
+#define USIZE 64
+#include "srled_.h"
+#undef rmemset
+#undef USIZE
+#undef MEMSAFE
+#undef runcpy
 
-unsigned srled(unsigned char *in, unsigned char *out, unsigned outlen) { return _srled(in+1, out, outlen, *in); }
+#define USIZE 32
+#include "srled_.h"
+#undef rmemset
+#undef USIZE
+#undef runcpy
+
+#define USIZE 16
+#include "srled_.h"
+#undef rmemset
+#undef USIZE
+#undef runcpy
+
+#define USIZE 8
+#include "srled_.h"
+
+unsigned srled(unsigned char *in, unsigned char *out, unsigned outlen) { return _srled8(in+1, out, outlen, *in); }
 
 //------------------------------------- TurboRLE ------------------------------------------
 unsigned trled(unsigned char *in, unsigned char *out, unsigned outlen) {
@@ -49,18 +59,25 @@ unsigned trled(unsigned char *in, unsigned char *out, unsigned outlen) {
   int m = -1,i,c; 
   if(outlen < 1) return 0;
 
-  if(!*in) { memcpy(out,in+1,outlen); return outlen+1; }
-  if(*in++ == 1) return _srled(in+1, out, outlen, *in)+2;
+  if(!*in) { 
+    memcpy(out,in+1,outlen); 
+	return outlen+1; 
+  }
+  if(*in++ == 1) 
+    return _srled8(in+1, out, outlen, *in)+2;
   
   for(ip = in; ip < in+32; ip++)
     for(i = 0; i < 8; ++i) 
 	  if(((*ip) >> i) & 1) b[(ip-in)<<3 | i] = ++m+1; 		
 		
   while(op < out+outlen)
-    if(!(c=b[*ip])) *op++ = *ip++; 						
-	else { ip++; 
+    if(likely(!(c=b[*ip]))) *op++ = *ip++; 						
+	else { 
+	  ip++; 
 	  vbzget(ip, i, m, c-1);
-	  c = *ip++; i+=3; rmemset(op,c,i); 					
+	  c = *ip++; 
+	  i += 3; 
+	  rmemset(op,c,i); 					
     }
   return ip - in;
 }

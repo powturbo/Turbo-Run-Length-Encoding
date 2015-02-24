@@ -23,12 +23,23 @@
 
     TurboRLE - "Efficient and fast Run Length Encoding"
 **/
+#include <stdint.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
 // RLE with escape char
-unsigned _srlec(unsigned char *in, unsigned inlen, unsigned char *out, int e);
-unsigned _srled(unsigned char *in,                 unsigned char *out, unsigned outlen, int e);
+unsigned _srlec8(unsigned char *in, unsigned inlen, unsigned char *out, uint8_t e);
+unsigned _srled8(unsigned char *in,                 unsigned char *out, unsigned outlen, uint8_t e);
+
+unsigned _srlec16(unsigned char *in, unsigned inlen, unsigned char *out, uint16_t e);
+unsigned _srled16(unsigned char *in,                 unsigned char *out, unsigned outlen, uint16_t e);
+
+unsigned _srlec32(unsigned char *in, unsigned inlen, unsigned char *out, uint32_t e);
+unsigned _srled32(unsigned char *in,                 unsigned char *out, unsigned outlen, uint32_t e);
+
+unsigned _srlec64(unsigned char *in, unsigned inlen, unsigned char *out, uint64_t e);
+unsigned _srled64(unsigned char *in,                 unsigned char *out, unsigned outlen, uint64_t e);
+
 
 // RLE w. automatic escape char determination
 unsigned  srlec(unsigned char *in, unsigned inlen, unsigned char *out);

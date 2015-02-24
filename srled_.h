@@ -23,7 +23,7 @@
 
     TurboRLE - "Efficient and fast Run Length Encoding"
 **/
-  #ifdef MEMSAFE 
+  #ifdef MEMSAFE  
 #define rmemset(__op, __c, __i) while(__i--) *__op++ = __c
   #elif defined(__SSE__)
 #include <tmmintrin.h>

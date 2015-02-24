@@ -22,4 +22,3 @@ clean:
 
 cleanw:
 	del .\*.o
-

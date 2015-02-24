@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
   unsigned char *in,*out,*cpy;
   char *inname = argv[optind];  
 
-  FILE *fi = fopen(inname,  "rb"); if(!fi ) perror(inname), exit(1);  							
+  FILE *fi = fopen(inname, "rb"); if(!fi ) perror(inname), exit(1);  							
   fseek(fi, 0, SEEK_END); long long flen = ftell(fi); fseek(fi, 0, SEEK_SET);
   if(flen > b) flen = b;
   int n = flen; 
@@ -102,12 +102,20 @@ int main(int argc, char *argv[]) {
   if(cmp && !(cpy = (unsigned char*)malloc(n+1024))) { fprintf(stderr, "malloc error\n"); exit(-1); }
   n = fread(in, 1, n, fi);
   fclose(fi);
-  if(n <= 0) exit(0); 																			printf("'%s' %u\n", inname,n);
+  if(n <= 0) exit(0); 																printf("'%s' %u\n", inname, n);
     
   unsigned l;
-  TMDEF;
-  TMBEG memcpy(out, in,  n);   TMEND; printf("size=%10u C-Time=", n); TMPRINT("D-Time="); TMBEG memcpy(cpy,out, n); TMEND; if(cmp) check(in,cpy,n); TMPRINT("memcpy\n"); 
-  TMBEG l = trlec(in, n, out); TMEND; printf("size=%10u C-Time=", l); TMPRINT("D-Time="); TMBEG trled(out, cpy, n); TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE\n"); 
-  TMBEG l = srlec(in, n, out); TMEND; printf("size=%10u C-Time=", l); TMPRINT("D-Time="); TMBEG srled(out, cpy, n); TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE esc\n");
-  TMBEG l = mrlec(in, n, out); TMEND; printf("size=%10u C-Time=", l); TMPRINT("D-Time="); TMBEG mrled(out, cpy, n); TMEND; if(cmp) check(in,cpy,n); TMPRINT("Mespotine RLE\n");
+  TMDEF; memcpy(out, in,  n);
+  TMBEG l = trlec(in, n, out); 				  TMEND; printf("%10u ", l); TMPRINT(""); TMBEG trled(out, cpy, n); 				TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE\n");
+  TMBEG l = srlec(in, n, out); 				  TMEND; printf("%10u ", l); TMPRINT(""); TMBEG srled(out, cpy, n); 				TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE esc\n");
+  TMBEG l = mrlec(in, n, out); 				  TMEND; printf("%10u ", l); TMPRINT(""); TMBEG mrled(out, cpy, n); 				TMEND; if(cmp) check(in,cpy,n); TMPRINT("Mespotine RLE\n");
+  
+    #if 1
+  TMBEG l = _srlec8( in, n, out, 0xda);  	  TMEND; printf("%10u ", l); TMPRINT(""); TMBEG _srled8( out, cpy, n, 0xda);  		TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE esc  8\n");
+  TMBEG l = _srlec16(in, n, out, 0xdada); 	  TMEND; printf("%10u ", l); TMPRINT(""); TMBEG _srled16(out, cpy, n, 0xdada); 		TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE esc 16\n");
+  TMBEG l = _srlec32(in, n, out, 0xdadadadau);TMEND; printf("%10u ", l); TMPRINT(""); TMBEG _srled32(out, cpy, n, 0xdadadadau);	TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE esc 32\n");
+  unsigned long long esc = 0xdadadadau; esc=esc<<32|esc;
+  TMBEG l = _srlec64(in, n, out, esc); 		  TMEND; printf("%10u ", l); TMPRINT(""); TMBEG _srled64(out, cpy, n, esc);TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE esc 64\n");
+	#endif
+  TMBEG memcpy(out, in,  n);   				  TMEND; printf("%10u ", n); TMPRINT(""); TMBEG memcpy(cpy,out, n); 				TMEND; if(cmp) check(in,cpy,n); TMPRINT("memcpy\n"); 
 }

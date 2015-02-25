@@ -59,7 +59,7 @@ unsigned trled(unsigned char *in, unsigned char *out, unsigned outlen) {
   int m = -1,i,c; 
   if(outlen < 1) return 0;
 
-  if(!*in) { 
+  if(!*in) {
     memcpy(out,in+1,outlen); 
 	return outlen+1; 
   }
@@ -68,14 +68,16 @@ unsigned trled(unsigned char *in, unsigned char *out, unsigned outlen) {
   
   for(ip = in; ip < in+32; ip++)
     for(i = 0; i < 8; ++i) 
-	  if(((*ip) >> i) & 1) b[(ip-in)<<3 | i] = ++m+1; 		
+	  if(((*ip) >> i) & 1) 
+	    b[(ip-in)<<3 | i] = ++m+1; 		
 		
   while(op < out+outlen)
-    if(likely(!(c=b[*ip]))) *op++ = *ip++; 						
+    if(likely(!(c=b[*ip]))) 
+	  *op++ = *ip++; 						
 	else { 
 	  ip++; 
 	  vbzget(ip, i, m, c-1);
-	  c = *ip++; 
+	  c  = *ip++; 
 	  i += 3; 
 	  rmemset(op,c,i); 					
     }

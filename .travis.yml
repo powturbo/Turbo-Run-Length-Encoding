@@ -3,7 +3,7 @@ compiler: gcc
 
 branches:
   only:
-    - master   
+    - master
 script:
     - make
 os:

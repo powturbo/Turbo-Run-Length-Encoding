@@ -21,7 +21,7 @@
     - homepage : https://sites.google.com/site/powturbo/
     - twitter  : https://twitter.com/powturbo
 
-    TurboRLE - "Efficient and fast Run Length Encoding"
+    TurboRLE - "Most efficient and fastest Run Length Encoding"
 **/
 #include <stdint.h>
 #define likely(x)     	__builtin_expect((x),1)

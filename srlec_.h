@@ -55,3 +55,4 @@ unsigned TEMPLATE2(_srlec, USIZE)(unsigned char *_in, unsigned inlen, unsigned c
 }
 #undef SRLEC
 #undef USIZE
+

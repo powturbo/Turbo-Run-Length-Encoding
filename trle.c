@@ -21,7 +21,7 @@
     - homepage : https://sites.google.com/site/powturbo/
     - twitter  : https://twitter.com/powturbo
 
-    TurboRLE - "Efficient and fast Run Length Encoding"
+    TurboRLE - "Most efficient and fastest Run Length Encoding"
 **/      
 #include <string.h> 
 #include <stdio.h>
@@ -67,15 +67,13 @@ unsigned argtoi(char *s) {
 #include "mrle.c"
 
 void check(unsigned char *in, unsigned char *cpy, unsigned n) { int i;
-  if(memcmp(in,cpy,n)) 
-    for(i = 0; i < n; i++) 
-      if(in[i] != cpy[i]) { printf("ERROR at %d ", i); break; }
+  for(i = 0; i < n; i++) 
+    if(in[i] != cpy[i]) { printf("ERROR at %d ", i); break; }
   memset(cpy,0xff,n); 
 }
 
-int main(int argc, char *argv[]) { 
-  unsigned reps = 1<<30, trips = 3,cmp=0;
-  int b = 1 << 30;
+int main(int argc, char *argv[]) {
+  unsigned reps = 1<<30, trips = 3,cmp=0, b = 1 << 30;
   int c, digit_optind = 0, this_option_optind = optind ? optind : 1, option_index = 0;
   static struct option long_options[] = { {"blocsize", 	0, 0, 'b'}, {0,0, 0, 0}  };
   for(;;) {
@@ -90,22 +88,20 @@ int main(int argc, char *argv[]) {
   }
   if(argc - optind < 1) { fprintf(stderr, "File not specified\n"); exit(-1); }
 
-  unsigned char *in,*out,*cpy;
-  char *inname = argv[optind];  
-
+  unsigned char *in,*out,*cpy,*inname = argv[optind];  
   FILE *fi = fopen(inname, "rb"); if(!fi ) perror(inname), exit(1);  							
   fseek(fi, 0, SEEK_END); long long flen = ftell(fi); fseek(fi, 0, SEEK_SET);
   if(flen > b) flen = b;
   int n = flen; 
-  if(!(in  = (unsigned char*)malloc(n+1024))) { fprintf(stderr, "malloc error\n"); exit(-1); } cpy = in;
-  if(!(out = (unsigned char*)malloc(flen*4/3+1024))) { fprintf(stderr, "malloc error\n"); exit(-1); } 
-  if(cmp && !(cpy = (unsigned char*)malloc(n+1024))) { fprintf(stderr, "malloc error\n"); exit(-1); }
+  if(!(in  =        (unsigned char*)malloc(n+1024)))        { fprintf(stderr, "malloc error\n"); exit(-1); } cpy = in;
+  if(!(out =        (unsigned char*)malloc(flen*4/3+1024))) { fprintf(stderr, "malloc error\n"); exit(-1); } 
+  if(cmp && !(cpy = (unsigned char*)malloc(n+1024)))        { fprintf(stderr, "malloc error\n"); exit(-1); }
   n = fread(in, 1, n, fi);
   fclose(fi);
   if(n <= 0) exit(0); 																printf("'%s' %u\n", inname, n);
     
   unsigned l;
-  TMDEF; memcpy(out, in,  n);
+  TMDEF; memcpy(out, in,  n); memcpy(out,cpy,n);
   TMBEG l = trlec(in, n, out); 				  TMEND; printf("%10u ", l); TMPRINT(""); TMBEG trled(out, cpy, n); 				TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE\n");
   TMBEG l = srlec(in, n, out); 				  TMEND; printf("%10u ", l); TMPRINT(""); TMBEG srled(out, cpy, n); 				TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE esc\n");
   TMBEG l = mrlec(in, n, out); 				  TMEND; printf("%10u ", l); TMPRINT(""); TMBEG mrled(out, cpy, n); 				TMEND; if(cmp) check(in,cpy,n); TMPRINT("Mespotine RLE\n");

@@ -21,12 +21,12 @@
     - homepage : https://sites.google.com/site/powturbo/
     - twitter  : https://twitter.com/powturbo
 
-    TurboRLE - "Efficient and fast Run Length Encoding"
+    TurboRLE - "Most efficient and fastest Run Length Encoding"
 **/
 #define uint_t TEMPLATE3(uint, USIZE, _t)
 
 #define SRLEC(pp, ip, op, e) do {\
-  unsigned i = ip - pp; /*uint_t c = *ip;*/\
+  unsigned i = ip - pp;\
   if(i > 3) { *(uint_t *)op = e; op+=sizeof(uint_t); i -= 3; vbxput(op, i); *(uint_t *)op = c; op+=sizeof(uint_t); }\
   else if(c == e) {\
 	while(i--) { *(uint_t *)op = e; op+=sizeof(uint_t); vbxput(op, 0); }\
@@ -45,6 +45,7 @@ unsigned TEMPLATE2(_srlec, USIZE)(unsigned char *_in, unsigned inlen, unsigned c
   }
   uint_t c = *ip; 
   SRLEC(pp, ip, op, e);
+  
   if(USIZE > 8) {
     unsigned char *p = (unsigned char *)ip; 
 	while(p < _in+inlen) 

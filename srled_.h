@@ -21,9 +21,9 @@
     - homepage : https://sites.google.com/site/powturbo/
     - twitter  : https://twitter.com/powturbo
 
-    TurboRLE - "Efficient and fast Run Length Encoding"
+    TurboRLE - "Most efficient and fastest Run Length Encoding"
 **/
-  #ifdef MEMSAFE  
+  #ifdef MEMSAFE 
 #define rmemset(__op, __c, __i) while(__i--) *__op++ = __c
   #elif defined(__SSE__)
 #include <tmmintrin.h>
@@ -52,7 +52,7 @@ unsigned TEMPLATE2(_srled, USIZE)(unsigned char *in, unsigned char *_out, unsign
   
   while(op < out+outlen/sizeof(uint_t)) 
     if(likely((c = *(uint_t *)ip) != e)) {
-	  ip   += sizeof(uint_t); 
+	  ip   += sizeof(uint_t);
 	  *op++ = c; 
 	} else { 
 	  ip += sizeof(uint_t);
@@ -66,7 +66,7 @@ unsigned TEMPLATE2(_srled, USIZE)(unsigned char *in, unsigned char *_out, unsign
 	    *op++ = e;
     }
 	
-  if(USIZE > 8) { 
+  if(USIZE > 8) {
     unsigned char *p = (unsigned char *)op; 
 	while(p < _out+outlen) *p++ = *ip++; 
   }

@@ -1,4 +1,4 @@
-# powturbo  (c) Copyright 2015
+# powturbo  (c) Copyright 2015-2016
 CFLAGS=-march=native -minline-all-stringops
 
 UNAME := $(shell uname)

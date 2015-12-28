@@ -1,5 +1,5 @@
 /**
-    Copyright (C) powturbo 2015
+    Copyright (C) powturbo 2015-2016
     GPL v2 License
 
     This program is free software; you can redistribute it and/or modify
@@ -25,11 +25,12 @@
 **/
   #ifndef USIZE
 #include <string.h> 
+#include "conf.h"
 #include "trle.h"
 #include "trle_.h"
   
 //------------------------------------- Histogram ---------------------------------------------------------
-static inline void hist(unsigned char *in, unsigned inlen, unsigned *cc) { // Optimized for x86
+static inline unsigned hist(unsigned char *in, unsigned inlen, unsigned *cc) { // Optimized for x86
   unsigned c0[256+8]={0},c1[256+8]={0},c2[256+8]={0},c3[256+8]={0},c4[256+8]={0},c5[256+8]={0},c6[256+8]={0},c7[256+8]={0}; 
 
   unsigned char *ip;
@@ -60,12 +61,66 @@ static inline void hist(unsigned char *in, unsigned inlen, unsigned *cc) { // Op
   int i;
   for(i = 0; i < 256; i++) 
     cc[i] += c0[i]+c1[i]+c2[i]+c3[i]+c4[i]+c5[i]+c6[i]+c7[i];
+  unsigned a = 256; while(a > 1 && !cc[a-1]) a--; 
+  return a;
 }
-
 //------------------------------------- RLE with Escape char ------------------------------------------------------------------
 #define USIZE 8
 #include "trlec.c"
 
+#if SRLE8
+#define SRLEC8(pp, ip, op, e) do {\
+  unsigned i = ip - pp;\
+  if(i > 3) { *op++ = e; i -= 3; vbxput(op, i); *op++ = c; }\
+  else if(c == e) {\
+	while(i--) { *op++ = e; vbxput(op, 0); }\
+  } else while(i--) *op++ = c;\
+} while(0)
+
+unsigned _srlec8(unsigned char *in, unsigned inlen, unsigned char *out, uint8_t e) {
+  uint8_t *ip=in, *pp = in - 1, *in_, *op = out;  //if(inlen <= ALN) goto a;
+  for(in_ = in + (inlen-0); ip < in_; ) {
+    unsigned long long z;
+	if(!(z = (ctou64(ip) ^ ctou64(ip+1)))) // SSE not faster than scalar
+	  ip += 8;
+	else {
+      uint8_t c = *ip; ip += __builtin_ctzll(z)>>3; 				//if(ip > in_) ip = in_;       
+      SRLEC8(pp, ip, op, e);
+	  pp = ip++;
+    }
+  } 
+  //if(ip > in_) ip = in_; 														
+  //if(pp < ip) 
+  { 
+    uint8_t c = *ip; 
+    SRLEC8(pp, ip, op, e); 
+  }
+  //a:while(pp < in+inlen) *op++ = *pp++;
+  return op - out;
+}
+#endif
+
+unsigned srlec(unsigned char *in,  unsigned inlen, unsigned char *out) {
+  unsigned m = 0xffffffffu, mi = 0, i, b[256] = {0}; 
+  if(inlen < 1) return 0;
+
+  unsigned a = hist(in,inlen,b);  		
+  if(b[a-1] == inlen) {
+    *out = *in;
+    return 1;
+  }
+  
+  for(i = 0; i < 256; i++) 
+    if(b[i] <= m) 
+	  m = b[i],mi = i;
+  *out = mi;                                  
+  size_t l = _srlec8(in, inlen, out+1, mi)+1;
+  if(l < inlen) return l;
+  memcpy(out, in, inlen);
+  return inlen;
+}
+
+#undef SRLE8
 #define USIZE 16
 #include "trlec.c"
 
@@ -75,21 +130,8 @@ static inline void hist(unsigned char *in, unsigned inlen, unsigned *cc) { // Op
 #define USIZE 64
 #include "trlec.c"
 
-unsigned srlec(unsigned char *in,  unsigned inlen, unsigned char *out) {
-  unsigned m = 0xffffffffu, mi = 0, i, b[256] = {0}; 
-  if(inlen < 1) return 0;
-
-  hist(in,inlen,b);  		
-  
-  for(i = 0; i < 256; i++) 
-    if(b[i] <= m) 
-	  m = b[i],mi = i;
-  *out++ = mi; 
-  return _srlec8(in, inlen, out, mi)+1;
-}
-
 //------------------------------------------------- TurboRLE ------------------------------------------
-struct u { unsigned c,i; };										//int ucmp(struct u *a, struct u *b) { if(a->c  < b->c) return -1; if(a->c  > b->c) return  1; return 0;}
+struct u { unsigned c,i; };										
 
 #define TRLEC(pp, ip, op) do { __label__ a;\
   unsigned i = ip - pp, c = *ip;\
@@ -106,10 +148,15 @@ unsigned trlec(unsigned char *in, unsigned inlen, unsigned char *out) {
   int m,i;
   unsigned b[256] = {0}, rmap[256];
   if(inlen < 1) return 0;
-  hist(in,inlen,b);  											//for(ip = in; ip < in_; ip++) b[*ip]++;
+
+  unsigned a = hist(in,inlen,b);  		
+  if(b[a-1] == inlen) {
+    *out = *in;
+    return 1;
+  }
   
   struct u u[256]; // sort
-  for(i = 0; i < 256; i++) u[i].c = b[i], u[i].i = i,b[i]=0;  	//qsort(u, 256, sizeof(u[0]), (int(*)(const void*,const void*))ucmp);	
+  for(i = 0; i < 256; i++) u[i].c = b[i], u[i].i = i,b[i]=0;  		
   struct u *v;													
   for(v = u + 1; v < u + 256; ++v)
     if(v->c < v[-1].c) { 
@@ -117,21 +164,19 @@ unsigned trlec(unsigned char *in, unsigned inlen, unsigned char *out) {
       for(w = v; w > u && tmp.c < w[-1].c; --w) *w = w[-1];
       *w = tmp;
     }  															
-																			
+  																												
   for(m = -1,i = 0; i < 256 && !u[i].c; i++) 
     b[u[i].i]++, ++m;
   if(m < 0) { // no unused bytes found
-    *op++ = 1; 
+    *op++ = 0; 
 	*op++ = u[0].i; 
-    if((i = _srlec8(in, inlen, op, u[0].i)+2) < inlen) 
-	  return i;
-	  
-	out[0] = 0; 
-	memcpy(out+1,in,inlen); 
-	return inlen+1;
+    size_t l = _srlec8(in, inlen, op, u[0].i)+2;
+    if(l < inlen) return l;
+    memcpy(out, in, inlen);
+    return inlen;
   } 																		
   
-  *op++ = 2; 
+  *op++ = 1;
   memset(op, 0, 32);
   for(m = -1,i = 0; i < 256; i++) 
     if(b[i]) { 
@@ -146,13 +191,12 @@ unsigned trlec(unsigned char *in, unsigned inlen, unsigned char *out) {
 	}
   TRLEC(pp,ip, op);
   
-  if(op - out >= inlen) { 
-    out[0] = 0; 
-	memcpy(out+1,in,inlen); 
-	return inlen+1; 
-  }
-  return op - out;
+  if(op - out < inlen) 
+   return op - out;
+  memcpy(out, in, inlen); 
+  return inlen; 
 }
+
 #else
 #define uint_t TEMPLATE3(uint, USIZE, _t)
 
@@ -164,6 +208,7 @@ unsigned trlec(unsigned char *in, unsigned inlen, unsigned char *out) {
   } else while(i--) { *(uint_t *)op = c; op+=sizeof(uint_t); }\
 } while(0)
 
+  #if !SRLE8
 unsigned TEMPLATE2(_srlec, USIZE)(unsigned char *_in, unsigned inlen, unsigned char *out, uint_t e) {
   uint_t *in = (uint_t *)_in, *ip, *pp = in-1; 
   unsigned char *op = out;
@@ -184,7 +229,15 @@ unsigned TEMPLATE2(_srlec, USIZE)(unsigned char *_in, unsigned inlen, unsigned c
   }
   return op - out;
 }
+ #endif
 #undef SRLEC
+
+unsigned TEMPLATE2(srlec, USIZE)(unsigned char *in, unsigned inlen, unsigned char *out, uint_t e) {
+  size_t l = TEMPLATE2(_srlec, USIZE)(in, inlen, out, e);
+  if(l < inlen) return l;
+  memcpy(out, in, inlen);
+  return inlen;
+}
 #undef USIZE
 #endif
 

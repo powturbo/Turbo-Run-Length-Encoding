@@ -90,7 +90,7 @@ CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 5.2, ubuntu 15.10
 
 ## Usage:
 
-        trle file
+        ./trle file
 
 
 

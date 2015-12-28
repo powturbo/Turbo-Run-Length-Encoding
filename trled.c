@@ -1,5 +1,5 @@
 /**
-    Copyright (C) powturbo 2015-2016
+    Copyright (C) powturbo 2015
     GPL v2 License
 
     This program is free software; you can redistribute it and/or modify
@@ -20,95 +20,53 @@
     - github   : https://github.com/powturbo
     - homepage : https://sites.google.com/site/powturbo/
     - twitter  : https://twitter.com/powturbo
+
+    TurboRLE - "Most efficient and fastest Run Length Encoding"
 **/
-//    TurboRLE - "Most efficient and fastest Run Length Encoding"
   #ifndef USIZE
-#include <string.h>
-#include "conf.h"
+#include <string.h> 
 #include "trle.h"
 #include "trle_.h"
-
-//#define MEMSAFE         
+         
 //------------------------------------- RLE with Escape char ------------------------------------------------------------------
+#define MEMSAFE
+#define USIZE 64
+#include "trled.c"
+#undef rmemset
+#undef USIZE
+#undef MEMSAFE
+#undef runcpy
+
+#define USIZE 32
+#include "trled.c"
+#undef rmemset
+#undef USIZE
+#undef runcpy
+
+#define USIZE 16
+#include "trled.c"
+#undef rmemset
+#undef USIZE
+#undef runcpy
+
 #define USIZE 8
 #include "trled.c"
- 
-unsigned _srled8(uint8_t *in, uint8_t *_out, unsigned outlen, uint8_t e) { 
-  uint8_t *out = (uint8_t *)_out, *op = out, c, *out_ = _out+(outlen -/*& ~*/(ALN)), *ip = in;
-  if(outlen <= ALN) 
-    goto a;
-    #ifdef __SSE__    
-  __m128i ev = _mm_set1_epi8(e);
-    #else
-  uint64_t ev = (uint32_t)e<<24 | (uint32_t)e<<16 | (uint32_t)e<<8 | e; ev |= ev<<32;
-    #endif   
-  while(op < out_) {
-      #ifdef __SSE__    
-    __m128i v = _mm_loadu_si128((const __m128i*)ip);
-	uint32_t mask = _mm_movemask_epi8(_mm_cmpeq_epi8(v, ev));  
-	_mm_storeu_si128((__m128i *)op, v);
-    if(!mask) op += 16, ip += 16;
-    else {
-      uint32_t i = __builtin_ctz(mask); op += i; ip += i+1;
-      #elif 1 
-    uint64_t mask = ctou64(ip) ^ ev;
-    if(mask >> 56) *op++ = *ip++;
-    else {
-      uint32_t i = __builtin_ctzll(mask)>>3; ctou64(op) = ctou64(ip), op += i; ip += i+1;
-      #else
-    if(likely((c = *(uint8_t *)ip) != e)) {
-	  ip++;
-	  *op++ = c; 
-	} 
-    else {  
-	  uint32_t i;
-      #endif
-	  vbxget(ip, i);
-	  if(likely(i)) { 
-	    c   = *(uint8_t *)ip; 
-		ip++; 
-		i  += 3; 
-		rmemset(op, c, i);
-	  } else 
-	    *op++ = e;
-    }
-  }
-  if(op >= out_) { 
-    int u = op - out_; 
-    op   -= u; 
-    ip   -= u-1; 
-  }
-    #if ALN > 1
-  a: while(op < _out+outlen) 
-       *op++ = *ip++;
-    #endif
-  return ip - in;
-} 
 
-unsigned _srled(uint8_t *in, uint8_t *out, unsigned outlen) {
-  return _srled8(in+1, out, outlen, *in); 
-}
-
-unsigned srled(uint8_t *in, unsigned inlen, uint8_t *out, unsigned outlen) {
-  if(inlen == outlen) 
-    memcpy(out, in, outlen); 
-  else if(inlen == 1) 
-    memset(out, in[0], outlen);
-  else 
-    return _srled8(in+1, out, outlen, *in); 
-}
+unsigned srled(unsigned char *in, unsigned char *out, unsigned outlen) { return _srled8(in+1, out, outlen, *in); }
 
 //------------------------------------- TurboRLE ------------------------------------------
-unsigned _trled(uint8_t *in, uint8_t *out, unsigned outlen) {
-  uint8_t b[256] = {0}, *ip, *op = out;  
-  int m = -1, i, c; 
+unsigned trled(unsigned char *in, unsigned char *out, unsigned outlen) {
+  unsigned char b[256]={0},*ip,*op=out;  
+  int m = -1,i,c; 
+  if(outlen < 1) return 0;
 
-  if(outlen < 1) 
-    return 0;
-
-  if(!*in++) 
+  if(!*in) {
+    memcpy(out,in+1,outlen); 
+	return outlen+1; 
+  }
+  if(*in++ == 1) 
     return _srled8(in+1, out, outlen, *in)+2;
-
+  
   for(ip = in; ip < in+32; ip++)
     for(i = 0; i < 8; ++i) 
 	  if(((*ip) >> i) & 1) 
@@ -126,63 +84,33 @@ unsigned _trled(uint8_t *in, uint8_t *out, unsigned outlen) {
     }
   return ip - in;
 }
-
-unsigned trled(uint8_t *in, unsigned inlen, uint8_t *out, unsigned outlen) {
-  if(inlen == outlen) 
-    memcpy(out, in, outlen); 
-  else if(inlen == 1) 
-    memset(out, in[0], outlen);
-  else 
-    return _trled(in, out, outlen);
-  return inlen;
-}
-#undef rmemset
-#undef USIZE
-
-#define USIZE 16
-#include "trled.c"
-#undef rmemset
-#undef USIZE
-
-#define USIZE 32
-#include "trled.c"
-#undef rmemset
-#undef USIZE
-
-#define USIZE 64
-#include "trled.c"
-  #else
-
-  #ifdef MEMSAFE
+ #else
+  #ifdef MEMSAFE 
 #define rmemset(__op, __c, __i) while(__i--) *__op++ = __c
-  #elif defined(__SSE__) && USIZE < 64
-#include <emmintrin.h>
-#define rmemset(__op, __c, __i) do { \
-  __m128i *_up = (__m128i *)__op, cv = TEMPLATE2(_mm_set1_epi, USIZE)(__c);\
-  __op+=__i;\
-  do _mm_storeu_si128(  _up, cv),_mm_storeu_si128(++_up, cv); while(++_up < (__m128i *)__op);\
+  #elif defined(__SSE__)
+#include <tmmintrin.h>
+#define rmemset(__op, __c, __i) do { __m128i *_up = (__m128i *)__op,cv = TEMPLATE2(_mm_set1_epi, USIZE)(__c); __op+=__i; \
+  do _mm_storeu_si128(_up, cv), _mm_storeu_si128(++_up, cv); while(++_up < (__m128i *)__op);\
 } while(0)
   #else
-#define _cset64(_cc,__c) _cc = __c
-#define _cset32(_cc,__c) _cc = __c; _cc = _cc<<32|_cc
-#define _cset16(_cc,__c) _cc = __c; _cc = _cc<<48|_cc<<32|_cc<<16|_cc
-#define _cset8( _cc,__c) _cc = (uint32_t)__c<<24 | (uint32_t)__c<<16 | (uint32_t)__c<<8 | (uint32_t)__c; _cc = _cc<<32|_cc
-
-#define rmemset(__op, __c, __i) do { uint8_t *_up = (uint8_t *)__op; __op +=__i;\
-  uint64_t _cc; TEMPLATE2(_cset, USIZE)(_cc,__c);\
-  do {\
-    TEMPLATE2(ctou, USIZE)(_up) = __c; _up += USIZE/8;\
-    TEMPLATE2(ctou, USIZE)(_up) = __c; _up += USIZE/8;\
-  } while(_up < (uint8_t *)__op);\
-} while(0)
+#define _runcpy(_up, __op,__c) do { *(uint_t *)_up = __c; _up += sizeof(uint_t); *(uint_t *)_up = __c; _up += sizeof(uint_t); /*(uint_t *)_up = __c; _up += sizeof(uint_t); *(uint_t *)_up = __c; _up += sizeof(uint_t);*/} while(_up < (unsigned char *)__op)
+    #if USIZE == 64
+#define runcpy(_up, __op,__c) _runcpy(_up, __op,__c) 
+    #elif USIZE == 32
+#define runcpy(_up, __op,__c) unsigned long long _cc=__c; _cc=_cc<<32|_cc; _runcpy(_up, __op, _cc)
+    #elif USIZE == 16
+#define runcpy(_up, __op,__c) unsigned long long _cc=__c; _cc=_cc<<48|_cc<<32|_cc<<16|_cc; _runcpy(_up, __op, _cc)
+    #else
+#define runcpy(_up, __op,__c) unsigned long long _uc = (unsigned)__c<<24 | (unsigned)__c<<16 | (unsigned)__c<<8 | (unsigned)__c; _uc = _uc<<32|_uc; _runcpy(_up,__op,_uc);
+    #endif  
+#define rmemset(__op, __c, __i) do { unsigned char *_up = (unsigned char *)__op; __op+=__i; runcpy(_up,__op,__c); } while(0)
   #endif 
 
 #define uint_t TEMPLATE3(uint, USIZE, _t)
 
-  #if USIZE != 8
-unsigned TEMPLATE2(_srled, USIZE)(uint8_t *in, uint8_t *_out, unsigned outlen, uint_t e) {
+unsigned TEMPLATE2(_srled, USIZE)(unsigned char *in, unsigned char *_out, unsigned outlen, uint_t e) {
   uint_t *out = (uint_t *)_out, *op = out, c; 
-  uint8_t *ip = in;
+  unsigned char *ip = in;
   
   while(op < out+outlen/sizeof(uint_t)) 
     if(likely((c = *(uint_t *)ip) != e)) {
@@ -201,11 +129,9 @@ unsigned TEMPLATE2(_srled, USIZE)(uint8_t *in, uint8_t *_out, unsigned outlen, u
     }
 	
   if(USIZE > 8) {
-    uint8_t *p = (uint8_t *)op; 
+    unsigned char *p = (unsigned char *)op; 
 	while(p < _out+outlen) *p++ = *ip++; 
   }
   return ip - in;
 }
-  #endif
-  #endif
-
+ #endif

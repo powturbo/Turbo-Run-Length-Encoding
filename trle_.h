@@ -1,5 +1,5 @@
 /**
-    Copyright (C) powturbo 2015-2016
+    Copyright (C) powturbo 2015
     GPL v2 License
 
     This program is free software; you can redistribute it and/or modify
@@ -20,9 +20,9 @@
     - github   : https://github.com/powturbo
     - homepage : https://sites.google.com/site/powturbo/
     - twitter  : https://twitter.com/powturbo
-**/
-//    TurboRLE - "Most efficient and fastest Run Length Encoding"
 
+    TurboRLE - "Most efficient and fastest Run Length Encoding"
+**/
 #include <stdint.h>
 #define likely(x)     	__builtin_expect((x),1)
 #define unlikely(x)   	__builtin_expect((x),0)
@@ -52,9 +52,8 @@
 #define vbzput(__op, __x, __m, __emap) do { if(unlikely((__x) < __m)) *__op++ = __emap[__x]; else { unsigned _xi = (__x) - __m; *__op++ = __emap[__m]; vbput(__op, _xi); } } while(0)
 #define vbzget(__ip, __x, __m, __e) { __x = __e; if(unlikely( __x == __m)) { __x = vbget(__ip); __x+=__m; } }
  
-  #ifdef __SSE__
-#define ALN 16
-#include <emmintrin.h>
-  #else
-#define ALN 1
-  #endif
+#define TEMPLATE2_(__x, __y) __x##__y
+#define TEMPLATE2(__x, __y) TEMPLATE2_(__x,__y)
+
+#define TEMPLATE3_(x,y,z) x ## ## y ## z
+#define TEMPLATE3(x,y,z) TEMPLATE3_(x, y, z)

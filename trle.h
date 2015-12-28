@@ -1,5 +1,5 @@
 /**
-    Copyright (C) powturbo 2015-2016
+    Copyright (C) powturbo 2015
     GPL v2 License
 
     This program is free software; you can redistribute it and/or modify
@@ -40,14 +40,15 @@ unsigned _srled32(unsigned char *in,                 unsigned char *out, unsigne
 unsigned _srlec64(unsigned char *in, unsigned inlen, unsigned char *out, uint64_t e);
 unsigned _srled64(unsigned char *in,                 unsigned char *out, unsigned outlen, uint64_t e);
 
-// RLE with automatic escape char determination
-unsigned _srled(unsigned char *in,                 unsigned char *out, unsigned outlen);
+
+// RLE w. automatic escape char determination
 unsigned  srlec(unsigned char *in, unsigned inlen, unsigned char *out);
-unsigned  srled(uint8_t *in, unsigned inlen, uint8_t *out, unsigned outlen);
+unsigned  srled(unsigned char *in,                 unsigned char *out, unsigned outlen);
+
 // Turbo RLE
-unsigned _trled(unsigned char *in,                 unsigned char *out, unsigned outlen);
 unsigned  trlec(unsigned char *in, unsigned inlen, unsigned char *out);
-unsigned  trled(unsigned char *in, unsigned inlen, unsigned char *out, unsigned outlen);
+unsigned  trled(unsigned char *in,                 unsigned char *out, unsigned outlen);
+
 #ifdef __cplusplus
 }
 #endif

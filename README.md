@@ -1,13 +1,14 @@
-TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powturbo/TurboRLE.svg?branch=master)](https://travis-ci.org/powturbo/TurboRLE)
+TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powturbo/TurboRLE.svg?branch=master)](https://travis-ci.org/powturbo/TurboRLE) 
 ===================================
 
-###### Efficient and fast **Run Length Encoding** library
+###### Most Efficient and fastest **Run Length Encoding** library
 - 100% C (C++ compatible headers), without inline assembly
 <p>
-- Efficient compression 
-- :new: 2x faster with :+1: SIMD decompression
+- Most efficient compression
 <p>
-- :new: **ZERO** byte overhead
+- No other RLE compress or decompress faster with better compression 
+<p>
+- Maximal 1 byte overhead
 <p>
 - No modification of the raw data, preserving compressibility
 <p>
@@ -25,76 +26,45 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 
 <p>
 ## Benchmark:
-CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 5.2, ubuntu 15.10
-- with [TurboBench](https://github.com/powturbo/TurboBench)
+CPU: Sandy bridge i7-2600k at 4.5GHz, gcc 4.9, ubuntu 14.10
 - Single thread
 - Realistic and practical benchmark with large files
 
-
 - Text File: [enwik9bwt](http://mattmahoney.net/dc/textdata.html) enwik9 bwt generated w. [libdivsufsort](https://code.google.com/p/libdivsufsort/)
 
- (**bold** = pareto)  MB=1.000.000
-
-|C Size|ratio%|C MB/s|D MB/s|Name|
-|--------:|-----:|--------:|--------:|----------------|----------------|
-|378458015| 37.8|**453.89**|**1908.41**|**trle**|
-|419346354| 41.9|**506.60**|**4162.49**|**srle 8**|
-|419346355| 41.9|423.73|4162.24|srle 0|
-|422296235| 42.2|**557.84**|1364.10|**rle64 8**|
-|487466207| 48.7|**1221.43**|4044.98|**srle 16**|
-|498420792| 49.8|1113.81|2511.38|rle64 16|
-|549218833| 54.9|**2541.74**|**6456.60**|**srle 32**|
-|563503744| 56.4|**2730.54**|5073.81|**rle64 32**|
-|576619945| 57.7|205.83|570.93|mrle|enwik9bwt|
-|605766094| 60.6|**4616.15**|**7447.81**|**srle 64**|
-|620676412| 62.1|**5247.28**|7376.44|**rle64 64**|
-|1000000012|100.0|**8517.76**|**9176.59**|**memcpy**|
-
+<table>
+<tr><th>Size</th><th>Ratio in %</th><th>C Time MB/s</th><th>D Time MB/s</th><th>Function</th></tr>
+<tr><th> 378458011</th><th>   37.8</th><th> 434.12</th><th>1587.76</th><th>trle v15-02</th></tr>
+<tr><th> 419346347</th><th>   41.9</th><th> 456.84</th><th>2167.74</th><th>srle v15-02</th></tr>
+<tr><th> 422296231</th><th>   42.2</th><th> 608.26</th><th>1209.34</th><th>rle64 8 v15-02</th></tr>
+<tr><th> 576619941</th><th>   57.7</th><th> 229.47</th><th> 789.99</th><th>mrle v15-02</th></tr>
+<tr><th>1000000008</th><th>100.0</th><th>7950.00</th><th>7975.00</th><th>memcpy</th></tr>
+</table>
 <p>
 - Checkers program "End Game Table Base": [1034.db](http://encode.ru/threads/2077-EGTB-compression?p=41392&viewfull=1#post41392)
 
-|C Size|ratio%|C MB/s|D MB/s|Name|
-|--------:|-----:|--------:|--------:|----------------|----------------|
-|82452164| 19.7|**652.87**|**3138.22**|**trle**|
-|88055364| 21.0|233.07|1573.62|mrle|
-|92539201| 22.1|**946.16**|**5606.42**|**srle 8**|
-|92539202| 22.1|692.12|5600.31|srle 0|
-|93905327| 22.4|780.05|1659.48|rle64 8|
-|113627625| 27.1|**1676.77**|5111.00|**srle 16**|
-|117590491| 28.0|1341.02|2825.66|rle64 16|
-|136924740| 32.7|**3135.97**|**7649.05**|**srle 32**|
-|143953177| 34.3|2970.51|5506.36|rle64 32|
-|165545036| 39.5|**5133.69**|**8081.30**|**srle 64**|
-|176442237| 42.1|5090.87|7871.78|rle64 64|
-|419225629|100.0|**8367.04**|**8934.25**|**memcpy**|
-
+<table>
+<tr><th>Size</th><th>Ratio in %</th><th>C Time MB/s</th><th>D Time MB/s</th><th>Function</th></tr>
+<tr><th> 82452160</th><th> 19.7</th><th> 560.01</th><th>2589.77</th><th>trle v15-02</th></tr>
+<tr><th> 88055360</th><th> 21.0</th><th> 272.68</th><th>1676.85</th><th>mrle v15-02</th></tr>
+<tr><th> 92539187</th><th> 22.1</th><th> 578.68</th><th>3382.29</th><th>srle v15-02</th></tr>
+<tr><th> 93905323</th><th> 22.4</th><th> 917.00</th><th>1368.14</th><th>rle64 8 v15-02</th></tr>
+<tr><th>419225625</th><th>100.0</th><th>8010.00</th><th>7950.00</th><th>memcpy</th></tr>
+</table>
 <p>
 - BMP File: [girl.bmp in RLE64Samples](http://sourceforge.net/projects/nikkhokkho/files/RLE64/3.00/)
 
-|C Size|ratio%|C MB/s|D MB/s|Name|
-|--------:|-----:|--------:|--------:|----------------|----------------|
-|3293899|  0.8|**1087.74**|**13113.37**|**trle**|
-|4482388|  1.1|297.68|9209.99|mrle|
-|4821177|  1.2|**8850.19**|13006.29|**srle 8**|
-|4821178|  1.2|2013.93|13004.84|srle 0|
-|8501660|  2.1|3511.35|10014.59|srle 16|
-|8832647|  2.2|1274.23|2920.96|rle64 8|
-|9265516|  2.3|2241.56|5721.46|rle64 16|
-|13777939|  3.4|6131.34|10248.28|srle 32|
-|15175482|  3.8|4609.31|9360.16|rle64 32|
-|19872605|  4.9|**10322.97**|10169.71|**srle 64**|
-|21910714|  5.4|8300.55|10232.33|rle64 64|
-|403920058|100.0|8151.92|9160.88|memcpy|
+<table>
+<tr><th>Size</th><th>Ratio in %</th><th>C Time MB/s</th><th>D Time MB/s</th><th>Function</th></tr>
+<tr><th>  3293895</th><th> 0.8</th><th>  768.58</th><th>13058.49</th><th>trle v15-02</th></tr>
+<tr><th>  4482384</th><th> 1.1</th><th>  356.52</th><th>12899.49</th><th>mrle v15-02</th></tr>
+<tr><th>  4821158</th><th> 1.2</th><th>  770.65</th><th>13535.46</th><th>srle v15-02</th></tr>
+<tr><th>  8832643</th><th> 2.2</th><th> 1365.06</th><th> 1933.86</th><th>rle64 8 v15-02</th></tr>
+<tr><th>403920054</th><th>100.0</th><th>7910.00</th><th> 7910.00</th><th>memcpy</th></tr> 
+</table>
 
 ## Compile:
-
-        make
+  make
 
 ## Usage:
-
-        ./trle file
-
-
-
-Last update: 28 DEC 2015
-
+  trle file

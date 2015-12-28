@@ -1,5 +1,5 @@
 /**
-    Copyright (C) powturbo 2015-2016
+    Copyright (C) powturbo 2015
     GPL v2 License
 
     This program is free software; you can redistribute it and/or modify
@@ -28,7 +28,8 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <getopt.h>
-#include "trle.h"  
+#include "trle.h"
+   
 //-------------------------------------- Time ---------------------------------------------------------------------  
 typedef unsigned long long tm_t;
 #define TM_T 1000000.0
@@ -61,7 +62,7 @@ unsigned argtoi(char *s) {
      case 'G': f = 1<<30; 	   break;
   }
   return n*f;
-}
+} 
 //-------------------------------------------------------------------------------------------------------------------------------------
 #include "ext/mrle.c"
 
@@ -101,8 +102,8 @@ int main(int argc, char *argv[]) {
     
   unsigned l;
   TMDEF; memcpy(out, in,  n); memcpy(out,cpy,n);
-  TMBEG l = trlec(in, n, out); 				  TMEND; printf("%10u ", l); TMPRINT(""); TMBEG trled(out, l, cpy, n); 				TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE\n");
-  TMBEG l = srlec(in, n, out); 				  TMEND; printf("%10u ", l); TMPRINT(""); TMBEG srled(out, l, cpy, n); 				TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE esc\n");
+  TMBEG l = trlec(in, n, out); 				  TMEND; printf("%10u ", l); TMPRINT(""); TMBEG trled(out, cpy, n); 				TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE\n");
+  TMBEG l = srlec(in, n, out); 				  TMEND; printf("%10u ", l); TMPRINT(""); TMBEG srled(out, cpy, n); 				TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE esc\n");
   TMBEG l = mrlec(in, n, out); 				  TMEND; printf("%10u ", l); TMPRINT(""); TMBEG mrled(out, cpy, n); 				TMEND; if(cmp) check(in,cpy,n); TMPRINT("Mespotine RLE\n");
   
     #if 1

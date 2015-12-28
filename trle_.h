@@ -1,5 +1,5 @@
 /**
-    Copyright (C) powturbo 2015
+    Copyright (C) powturbo 2015-2016
     GPL v2 License
 
     This program is free software; you can redistribute it and/or modify
@@ -52,8 +52,11 @@
 #define vbzput(__op, __x, __m, __emap) do { if(unlikely((__x) < __m)) *__op++ = __emap[__x]; else { unsigned _xi = (__x) - __m; *__op++ = __emap[__m]; vbput(__op, _xi); } } while(0)
 #define vbzget(__ip, __x, __m, __e) { __x = __e; if(unlikely( __x == __m)) { __x = vbget(__ip); __x+=__m; } }
  
-#define TEMPLATE2_(__x, __y) __x##__y
-#define TEMPLATE2(__x, __y) TEMPLATE2_(__x,__y)
+  #ifdef __SSE__
+#define ALN 16
+#include <emmintrin.h>
+  #else
+#define ALN 1
+  #endif
 
-#define TEMPLATE3_(x,y,z) x ## ## y ## z
-#define TEMPLATE3(x,y,z) TEMPLATE3_(x, y, z)
+#define SRLE8 16

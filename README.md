@@ -85,10 +85,14 @@ CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 5.2, ubuntu 15.10
 |403920058|100.0|8151.92|9160.88|memcpy|
 
 ## Compile:
-  make
+
+        make
 
 ## Usage:
-  trle file
+
+        trle file
+
+
 
 Last update: 28 DEC 2015
 

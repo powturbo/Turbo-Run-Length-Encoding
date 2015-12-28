@@ -88,7 +88,7 @@ unsigned trled(unsigned char *in, unsigned char *out, unsigned outlen) {
   #ifdef MEMSAFE 
 #define rmemset(__op, __c, __i) while(__i--) *__op++ = __c
   #elif defined(__SSE__)
-#include <tmmintrin.h>
+#include <emmintrin.h>
 #define rmemset(__op, __c, __i) do { __m128i *_up = (__m128i *)__op,cv = TEMPLATE2(_mm_set1_epi, USIZE)(__c); __op+=__i; \
   do _mm_storeu_si128(_up, cv), _mm_storeu_si128(++_up, cv); while(++_up < (__m128i *)__op);\
 } while(0)

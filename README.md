@@ -30,6 +30,7 @@ CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 5.2, ubuntu 15.10
 - Single thread
 - Realistic and practical benchmark with large files
 
+
 - Text File: [enwik9bwt](http://mattmahoney.net/dc/textdata.html) enwik9 bwt generated w. [libdivsufsort](https://code.google.com/p/libdivsufsort/)
 
  (bold = pareto)  MB=1.000.000

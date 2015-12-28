@@ -28,7 +28,7 @@
 #include "conf.h"
 #include "trle.h"
 #include "trle_.h"
-  
+
 //------------------------------------- Histogram ---------------------------------------------------------
 static inline unsigned hist(unsigned char *in, unsigned inlen, unsigned *cc) { // Optimized for x86
   unsigned c0[256+8]={0},c1[256+8]={0},c2[256+8]={0},c3[256+8]={0},c4[256+8]={0},c5[256+8]={0},c6[256+8]={0},c7[256+8]={0}; 
@@ -89,9 +89,7 @@ static inline unsigned hist(unsigned char *in, unsigned inlen, unsigned *cc) { /
 	while(i--) { *op++ = e; vbxput(op, 0); }\
   } else while(i--) *op++ = c;\
 } while(0)
-
-//000000000xx0ppp
-// 00000000x........      
+ 
 unsigned _srlec8(unsigned char *_in, unsigned inlen, unsigned char *out, uint8_t e) {
   uint8_t *in = (uint8_t *)_in, *ip=in, *pp = in - 1; 
   unsigned char *op = out;

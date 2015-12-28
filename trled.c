@@ -156,7 +156,7 @@ unsigned trled(uint8_t *in, unsigned inlen, uint8_t *out, unsigned outlen) {
   #ifdef MEMSAFE
 #define rmemset(__op, __c, __i) while(__i--) *__op++ = __c
   #elif defined(__SSE__) && USIZE < 64
-#include <tmmintrin.h>
+#include <emmintrin.h>
 #define rmemset(__op, __c, __i) do { \
   __m128i *_up = (__m128i *)__op, cv = TEMPLATE2(_mm_set1_epi, USIZE)(__c);\
   __op+=__i;\

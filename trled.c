@@ -27,6 +27,7 @@
 #include "conf.h"
 #include "trle.h"
 #include "trle_.h"
+
 //#define MEMSAFE         
 //------------------------------------- RLE with Escape char ------------------------------------------------------------------
 #define USIZE 8

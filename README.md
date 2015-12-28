@@ -33,7 +33,7 @@ CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 5.2, ubuntu 15.10
 
 - Text File: [enwik9bwt](http://mattmahoney.net/dc/textdata.html) enwik9 bwt generated w. [libdivsufsort](https://code.google.com/p/libdivsufsort/)
 
- (bold = pareto)  MB=1.000.000
+ (**bold** = pareto)  MB=1.000.000
 
 |C Size|ratio%|C MB/s|D MB/s|Name|
 |--------:|-----:|--------:|--------:|----------------|----------------|
@@ -47,6 +47,7 @@ CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 5.2, ubuntu 15.10
 |563503744| 56.4|**2730.54**|5073.81|**rle64 32**|
 |576619945| 57.7|205.83|570.93|mrle|enwik9bwt|
 |605766094| 60.6|**4616.15**|**7447.81**|**srle 64**|
+|620676412| 62.1|**5247.28**|7376.44|**rle64 64**|
 |1000000012|100.0|**8517.76**|**9176.59**|**memcpy**|
 
 <p>

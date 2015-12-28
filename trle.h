@@ -40,13 +40,13 @@ unsigned _srled32(unsigned char *in,                 unsigned char *out, unsigne
 unsigned _srlec64(unsigned char *in, unsigned inlen, unsigned char *out, uint64_t e);
 unsigned _srled64(unsigned char *in,                 unsigned char *out, unsigned outlen, uint64_t e);
 
-// RLE w. automatic escape char determination
-unsigned  srlec(unsigned char *in, unsigned inlen, unsigned char *out);
+// RLE with automatic escape char determination
 unsigned _srled(unsigned char *in,                 unsigned char *out, unsigned outlen);
+unsigned  srlec(unsigned char *in, unsigned inlen, unsigned char *out);
 unsigned  srled(uint8_t *in, unsigned inlen, uint8_t *out, unsigned outlen);
 // Turbo RLE
-unsigned  trlec(unsigned char *in, unsigned inlen, unsigned char *out);
 unsigned _trled(unsigned char *in,                 unsigned char *out, unsigned outlen);
+unsigned  trlec(unsigned char *in, unsigned inlen, unsigned char *out);
 unsigned  trled(unsigned char *in, unsigned inlen, unsigned char *out, unsigned outlen);
 #ifdef __cplusplus
 }

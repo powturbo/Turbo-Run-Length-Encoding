@@ -5,7 +5,7 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 - 100% C (C++ compatible headers), without inline assembly
 <p>
 - Efficient compression 
-- :new: 2x faster w/ :+1:SIMD decompression
+- :new: 2x faster with :+1: SIMD decompression
 <p>
 - :new: **ZERO** byte overhead
 <p>
@@ -33,7 +33,7 @@ CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 5.2, ubuntu 15.10
 - Text File: [enwik9bwt](http://mattmahoney.net/dc/textdata.html) enwik9 bwt generated w. [libdivsufsort](https://code.google.com/p/libdivsufsort/)
 
  (bold = pareto)  MB=1.000.000
-|C Size|ratio%|C MB/s|D MB/s|Name|File|
+|C Size|ratio%|C MB/s|D MB/s|Name|
 |--------:|-----:|--------:|--------:|----------------|----------------|
 |378458015| 37.8|**453.89**|**1908.41**|**trle**|
 |419346354| 41.9|**505.85**|**4162.49**|**srle 8**|
@@ -50,7 +50,7 @@ CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 5.2, ubuntu 15.10
 <p>
 - Checkers program "End Game Table Base": [1034.db](http://encode.ru/threads/2077-EGTB-compression?p=41392&viewfull=1#post41392)
 
-|C Size|ratio%|C MB/s|D MB/s|Name|File|
+|C Size|ratio%|C MB/s|D MB/s|Name|
 |--------:|-----:|--------:|--------:|----------------|----------------|
 |82452164| 19.7|**652.87**|**3138.22**|**trle**|
 |88055364| 21.0|233.07|1573.62|mrle|
@@ -68,7 +68,7 @@ CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 5.2, ubuntu 15.10
 <p>
 - BMP File: [girl.bmp in RLE64Samples](http://sourceforge.net/projects/nikkhokkho/files/RLE64/3.00/)
 
-|C Size|ratio%|C MB/s|D MB/s|Name|File|
+|C Size|ratio%|C MB/s|D MB/s|Name|
 |--------:|-----:|--------:|--------:|----------------|----------------|
 |3293899|  0.8|**1087.74**|**13113.37**|**trle**|
 |4482388|  1.1|297.68|9209.99|mrle|

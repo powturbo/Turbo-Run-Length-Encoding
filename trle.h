@@ -1,5 +1,5 @@
 /**
-    Copyright (C) powturbo 2015
+    Copyright (C) powturbo 2015-2016
     GPL v2 License
 
     This program is free software; you can redistribute it and/or modify
@@ -40,15 +40,28 @@ unsigned _srled32(unsigned char *in,                 unsigned char *out, unsigne
 unsigned _srlec64(unsigned char *in, unsigned inlen, unsigned char *out, uint64_t e);
 unsigned _srled64(unsigned char *in,                 unsigned char *out, unsigned outlen, uint64_t e);
 
+// functions w/ overflow handling
+unsigned  srlec8( unsigned char *in, unsigned inlen, unsigned char *out, uint8_t e);
+unsigned  srled8( unsigned char *in, unsigned inlen, unsigned char *out, unsigned outlen, uint8_t e);
+
+unsigned  srlec16(unsigned char *in, unsigned inlen, unsigned char *out, uint16_t e);
+unsigned  srled16(unsigned char *in, unsigned inlen, unsigned char *out, unsigned outlen, uint16_t e);
+
+unsigned  srlec32(unsigned char *in, unsigned inlen, unsigned char *out, uint32_t e);
+unsigned  srled32(unsigned char *in, unsigned inlen, unsigned char *out, unsigned outlen, uint32_t e);
+
+unsigned  srlec64(unsigned char *in, unsigned inlen, unsigned char *out, uint64_t e);
+unsigned  srled64(unsigned char *in, unsigned inlen, unsigned char *out, unsigned outlen, uint64_t e);
 
 // RLE w. automatic escape char determination
 unsigned  srlec(unsigned char *in, unsigned inlen, unsigned char *out);
-unsigned  srled(unsigned char *in,                 unsigned char *out, unsigned outlen);
+unsigned _srled(unsigned char *in,                 unsigned char *out, unsigned outlen);
+unsigned  srled(unsigned char *in, unsigned inlen, unsigned char *out, unsigned outlen);
 
 // Turbo RLE
 unsigned  trlec(unsigned char *in, unsigned inlen, unsigned char *out);
-unsigned  trled(unsigned char *in,                 unsigned char *out, unsigned outlen);
-
+unsigned _trled(unsigned char *in,                 unsigned char *out, unsigned outlen);
+unsigned  trled(unsigned char *in, unsigned inlen, unsigned char *out, unsigned outlen);
 #ifdef __cplusplus
 }
 #endif

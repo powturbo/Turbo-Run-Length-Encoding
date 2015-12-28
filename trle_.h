@@ -54,7 +54,7 @@
  
   #ifdef __SSE__
 #define ALN 16
-#include <pmmintrin.h>
+#include <emmintrin.h>
   #else
 #define ALN 1
   #endif

@@ -28,8 +28,7 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <getopt.h>
-#include "trle.h"
-   
+#include "trle.h"  
 //-------------------------------------- Time ---------------------------------------------------------------------  
 typedef unsigned long long tm_t;
 #define TM_T 1000000.0

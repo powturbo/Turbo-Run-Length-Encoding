@@ -1,5 +1,5 @@
 /**
-    Copyright (C) powturbo 2015
+    Copyright (C) powturbo 2015-2016
     GPL v2 License
 
     This program is free software; you can redistribute it and/or modify
@@ -102,16 +102,16 @@ int main(int argc, char *argv[]) {
     
   unsigned l;
   TMDEF; memcpy(out, in,  n); memcpy(out,cpy,n);
-  TMBEG l = trlec(in, n, out); 				  TMEND; printf("%10u ", l); TMPRINT(""); TMBEG trled(out, cpy, n); 				TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE\n");
-  TMBEG l = srlec(in, n, out); 				  TMEND; printf("%10u ", l); TMPRINT(""); TMBEG srled(out, cpy, n); 				TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE esc\n");
+  TMBEG l = trlec(in, n, out); 				  TMEND; printf("%10u ", l); TMPRINT(""); TMBEG trled(out, l, cpy, n); 				TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE\n");
+  TMBEG l = srlec(in, n, out); 				  TMEND; printf("%10u ", l); TMPRINT(""); TMBEG srled(out, l, cpy, n); 				TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE esc\n");
   TMBEG l = mrlec(in, n, out); 				  TMEND; printf("%10u ", l); TMPRINT(""); TMBEG mrled(out, cpy, n); 				TMEND; if(cmp) check(in,cpy,n); TMPRINT("Mespotine RLE\n");
   
     #if 1
-  TMBEG l = _srlec8( in, n, out, 0xda);  	  TMEND; printf("%10u ", l); TMPRINT(""); TMBEG _srled8( out, cpy, n, 0xda);  		TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE esc  8\n");
-  TMBEG l = _srlec16(in, n, out, 0xdada); 	  TMEND; printf("%10u ", l); TMPRINT(""); TMBEG _srled16(out, cpy, n, 0xdada); 		TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE esc 16\n");
-  TMBEG l = _srlec32(in, n, out, 0xdadadadau);TMEND; printf("%10u ", l); TMPRINT(""); TMBEG _srled32(out, cpy, n, 0xdadadadau);	TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE esc 32\n");
+  TMBEG l = srlec8( in, n, out, 0xda);  	  TMEND; printf("%10u ", l); TMPRINT(""); TMBEG srled8( out, l, cpy, n, 0xda);  		TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE esc  8\n");
+  TMBEG l = srlec16(in, n, out, 0xdada); 	  TMEND; printf("%10u ", l); TMPRINT(""); TMBEG srled16(out, l, cpy, n, 0xdada); 		TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE esc 16\n");
+  TMBEG l = srlec32(in, n, out, 0xdadadadau); TMEND; printf("%10u ", l); TMPRINT(""); TMBEG srled32(out, l, cpy, n, 0xdadadadau);	TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE esc 32\n");
   unsigned long long esc = 0xdadadadau; esc=esc<<32|esc;
-  TMBEG l = _srlec64(in, n, out, esc); 		  TMEND; printf("%10u ", l); TMPRINT(""); TMBEG _srled64(out, cpy, n, esc);TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE esc 64\n");
+  TMBEG l = srlec64(in, n, out, esc); 		  TMEND; printf("%10u ", l); TMPRINT(""); TMBEG srled64(out, l, cpy, n, esc);TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE esc 64\n");
 	#endif
   TMBEG memcpy(out, in,  n);   				  TMEND; printf("%10u ", n); TMPRINT(""); TMBEG memcpy(cpy,out, n); 				TMEND; if(cmp) check(in,cpy,n); TMPRINT("memcpy\n"); 
 }

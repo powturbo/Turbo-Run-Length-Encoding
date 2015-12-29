@@ -78,24 +78,28 @@ static inline unsigned hist(unsigned char *in, unsigned inlen, unsigned *cc) { /
 } while(0)
 
 unsigned _srlec8(unsigned char *in, unsigned inlen, unsigned char *out, uint8_t e) {
-  uint8_t *ip=in, *pp = in - 1, *in_, *op = out;  //if(inlen <= ALN) goto a;
-  for(in_ = in + (inlen-0); ip < in_; ) {
+  uint8_t *ip=in, *pp = in - 1, *op = out;
+  if(inlen >= 32)
+  for(; ip <  in+(inlen-32); ) {
     unsigned long long z;
-	if(!(z = (ctou64(ip) ^ ctou64(ip+1)))) // SSE not faster than scalar
-	  ip += 8;
-	else {
-      uint8_t c = *ip; ip += __builtin_ctzll(z)>>3; 				//if(ip > in_) ip = in_;       
-      SRLEC8(pp, ip, op, e);
-	  pp = ip++;
-    }
-  } 
-  //if(ip > in_) ip = in_; 														
-  //if(pp < ip) 
-  { 
-    uint8_t c = *ip; 
-    SRLEC8(pp, ip, op, e); 
+	if(z = (ctou64(ip) ^ ctou64(ip+1))) goto a; ip += 8;
+	if(z = (ctou64(ip) ^ ctou64(ip+1))) goto a; ip += 8;
+	if(z = (ctou64(ip) ^ ctou64(ip+1))) goto a; ip += 8;
+	if(z = (ctou64(ip) ^ ctou64(ip+1))) goto a; ip += 8;
+    continue;
+    a:;
+    uint8_t c = *ip; ip += __builtin_ctzll(z)>>3; 				       
+    SRLEC8(pp, ip, op, e);
+	pp = ip++;
   }
-  //a:while(pp < in+inlen) *op++ = *pp++;
+  for(;ip < in+inlen; ip++) 
+    if(*ip != ip[1]) {
+      uint8_t c = *ip;
+	  SRLEC8(pp,ip, op, e);
+	  pp = ip;
+	}
+  uint8_t c = *ip; 
+  SRLEC8(pp, ip, op, e);
   return op - out;
 }
 #endif
@@ -212,13 +216,23 @@ unsigned trlec(unsigned char *in, unsigned inlen, unsigned char *out) {
 unsigned TEMPLATE2(_srlec, USIZE)(unsigned char *_in, unsigned inlen, unsigned char *out, uint_t e) {
   uint_t *in = (uint_t *)_in, *ip, *pp = in-1; 
   unsigned char *op = out;
-  for(ip = in; ip < in+inlen/sizeof(uint_t); ip++) { 
-    uint_t c = *ip;
-    if(c != ip[1]) {
+  unsigned n = inlen/sizeof(uint_t);
+  for(ip = in; ip < in+(n&~(4-1)); ip++) { //in+(inlen&~(sizeof(uint_t)-1));
+    if(*ip == ip[1]) 
+      if(*++ip == ip[1])
+        if(*++ip == ip[1]) ip++;
+    if(*ip != ip[1]) {
+      uint_t c = *ip;
 	  SRLEC(pp,ip, op, e);
 	  pp = ip;
 	}
   }
+  for(;ip < in+n; ip++) 
+    if(*ip != ip[1]) {
+      uint_t c = *ip;
+	  SRLEC(pp,ip, op, e);
+	  pp = ip;
+	}
   uint_t c = *ip; 
   SRLEC(pp, ip, op, e);
   

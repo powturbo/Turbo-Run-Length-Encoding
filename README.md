@@ -4,11 +4,11 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 ###### Efficient and fastest **Run Length Encoding** library
 - 100% C (C++ compatible headers), without inline assembly
 <p>
-- Efficient compression 
+- Most Efficient compression 
 - No other RLE compress or decompress faster with better compression
 - :new: faster compression and 2x faster decompression with :+1: SIMD
 - Compress better and up to 8 times faster and decompress up to 4 times faster than other fast RLEs
-- Can be faster then memcpy
+- Can be faster than memcpy
 - :new: **ZERO!** byte overhead
   
 <p>

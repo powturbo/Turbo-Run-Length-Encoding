@@ -31,31 +31,25 @@
          
 //------------------------------------- RLE with Escape char ------------------------------------------------------------------
 //#define MEMSAFE
-
 #define USIZE 8
 #include "trled.c"
 
   #if SRLE8
 unsigned _srled8(uint8_t *in, uint8_t *out, unsigned outlen, uint8_t e) { 
-  uint8_t *op = out, c, *out_ = out+(outlen -(0)), *ip = in;  //if(outlen <= ALN) goto a;
+  uint8_t *op=out, *ip = in;
     #ifdef __SSE__    
   __m128i ev = _mm_set1_epi8(e);
-    #else
-  uint64_t ev = (uint32_t)e<<24 | (uint32_t)e<<16 | (uint32_t)e<<8 | e; ev |= ev<<32;
-    #endif   
-  while(op < out_) {
-      #ifdef __SSE__    
-    __m128i v = _mm_loadu_si128((const __m128i*)ip);
-	uint32_t mask = _mm_movemask_epi8(_mm_cmpeq_epi8(v, ev));  
-	_mm_storeu_si128((__m128i *)op, v);
-    if(!mask) op += 16, ip += 16;
-    else {
-      uint32_t i = __builtin_ctz(mask); op += i; ip += i+1;
-      #elif 1 
-    uint64_t mask = ctou64(ip) ^ ev;
-    if(mask >> 56) *op++ = *ip++;
-    else {
-      uint32_t i = __builtin_ctzll(mask)>>3; ctou64(op) = ctou64(ip), op += i; ip += i+1;
+    #endif 
+  if(outlen >= 32)
+  for(; op < out+(outlen-32);) {
+      #ifdef __SSE__
+    uint32_t mask;
+    __m128i v = _mm_loadu_si128((__m128i*)ip); mask = _mm_movemask_epi8(_mm_cmpeq_epi8(v, ev)); _mm_storeu_si128((__m128i *)op, v); if(mask) goto a; op += 16; ip += 16;
+    __m128i u = _mm_loadu_si128((__m128i*)ip); mask = _mm_movemask_epi8(_mm_cmpeq_epi8(u, ev)); _mm_storeu_si128((__m128i *)op, u); if(mask) goto a; op += 16; ip += 16;
+    continue;
+    a:;
+    uint32_t i = __builtin_ctz(mask);
+    op += i; ip += i+1;
       #else
     if(likely((c = *(uint8_t *)ip) != e)) {
 	  ip++;
@@ -63,23 +57,31 @@ unsigned _srled8(uint8_t *in, uint8_t *out, unsigned outlen, uint8_t e) {
 	} 
     else {  
 	  uint32_t i;
-      #endif
-	  vbxget(ip, i);
+      #endif     
+    vbxget(ip, i);
+    if(likely(i)) { 
+	  uint8_t c = *ip++; 
+	  i  += 3; 
+	  rmemset(op, c, i);
+	} else 
+	  *op++ = e;
+  }
+  #define rmemset8(__op, __c, __i) while(__i--) *__op++ = __c
+  uint8_t c;
+  while(op < out+outlen) 
+    if(likely((c = *ip) != e)) {
+	  ip++;
+	  *op++ = c; 
+	} else { 
+	  ip++;
+	  int i; vbxget(ip, i);
 	  if(likely(i)) { 
-	    c   = *(uint8_t *)ip; 
-		ip++; 
+	    c   = *ip++;  
 		i  += 3; 
-		rmemset(op, c, i);
+		rmemset8(op, c, i);
 	  } else 
 	    *op++ = e;
     }
-  }
-  /*if(op >= out_) { 
-    int u = op - out_; 
-    op   -= u; 
-    ip   -= u-1; 
-  }
-  a: while(op < _out+outlen) *op++ = *ip++;*/
   return ip - in;
 } 
   #endif
@@ -156,8 +158,6 @@ unsigned trled(uint8_t *in, unsigned inlen, uint8_t *out, unsigned outlen) {
 #undef rmemset
 #undef USIZE
 
-#undef MEMSAFE
-#undef runcpy
  #else
   #ifdef MEMSAFE
 #define rmemset(__op, __c, __i) while(__i--) *__op++ = __c

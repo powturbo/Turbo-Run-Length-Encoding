@@ -49,6 +49,7 @@ CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 5.2, ubuntu 15.10
 |620676412| 62.1|**5247.28**|7376.44|**rle64 64**|
 |1000000012|100.0|**8517.76**|**9176.59**|**memcpy**|
 
+srle 0: RLE w/ auto escape
 <p>
 - Checkers program "End Game Table Base": [1034.db](http://encode.ru/threads/2077-EGTB-compression?p=41392&viewfull=1#post41392)
 

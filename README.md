@@ -8,6 +8,8 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 - No other RLE compress or decompress faster with better compression
 - :new: faster compression and 2x faster decompression with :+1: SIMD
 - :new: **ZERO!** byte overhead
+- Compress better and up to 8 times faster and decompress up to 4 times faster than other fast RLEs
+  
 <p>
 - No modification of the raw data, preserving compressibility
 - Order preserving 

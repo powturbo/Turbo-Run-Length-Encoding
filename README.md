@@ -7,22 +7,15 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 - Efficient compression 
 - No other RLE compress or decompress faster with better compression
 - :new: faster compression and 2x faster decompression with :+1: SIMD
-<p>
 - :new: **ZERO!** byte overhead
 <p>
 - No modification of the raw data, preserving compressibility
-<p>
 - Order preserving 
 
 ###### TurboRLE
 - **TRLE**: TurboRLE - Efficient and fast Run Length Encoding
 <p>
 - **SRLE**: TurboRLE Escape - Fast Run Length Encoding with automatic escape determination 
-
-###### Functions benchmarked
-- **MRLE**: Mespotine RLE [MRLE](http://encode.ru/threads/2121-No-more-encoding-overhead-in-Run-Length-Encoding-Read-about-Mespotine-RLE-here-)
-<p>
-- **RLE64**: Run Length Encoding - [RLE64](http://sourceforge.net/projects/nikkhokkho/files/RLE64/)
 
 <p>
 ## Benchmark:
@@ -31,6 +24,11 @@ CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 5.2, ubuntu 15.10
 - Single thread
 - Realistic and practical benchmark with large files
 
+###### Functions benchmarked
+- **MRLE**: Mespotine RLE [MRLE](http://encode.ru/threads/2121-No-more-encoding-overhead-in-Run-Length-Encoding-Read-about-Mespotine-RLE-here-)
+<p>
+- **RLE64**: Run Length Encoding - [RLE64](http://sourceforge.net/projects/nikkhokkho/files/RLE64/)
+<p>
 
 - Text File: [enwik9bwt](http://mattmahoney.net/dc/textdata.html) enwik9 bwt generated w. [libdivsufsort](https://code.google.com/p/libdivsufsort/)
 

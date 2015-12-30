@@ -42,7 +42,7 @@ static tm_t tminit() { QueryPerformanceFrequency(&tps); tm_t t0=tmtime(),ts; whi
   #else
 #include <time.h>
 static   tm_t tmtime(void)    { struct timespec tm; clock_gettime(CLOCK_MONOTONIC, &tm); return (tm_t)tm.tv_sec*1000000ull + tm.tv_nsec/1000; }
-static   tm_t tminit()        { tm_t t0=tmtime(),ts; while((ts = tmtime())==t0); return ts; }
+static   tm_t tminit()        { tm_t t0=tmtime(),ts; while((ts = tmtime())==t0) {}; return ts; }
   #endif
 //---------------------------------------- bench ---------------------------------------------------------------------
 #define TMPRINT(__x) { printf("%7.2f MB/s\t%s", (double)(tm>=0.000001?(((double)n*rm/MBS)/(((double)tm/1)/TM_T)):0.0), __x); fflush(stdout); }
@@ -66,7 +66,7 @@ unsigned argtoi(char *s) {
 //-------------------------------------------------------------------------------------------------------------------------------------
 #include "ext/mrle.c"
 
-void check(unsigned char *in, unsigned char *cpy, unsigned n) { int i;
+void check(const unsigned char *in, unsigned char *cpy, unsigned n) { int i;
   for(i = 0; i < n; i++) 
     if(in[i] != cpy[i]) { printf("ERROR at %d ", i); break; }
   memset(cpy,0xff,n); 
@@ -88,7 +88,8 @@ int main(int argc, char *argv[]) {
   }
   if(argc - optind < 1) { fprintf(stderr, "File not specified\n"); exit(-1); }
 
-  unsigned char *in,*out,*cpy,*inname = argv[optind];  
+  unsigned char *in,*out,*cpy;
+  char *inname = argv[optind];  
   FILE *fi = fopen(inname, "rb"); if(!fi ) perror(inname), exit(1);  							
   fseek(fi, 0, SEEK_END); long long flen = ftell(fi); fseek(fi, 0, SEEK_SET);
   if(flen > b) flen = b;

@@ -27,36 +27,28 @@
 #define likely(x)     	__builtin_expect((x),1)
 #define unlikely(x)   	__builtin_expect((x),0)
 //------------------------------------- Variable Byte -----------------------------------------------------
-#define vbputa(__op, __x, __act) {\
-       if(likely(__x < (1<< 7))) {		   			  *__op++ = __x << 1; 			 		      		__act;}\
-  else if(likely(__x < (1<<14))) { *(unsigned short *)__op = __x << 2 | 0x01; __op += 2; 		      	__act;}\
-  else if(likely(__x < (1<<21))) { *(unsigned short *)__op = __x << 3 | 0x03; __op += 2; *__op++ = __x >> 13; __act;}\
-  else if(likely(__x < (1<<28))) { *(unsigned       *)__op = __x << 4 | 0x07; __op += 4; 		      	__act;}\
-  else { 		           *(unsigned       *)__op = __x << 4 | 0x0f; __op += 4; *__op++ = __x >> 28; 	__act;}\
+#define vbputa(_op_, _x_, _act_) {\
+       if(likely(_x_ < (1<< 7))) {		   			  *_op_++ = _x_ << 1; 			 		      		_act_;}\
+  else if(likely(_x_ < (1<<14))) { *(unsigned short *)_op_ = _x_ << 2 | 0x01; _op_ += 2; 		      	_act_;}\
+  else if(likely(_x_ < (1<<21))) { *(unsigned short *)_op_ = _x_ << 3 | 0x03; _op_ += 2; *_op_++ = _x_ >> 13; _act_;}\
+  else if(likely(_x_ < (1<<28))) { *(unsigned       *)_op_ = _x_ << 4 | 0x07; _op_ += 4; 		      	_act_;}\
+  else { 		           *(unsigned       *)_op_ = _x_ << 4 | 0x0f; _op_ += 4; *_op_++ = _x_ >> 28; 	_act_;}\
 }
  
-#define vbgeta(__ip, __x, __act) do { __x = *__ip;\
-       if(!(__x & (1<<0))) { __x			     >>= 1; 		                      __ip++;    __act;}\
-  else if(!(__x & (1<<1))) { __x = (*(unsigned short *)__ip) >>  2;		              __ip += 2; __act;}\
-  else if(!(__x & (1<<2))) { __x = (*(unsigned short *)__ip) >>  3 | *(__ip+2) << 13; __ip += 3; __act;}\
-  else if(!(__x & (1<<3))) { __x = (*(unsigned       *)__ip) >>  4; 		      	  __ip += 4; __act;}\
-  else 			   	       { __x = (*(unsigned       *)__ip) >>  4 | *(__ip+4) << 28; __ip += 5; __act;}\
+#define vbgeta(_ip_, _x_, _act_) do { _x_ = *_ip_;\
+       if(!(_x_ & (1<<0))) { _x_			     >>= 1; 		                      _ip_++;    _act_;}\
+  else if(!(_x_ & (1<<1))) { _x_ = (*(unsigned short *)_ip_) >>  2;		              _ip_ += 2; _act_;}\
+  else if(!(_x_ & (1<<2))) { _x_ = (*(unsigned short *)_ip_) >>  3 | *(_ip_+2) << 13; _ip_ += 3; _act_;}\
+  else if(!(_x_ & (1<<3))) { _x_ = (*(unsigned       *)_ip_) >>  4; 		      	  _ip_ += 4; _act_;}\
+  else 			   	       { _x_ = (*(unsigned       *)_ip_) >>  4 | *(_ip_+4) << 28; _ip_ += 5; _act_;}\
 } while(0)
 
-#define vbput(__op, __x) { unsigned _x__ = __x; vbputa(__op, _x__, ;); }
-#define vbget(__ip) ({     unsigned _x_;        vbgeta(__ip, _x_, ;); _x_; })
+#define vbput(_op_, _x_) { unsigned _x = _x_; vbputa(_op_, _x, ;); }
+#define vbget(_ip_) ({     unsigned _x;       vbgeta(_ip_, _x, ;); _x; })
 
-#define vbxput(__op, __x) { *__op++ = __x; if(unlikely((__x) >= 0xff)) { unsigned _xi = (__x) - 0xff; __op[-1] = 0xff; vbput(__op, _xi); } }
-#define vbxget(__ip, __x) { __x = *__ip++; if(unlikely( __x == 0xff)) { __x = vbget(__ip); __x+=0xff; } }
+#define vbxput(_op_, _x_) { *_op_++ = _x_; if(unlikely((_x_) >= 0xff)) { unsigned _xi = (_x_) - 0xff; _op_[-1] = 0xff; vbput(_op_, _xi); } }
+#define vbxget(_ip_, _x_) { _x_ = *_ip_++; if(unlikely( _x_ == 0xff)) { _x_ = vbget(_ip_); _x_+=0xff; } }
 
-#define vbzput(__op, __x, __m, __emap) do { if(unlikely((__x) < __m)) *__op++ = __emap[__x]; else { unsigned _xi = (__x) - __m; *__op++ = __emap[__m]; vbput(__op, _xi); } } while(0)
-#define vbzget(__ip, __x, __m, __e) { __x = __e; if(unlikely( __x == __m)) { __x = vbget(__ip); __x+=__m; } }
- 
-  #ifdef __SSE__
-#define ALN 16
-#include <emmintrin.h>
-  #else
-#define ALN 1
-  #endif
+#define vbzput(_op_, _x_, _m_, _emap_) do { if(unlikely((_x_) < _m_)) *_op_++ = _emap_[_x_]; else { unsigned _xi = (_x_) - _m_; *_op_++ = _emap_[_m_]; vbput(_op_, _xi); } } while(0)
+#define vbzget(_ip_, _x_, _m_, _e_) { _x_ = _e_; if(unlikely( _x_ == _m_)) { _x_ = vbget(_ip_); _x_+=_m_; } }
 
-#define SRLE8 16

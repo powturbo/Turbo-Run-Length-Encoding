@@ -25,27 +25,35 @@
 **/
   #ifndef USIZE
 #include <string.h> 
+    #ifdef __SSE__
+#include <emmintrin.h>
+    #endif
+
 #include "conf.h"
 #include "trle.h"
 #include "trle_.h"
          
 //------------------------------------- RLE with Escape char ------------------------------------------------------------------
 //#define MEMSAFE
+#define SRLE8 32 // 16//
 #define USIZE 8
 #include "trled.c"
 
   #if SRLE8
-unsigned _srled8(uint8_t *in, uint8_t *out, unsigned outlen, uint8_t e) { 
-  uint8_t *op = out, *ip = in;
+unsigned _srled8(const unsigned char *in, uint8_t *out, unsigned outlen, uint8_t e) { 
+  const uint8_t *ip = in;
+        uint8_t *op = out;
     #ifdef __SSE__    
   __m128i ev = _mm_set1_epi8(e);
     #endif 
-  if(outlen >= 32)
-    for(; op < out+(outlen-32);) {	
+  if(outlen >= SRLE8)
+    for(; op < out+(outlen-SRLE8);) {	
         #ifdef __SSE__
       uint32_t mask;
       __m128i v = _mm_loadu_si128((__m128i*)ip); mask = _mm_movemask_epi8(_mm_cmpeq_epi8(v, ev)); _mm_storeu_si128((__m128i *)op, v); if(mask) goto a; op += 16; ip += 16;
+        #if SRLE8 >= 32
       __m128i u = _mm_loadu_si128((__m128i*)ip); mask = _mm_movemask_epi8(_mm_cmpeq_epi8(u, ev)); _mm_storeu_si128((__m128i *)op, u); if(mask) goto a; op += 16; ip += 16;
+        #endif
 	  											__builtin_prefetch(ip+256, 0);
       continue;
       a:;
@@ -68,7 +76,7 @@ unsigned _srled8(uint8_t *in, uint8_t *out, unsigned outlen, uint8_t e) {
 	    *op++ = e;												      
     }
 
-  #define rmemset8(__op, __c, __i) while(__i--) *__op++ = __c
+  #define rmemset8(_op_, _c_, _i_) while(_i_--) *_op_++ = _c_
   uint8_t c;
   while(op < out+outlen) 
     if(likely((c = *ip) != e)) {
@@ -88,21 +96,23 @@ unsigned _srled8(uint8_t *in, uint8_t *out, unsigned outlen, uint8_t e) {
 } 
   #endif
 
-unsigned _srled(uint8_t *in, uint8_t *out, unsigned outlen) {
+unsigned _srled(const unsigned char *in, uint8_t *out, unsigned outlen) {
   return _srled8(in+1, out, outlen, *in); 
 }
   
-unsigned srled(uint8_t *in, unsigned inlen, uint8_t *out, unsigned outlen) {
+unsigned srled(const unsigned char *in, unsigned inlen, uint8_t *out, unsigned outlen) {
   if(inlen == outlen) 
     memcpy(out, in, outlen); 
   else if(inlen == 1) 
     memset(out, in[0], outlen);
   else 
-    return _srled8(in+1, out, outlen, *in); 
+    return _srled8(in+1, out, outlen, *in);
+  return inlen;
 }
 //------------------------------------- TurboRLE ------------------------------------------
-unsigned _trled(uint8_t *in, uint8_t *out, unsigned outlen) {
-  uint8_t b[256] = {0}, *ip, *op = out;  
+unsigned _trled(const unsigned char *in, uint8_t *out, unsigned outlen) {
+        uint8_t b[256] = {0},*op = out;
+  const uint8_t *ip;
   int m = -1, i, c; 
 
   if(outlen < 1) 
@@ -130,7 +140,7 @@ unsigned _trled(uint8_t *in, uint8_t *out, unsigned outlen) {
   return ip - in;
 }
 
-unsigned trled(uint8_t *in, unsigned inlen, uint8_t *out, unsigned outlen) {
+unsigned trled(const unsigned char *in, unsigned inlen, uint8_t *out, unsigned outlen) {
   if(inlen == outlen) 
     memcpy(out, in, outlen); 
   else if(inlen == 1) 
@@ -163,35 +173,34 @@ unsigned trled(uint8_t *in, unsigned inlen, uint8_t *out, unsigned outlen) {
 
  #else
   #ifdef MEMSAFE
-#define rmemset(__op, __c, __i) while(__i--) *__op++ = __c
+#define rmemset(_op_, _c_, _i_) while(_i_--) *_op_++ = _c_
   #elif defined(__SSE__) && USIZE < 64
-#include <emmintrin.h>
-#define rmemset(__op, __c, __i) do { \
-  __m128i *_up = (__m128i *)__op, cv = TEMPLATE2(_mm_set1_epi, USIZE)(__c);\
-  __op+=__i;\
-  do _mm_storeu_si128(  _up, cv),_mm_storeu_si128(++_up, cv); while(++_up < (__m128i *)__op);\
+#define rmemset(_op_, _c_, _i_) do { \
+  __m128i *_up = (__m128i *)_op_, cv = TEMPLATE2(_mm_set1_epi, USIZE)(_c_);\
+  _op_ += _i_;\
+  do _mm_storeu_si128(  _up, cv),_mm_storeu_si128(++_up, cv); while(++_up < (__m128i *)_op_);\
 } while(0)
   #else
-#define _cset64(_cc,__c) _cc = __c
-#define _cset32(_cc,__c) _cc = __c; _cc = _cc<<32|_cc
-#define _cset16(_cc,__c) _cc = __c; _cc = _cc<<48|_cc<<32|_cc<<16|_cc
-#define _cset8( _cc,__c) _cc = (uint32_t)__c<<24 | (uint32_t)__c<<16 | (uint32_t)__c<<8 | (uint32_t)__c; _cc = _cc<<32|_cc
+#define _cset64(_cc,_c_) _cc = _c_
+#define _cset32(_cc,_c_) _cc = _c_; _cc = _cc<<32|_cc
+#define _cset16(_cc,_c_) _cc = _c_; _cc = _cc<<48|_cc<<32|_cc<<16|_cc
+#define _cset8( _cc,_c_) _cc = (uint32_t)_c_<<24 | (uint32_t)_c_<<16 | (uint32_t)_c_<<8 | (uint32_t)_c_; _cc = _cc<<32|_cc
 
-#define rmemset(__op, __c, __i) do { uint8_t *_up = (uint8_t *)__op; __op +=__i;\
-  uint64_t _cc; TEMPLATE2(_cset, USIZE)(_cc,__c);\
+#define rmemset(_op_, _c_, _i_) do { uint8_t *_up = (uint8_t *)_op_; _op_ +=_i_;\
+  uint64_t _cc; TEMPLATE2(_cset, USIZE)(_cc,_c_);\
   do {\
-    TEMPLATE2(ctou, USIZE)(_up) = __c; _up += USIZE/8;\
-    TEMPLATE2(ctou, USIZE)(_up) = __c; _up += USIZE/8;\
-  } while(_up < (uint8_t *)__op);\
+    TEMPLATE2(ctou, USIZE)(_up) = _c_; _up += USIZE/8;\
+    TEMPLATE2(ctou, USIZE)(_up) = _c_; _up += USIZE/8;\
+  } while(_up < (uint8_t *)_op_);\
 } while(0)
   #endif 
 
 #define uint_t TEMPLATE3(uint, USIZE, _t)
   
   #if !SRLE8
-unsigned TEMPLATE2(_srled, USIZE)(unsigned char *in, unsigned char *_out, unsigned outlen, uint_t e) {
-  uint_t *out = (uint_t *)_out, *op = out, c; 
-  unsigned char *ip = in;
+unsigned TEMPLATE2(_srled, USIZE)(const unsigned char *in, unsigned char *cout, unsigned outlen, uint_t e) {
+  uint_t *out = (uint_t *)cout, *op = out, c; 
+  const unsigned char *ip = in;
   
   while(op < out+outlen/sizeof(uint_t)) { 	__builtin_prefetch(ip +384, 0);
     if(likely((c = *(uint_t *)ip) != e)) { 
@@ -212,13 +221,13 @@ unsigned TEMPLATE2(_srled, USIZE)(unsigned char *in, unsigned char *_out, unsign
   }	
     #if USIZE > 8
   unsigned char *p = (unsigned char *)op; 
-  while(p < _out+outlen) *p++ = *ip++; 
+  while(p < cout+outlen) *p++ = *ip++; 
     #endif
   return ip - in;
 }
   #endif
 
-unsigned TEMPLATE2(srled, USIZE)(uint8_t *in, unsigned inlen, uint8_t *out, unsigned outlen, uint_t e) {
+unsigned TEMPLATE2(srled, USIZE)(const unsigned char *in, unsigned inlen, uint8_t *out, unsigned outlen, uint_t e) {
   if(inlen == outlen) 
     memcpy(out, in, outlen); 
   else if(inlen == 1) 

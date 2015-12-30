@@ -97,7 +97,11 @@ srle 0: RLE w/ auto escape
 
         ./trle file
 
-
+### Environment:
+###### OS/Compiler (32 + 64 bits):
+- Linux: GNU GCC (>=4.6)
+- clang (>=3.2) 
+- Windows: MinGW
 
 Last update: 30 DEC 2015
 

@@ -1,10 +1,21 @@
 # powturbo  (c) Copyright 2015-2016
-CFLAGS=-march=native -minline-all-stringops
+CC ?= gcc
+CXX ?= g++
+#CC=clang
+#CXX=clang++
 
-UNAME := $(shell uname)
-ifeq ($(UNAME), Linux)
-LIBRT=-lrt
+ifeq ($(OS),Windows_NT)
+  UNAME := Windows
+CC=gcc
+CXX=g++
+else
+  UNAME := $(shell uname -s)
+ifeq ($(UNAME),$(filter $(UNAME),Linux Darwin FreeBSD GNU/kFreeBSD))
+LDFLAGS+= -lrt
 endif
+endif
+
+CFLAGS=-march=native -minline-all-stringops
 
 all: trle
 
@@ -12,10 +23,10 @@ all: trle
 #	gcc -O3 $(CFLAGS) -c trled.c
 
 trle: trlec.o trled.o trle.o
-	gcc trle.o trlec.o trled.o $(LIBRT) -o trle
+	$(CC) trle.o trlec.o trled.o $(LDFLAGS) -o trle
  
 .c.o:
-	gcc -O3 $(CFLAGS) $< -c -o $@
+	$(CC) -O3 $(CFLAGS) $< -c -o $@
 
 clean:
 	rm  *.o

@@ -28,40 +28,40 @@
 extern "C" {
 #endif
 // RLE with specified escape char
-unsigned _srlec8( unsigned char *in, unsigned inlen, unsigned char *out, uint8_t e);
-unsigned _srled8( unsigned char *in,                 unsigned char *out, unsigned outlen, uint8_t e);
+unsigned _srlec8( const unsigned char *in, unsigned inlen, unsigned char *out, uint8_t e);
+unsigned _srled8( const unsigned char *in,                 unsigned char *out, unsigned outlen, uint8_t e);
 
-unsigned _srlec16(unsigned char *in, unsigned inlen, unsigned char *out, uint16_t e);
-unsigned _srled16(unsigned char *in,                 unsigned char *out, unsigned outlen, uint16_t e);
+unsigned _srlec16(const unsigned char *in, unsigned inlen, unsigned char *out, uint16_t e);
+unsigned _srled16(const unsigned char *in,                 unsigned char *out, unsigned outlen, uint16_t e);
 
-unsigned _srlec32(unsigned char *in, unsigned inlen, unsigned char *out, uint32_t e);
-unsigned _srled32(unsigned char *in,                 unsigned char *out, unsigned outlen, uint32_t e);
+unsigned _srlec32(const unsigned char *in, unsigned inlen, unsigned char *out, uint32_t e);
+unsigned _srled32(const unsigned char *in,                 unsigned char *out, unsigned outlen, uint32_t e);
 
-unsigned _srlec64(unsigned char *in, unsigned inlen, unsigned char *out, uint64_t e);
-unsigned _srled64(unsigned char *in,                 unsigned char *out, unsigned outlen, uint64_t e);
+unsigned _srlec64(const unsigned char *in, unsigned inlen, unsigned char *out, uint64_t e);
+unsigned _srled64(const unsigned char *in,                 unsigned char *out, unsigned outlen, uint64_t e);
 
 // functions w/ overflow handling
-unsigned  srlec8( unsigned char *in, unsigned inlen, unsigned char *out, uint8_t e);
-unsigned  srled8( unsigned char *in, unsigned inlen, unsigned char *out, unsigned outlen, uint8_t e);
+unsigned  srlec8( const unsigned char *in, unsigned inlen, unsigned char *out, uint8_t e);
+unsigned  srled8( const unsigned char *in, unsigned inlen, unsigned char *out, unsigned outlen, uint8_t e);
 
-unsigned  srlec16(unsigned char *in, unsigned inlen, unsigned char *out, uint16_t e);
-unsigned  srled16(unsigned char *in, unsigned inlen, unsigned char *out, unsigned outlen, uint16_t e);
+unsigned  srlec16(const unsigned char *in, unsigned inlen, unsigned char *out, uint16_t e);
+unsigned  srled16(const unsigned char *in, unsigned inlen, unsigned char *out, unsigned outlen, uint16_t e);
 
-unsigned  srlec32(unsigned char *in, unsigned inlen, unsigned char *out, uint32_t e);
-unsigned  srled32(unsigned char *in, unsigned inlen, unsigned char *out, unsigned outlen, uint32_t e);
+unsigned  srlec32(const unsigned char *in, unsigned inlen, unsigned char *out, uint32_t e);
+unsigned  srled32(const unsigned char *in, unsigned inlen, unsigned char *out, unsigned outlen, uint32_t e);
 
-unsigned  srlec64(unsigned char *in, unsigned inlen, unsigned char *out, uint64_t e);
-unsigned  srled64(unsigned char *in, unsigned inlen, unsigned char *out, unsigned outlen, uint64_t e);
+unsigned  srlec64(const unsigned char *in, unsigned inlen, unsigned char *out, uint64_t e);
+unsigned  srled64(const unsigned char *in, unsigned inlen, unsigned char *out, unsigned outlen, uint64_t e);
 
 // RLE w. automatic escape char determination
-unsigned  srlec(unsigned char *in, unsigned inlen, unsigned char *out);
-unsigned _srled(unsigned char *in,                 unsigned char *out, unsigned outlen);
-unsigned  srled(unsigned char *in, unsigned inlen, unsigned char *out, unsigned outlen);
+unsigned  srlec(const unsigned char *in, unsigned inlen, unsigned char *out);
+unsigned _srled(const unsigned char *in,                 unsigned char *out, unsigned outlen);
+unsigned  srled(const unsigned char *in, unsigned inlen, unsigned char *out, unsigned outlen);
 
 // Turbo RLE
-unsigned  trlec(unsigned char *in, unsigned inlen, unsigned char *out);
-unsigned _trled(unsigned char *in,                 unsigned char *out, unsigned outlen);
-unsigned  trled(unsigned char *in, unsigned inlen, unsigned char *out, unsigned outlen);
+unsigned  trlec(const unsigned char *in, unsigned inlen, unsigned char *out);
+unsigned _trled(const unsigned char *in,                 unsigned char *out, unsigned outlen);
+unsigned  trled(const unsigned char *in, unsigned inlen, unsigned char *out, unsigned outlen);
 #ifdef __cplusplus
 }
 #endif

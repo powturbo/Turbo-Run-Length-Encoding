@@ -34,20 +34,20 @@
 #define likely(x)     	__builtin_expect((x),1)
 #define unlikely(x)   	__builtin_expect((x),0)
 
-#define popcnt32(__x) 	__builtin_popcount(__x)
-#define popcnt64(__x) 	__builtin_popcountll(__x)
+#define popcnt32(_x_) 	__builtin_popcount(_x_)
+#define popcnt64(_x_) 	__builtin_popcountll(_x_)
 
     #if defined(__i386__) || defined(__x86_64__)
 static inline int __bsr32(int x) {             asm("bsr  %1,%0" : "=r" (x) : "rm" (x) ); return x; }
 static inline int bsr32(  int x) { int b = -1; asm("bsrl %1,%0" : "+r" (b) : "rm" (x) ); return b + 1; }
 static inline int bsr64(unsigned long long x) { return x?64 - __builtin_clzll(x):0; }
-#define bsr16(__x) bsr32(__x)
+#define bsr16(_x_) bsr32(_x_)
     #else
 static inline int bsr32(int x               ) { return x?32 - __builtin_clz(  x):0; }
 static inline int bsr64(unsigned long long x) { return x?64 - __builtin_clzll(x):0;
 }
     #endif
-#define ctzll(__x) __builtin_ctzll(__x)
+#define ctzll(_x_) __builtin_ctzll(_x_)
   #elif _MSC_VER
 #define ALIGNED(x) __declspec(align(x))
 #define ALWAYS_INLINE __forceinline
@@ -64,12 +64,12 @@ static inline int bsr64(unsigned long long x) { return x?64 - __builtin_clzll(x)
     defined(__ARM_ARCH_4__) || defined(__ARM_ARCH_4T__) || \
     defined(__ARM_ARCH_5__) || defined(__ARM_ARCH_5T__) || defined(__ARM_ARCH_5TE__) || defined(__ARM_ARCH_5TEJ__) || \
     defined(__ARM_ARCH_6__) || defined(__ARM_ARCH_6J__) || defined(__ARM_ARCH_6K__)  || defined(__ARM_ARCH_6T2__) || defined(__ARM_ARCH_6Z__)   || defined(__ARM_ARCH_6ZK__)
-#define ctou16(__cp) (*(unsigned short *)(__cp))
-#define ctou32(__cp) (*(unsigned       *)(__cp))
+#define ctou16(_cp_) (*(unsigned short *)(_cp_))
+#define ctou32(_cp_) (*(unsigned       *)(_cp_))
 
     #if defined(__i386__) || defined(__x86_64__) || defined(__powerpc__)
-#define ctou64(__cp)       (*(unsigned long long *)(__cp))
-#define ctou(__cp_t, __cp) (*(__cp_t *)(__cp))
+#define ctou64(_cp_)       (*(unsigned long long *)(_cp_))
+#define ctou(_cp_t, _cp_) (*(_cp_t *)(_cp_))
     #endif
 
   #elif defined(__ARM_ARCH_7__) || defined(__ARM_ARCH_7A__) || defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7R__) || defined(__ARM_ARCH_7S__)
@@ -77,35 +77,35 @@ struct _PACKED shortu    { unsigned short     s; };
 struct _PACKED unsignedu { unsigned           u; };
 struct _PACKED longu     { unsigned long long l; };
 
-#define ctou16(__cp) ((struct shortu    *)(__cp))->s
-#define ctou32(__cp) ((struct unsignedu *)(__cp))->u
-#define ctou64(__cp) ((struct longu     *)(__cp))->l
+#define ctou16(_cp_) ((struct shortu    *)(_cp_))->s
+#define ctou32(_cp_) ((struct unsignedu *)(_cp_))->u
+#define ctou64(_cp_) ((struct longu     *)(_cp_))->l
   #endif
 
   #ifdef ctou16
-#define utoc16(__x,__cp) ctou16(__cp) = __x
+#define utoc16(_x_,_cp_) ctou16(_cp_) = _x_
   #else
 static inline unsigned short     ctou16(const void *cp) { unsigned short     x; memcpy(&x, cp, sizeof(x); return x; }
 static inline               void utoc16(unsigned short     x, void *cp ) { memcpy(cp, &x, sizeof(x)); }
   #endif
 
   #ifdef ctou32
-#define utoc32(__x,__cp) ctou32(__cp) = __x
+#define utoc32(_x_,_cp_) ctou32(_cp_) = _x_
   #else
 static inline unsigned           ctou32(const void *cp) { unsigned           x; memcpy(&x, cp, sizeof(x); return x; }
 static inline               void utoc32(unsigned           x, void *cp ) { memcpy(cp, &x, sizeof(x)); }
   #endif
 
   #ifdef ctou64
-#define utoc64(__x,__cp) ctou64(__cp) = __x
+#define utoc64(_x_,_cp_) ctou64(_cp_) = _x_
   #else
 static inline unsigned long long ctou64(const void *cp) { unsigned long long x; memcpy(&x, cp, sizeof(x); return x; }
 static inline               void utoc64(unsigned long long x, void *cp ) { memcpy(cp, &x, sizeof(x)); }
   #endif
 
-#define ctou24(__cp) (ctou32(__cp) & 0xffffff)
-#define ctou48(__cp) (ctou64(__cp) & 0xffffffffffffull)
-#define ctou8(__cp) (*__cp)
+#define ctou24(_cp_) (ctou32(_cp_) & 0xffffff)
+#define ctou48(_cp_) (ctou64(_cp_) & 0xffffffffffffull)
+#define ctou8(_cp_) (*_cp_)
 //--------------------- wordsize ----------------------------------------------
   #if defined(__64BIT__) || defined(_LP64) || defined(__LP64__) || defined(_WIN64) ||\
     defined(__x86_64__) || defined(_M_X64) ||\
@@ -121,17 +121,17 @@ static inline               void utoc64(unsigned long long x, void *cp ) { memcp
 #endif
 
 //---------------------misc ---------------------------------------------------   
-#define SIZE_ROUNDUP(__n, __a) (((size_t)(__n) + (size_t)((__a) - 1)) & ~(size_t)((__a) - 1))
+#define SIZE_ROUNDUP(_n_, _a_) (((size_t)(_n_) + (size_t)((_a_) - 1)) & ~(size_t)((_a_) - 1))
   #ifndef min
 #define min(x,y) (((x)<(y)) ? (x) : (y))
 #define max(x,y) (((x)>(y)) ? (x) : (y))
   #endif
   
-#define TEMPLATE2_(__x, __y) __x##__y
-#define TEMPLATE2(__x, __y) TEMPLATE2_(__x,__y)
+#define TEMPLATE2_(_x_, _y_) _x_##_y_
+#define TEMPLATE2(_x_, _y_) TEMPLATE2_(_x_,_y_)
 
-#define TEMPLATE3_(__x,__y,__z) __x##__y##__z
-#define TEMPLATE3(__x,__y,__z) TEMPLATE3_(__x, __y, __z)
+#define TEMPLATE3_(_x_,_y_,_z_) _x_##_y_##_z_
+#define TEMPLATE3(_x_,_y_,_z_) TEMPLATE3_(_x_, _y_, _z_)
 
 //--- NDEBUG -------
 #include <stdio.h>

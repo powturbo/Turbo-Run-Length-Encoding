@@ -61,7 +61,8 @@ static inline unsigned hist(unsigned char *in, unsigned inlen, unsigned *cc) { /
   int i;
   for(i = 0; i < 256; i++) 
     cc[i] += c0[i]+c1[i]+c2[i]+c3[i]+c4[i]+c5[i]+c6[i]+c7[i];
-  unsigned a = 256; while(a > 1 && !cc[a-1]) a--; 
+  unsigned a = 256; 
+  while(a > 1 && !cc[a-1]) a--; 
   return a;
 }
 //------------------------------------- RLE with Escape char ------------------------------------------------------------------
@@ -79,19 +80,22 @@ static inline unsigned hist(unsigned char *in, unsigned inlen, unsigned *cc) { /
 
 unsigned _srlec8(unsigned char *in, unsigned inlen, unsigned char *out, uint8_t e) {
   uint8_t *ip=in, *pp = in - 1, *op = out;
+
   if(inlen >= 32)
-  for(; ip <  in+(inlen-32); ) {
-    unsigned long long z;
-	if(z = (ctou64(ip) ^ ctou64(ip+1))) goto a; ip += 8;
-	if(z = (ctou64(ip) ^ ctou64(ip+1))) goto a; ip += 8;
-	if(z = (ctou64(ip) ^ ctou64(ip+1))) goto a; ip += 8;
-	if(z = (ctou64(ip) ^ ctou64(ip+1))) goto a; ip += 8;
-    continue;
-    a:;
-    uint8_t c = *ip; ip += __builtin_ctzll(z)>>3; 				       
-    SRLEC8(pp, ip, op, e);
-	pp = ip++;
-  }
+    for(; ip <  in+(inlen-32); ) {							
+      unsigned long long z;
+	  if(z = (ctou64(ip) ^ ctou64(ip+1))) goto a; ip += 8;
+	  if(z = (ctou64(ip) ^ ctou64(ip+1))) goto a; ip += 8;
+	  if(z = (ctou64(ip) ^ ctou64(ip+1))) goto a; ip += 8;
+	  if(z = (ctou64(ip) ^ ctou64(ip+1))) goto a; ip += 8;	__builtin_prefetch(ip +256, 0);
+      continue;
+      a:;
+      uint8_t c = *ip; 
+      ip += __builtin_ctzll(z)>>3; 				       
+      SRLEC8(pp, ip, op, e);
+	  pp = ip++;											
+    }
+
   for(;ip < in+inlen; ip++) 
     if(*ip != ip[1]) {
       uint8_t c = *ip;
@@ -119,7 +123,8 @@ unsigned srlec(unsigned char *in,  unsigned inlen, unsigned char *out) {
 	  m = b[i],mi = i;
   *out = mi;                                  
   size_t l = _srlec8(in, inlen, out+1, mi)+1;
-  if(l < inlen) return l;
+  if(l < inlen) 
+    return l;
   memcpy(out, in, inlen);
   return inlen;
 }
@@ -184,15 +189,17 @@ unsigned trlec(unsigned char *in, unsigned inlen, unsigned char *out) {
   memset(op, 0, 32);
   for(m = -1,i = 0; i < 256; i++) 
     if(b[i]) { 
-      op[i>>3] |= 1<<(i&7); rmap[++m] = i; 
+      op[i>>3] |= 1<<(i&7); 
+      rmap[++m] = i; 
     } 
   op += 32;
 
-  for(ip = in, pp = in-1; ip < in+inlen-1; ip++)
+  for(ip = in, pp = in-1; ip < in+inlen-1; ip++) {
     if(*ip != *(ip+1)) {
 	  TRLEC(pp, ip, op);
 	  pp = ip;
 	}
+  }
   TRLEC(pp,ip, op);
   
   if(op - out < inlen) 
@@ -214,19 +221,33 @@ unsigned trlec(unsigned char *in, unsigned inlen, unsigned char *out) {
 
   #if !SRLE8
 unsigned TEMPLATE2(_srlec, USIZE)(unsigned char *_in, unsigned inlen, unsigned char *out, uint_t e) {
-  uint_t *in = (uint_t *)_in, *ip, *pp = in-1; 
   unsigned char *op = out;
+  uint_t *in = (uint_t *)_in, *pp = in-1, *ip=in; 
   unsigned n = inlen/sizeof(uint_t);
-  for(ip = in; ip < in+(n&~(4-1)); ip++) { //in+(inlen&~(sizeof(uint_t)-1));
-    if(*ip == ip[1]) 
-      if(*++ip == ip[1])
-        if(*++ip == ip[1]) ip++;
-    if(*ip != ip[1]) {
+
+  if(n >= 4)
+    for(; ip < in+(n-4);) {
+        #if 0 
+      if(*  ip == ip[1])  
+        if(*++ip == ip[1]) 
+          if(*++ip == ip[1])
+            if(*++ip == ip[1]) { 
+              ip++; 									__builtin_prefetch(ip +256, 0);
+              continue;
+            }
+        #else 
+      if(*ip != ip[1]) goto a; ++ip;
+      if(*ip != ip[1]) goto a; ++ip;
+      if(*ip != ip[1]) goto a; ++ip;
+      if(*ip != ip[1]) goto a; ++ip; 					__builtin_prefetch(ip +256, 0);
+      continue;
+      a:;
+        #endif  
       uint_t c = *ip;
-	  SRLEC(pp,ip, op, e);
-	  pp = ip;
-	}
-  }
+      SRLEC(pp,ip, op, e);
+	  pp = ip++;								
+    }
+
   for(;ip < in+n; ip++) 
     if(*ip != ip[1]) {
       uint_t c = *ip;
@@ -236,11 +257,11 @@ unsigned TEMPLATE2(_srlec, USIZE)(unsigned char *_in, unsigned inlen, unsigned c
   uint_t c = *ip; 
   SRLEC(pp, ip, op, e);
   
-  if(USIZE > 8) {
-    unsigned char *p = (unsigned char *)ip; 
-	while(p < _in+inlen) 
-	  *op++ = *p++; 
-  }
+    #if USIZE > 8
+  unsigned char *p = (unsigned char *)ip; 
+  while(p < _in+inlen) 
+	*op++ = *p++; 
+    #endif
   return op - out;
 }
  #endif
@@ -248,7 +269,9 @@ unsigned TEMPLATE2(_srlec, USIZE)(unsigned char *_in, unsigned inlen, unsigned c
 
 unsigned TEMPLATE2(srlec, USIZE)(unsigned char *in, unsigned inlen, unsigned char *out, uint_t e) {
   size_t l = TEMPLATE2(_srlec, USIZE)(in, inlen, out, e);
-  if(l < inlen) return l;
+
+  if(l < inlen) 
+    return l;
   memcpy(out, in, inlen);
   return inlen;
 }

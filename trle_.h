@@ -24,8 +24,6 @@
     TurboRLE - "Most efficient and fastest Run Length Encoding"
 **/
 #include <stdint.h>
-#define likely(x)     	__builtin_expect((x),1)
-#define unlikely(x)   	__builtin_expect((x),0)
 //------------------------------------- Variable Byte -----------------------------------------------------
 #define vbputa(_op_, _x_, _act_) {\
        if(likely(_x_ < (1<< 7))) {		   			  *_op_++ = _x_ << 1; 			 		      		_act_;}\
@@ -44,11 +42,11 @@
 } while(0)
 
 #define vbput(_op_, _x_) { unsigned _x = _x_; vbputa(_op_, _x, ;); }
-#define vbget(_ip_) ({     unsigned _x;       vbgeta(_ip_, _x, ;); _x; })
+#define vbget(_ip_, _x_) vbgeta(_ip_, _x_, ;);
 
 #define vbxput(_op_, _x_) { *_op_++ = _x_; if(unlikely((_x_) >= 0xff)) { unsigned _xi = (_x_) - 0xff; _op_[-1] = 0xff; vbput(_op_, _xi); } }
-#define vbxget(_ip_, _x_) { _x_ = *_ip_++; if(unlikely( _x_ == 0xff)) { _x_ = vbget(_ip_); _x_+=0xff; } }
+#define vbxget(_ip_, _x_) { _x_ = *_ip_++; if(unlikely( _x_ == 0xff)) { vbget(_ip_,_x_); _x_+=0xff; } }
 
 #define vbzput(_op_, _x_, _m_, _emap_) do { if(unlikely((_x_) < _m_)) *_op_++ = _emap_[_x_]; else { unsigned _xi = (_x_) - _m_; *_op_++ = _emap_[_m_]; vbput(_op_, _xi); } } while(0)
-#define vbzget(_ip_, _x_, _m_, _e_) { _x_ = _e_; if(unlikely( _x_ == _m_)) { _x_ = vbget(_ip_); _x_+=_m_; } }
+#define vbzget(_ip_, _x_, _m_, _e_) { _x_ = _e_; if(unlikely(_x_ == _m_)) { vbget(_ip_,_x_); _x_+=_m_; } }
 

@@ -25,10 +25,14 @@
 **/
   #ifndef USIZE
 #include <string.h> 
+    #ifdef __SSE__
+#include <emmintrin.h>
+    #endif
+
 #include "conf.h"
 #include "trle.h"
 #include "trle_.h"
-  
+
 //------------------------------------- Histogram ---------------------------------------------------------
 static inline unsigned hist(const unsigned char *in, unsigned inlen, unsigned *cc) { // Optimized for x86
   unsigned c0[256+8]={0},c1[256+8]={0},c2[256+8]={0},c3[256+8]={0},c4[256+8]={0},c5[256+8]={0},c6[256+8]={0},c7[256+8]={0}; 
@@ -84,21 +88,33 @@ unsigned _srlec8(const unsigned char *in, unsigned inlen, unsigned char *out, ui
   uint8_t *op = out;
 
   if(inlen >= SRLE8)
-    for(; ip <  in+(inlen-SRLE8); ) {							
+    for(; ip <  in+(inlen-SRLE8); ) {	
+        #if 0 //def __SSE__  // SSE slower than scalar 
+	  __m128i cv = _mm_set1_epi8(*ip);
+	  unsigned mask = _mm_movemask_epi8(_mm_cmpeq_epi8(_mm_loadu_si128((const __m128i*)(ip+1)), cv)); if(mask != 0xffffu) goto a; ip += 16;
+	           mask = _mm_movemask_epi8(_mm_cmpeq_epi8(_mm_loadu_si128((const __m128i*)(ip+1)), cv)); if(mask != 0xffffu) goto a; ip += 16;
+      continue;
+      a:;
+      uint8_t c = *ip; 
+      ip += __builtin_ctz((unsigned short)(~mask));
+      SRLEC8(pp, ip, op, e);
+	  pp = ip++;
+        #else						
       unsigned long long z;
 	  if((z = (ctou64(ip) ^ ctou64(ip+1)))) goto a; ip += 8;
 	  if((z = (ctou64(ip) ^ ctou64(ip+1)))) goto a; ip += 8;
-        #if SRLE8 >= 32
+          #if SRLE8 >= 32
 	  if((z = (ctou64(ip) ^ ctou64(ip+1)))) goto a; ip += 8;
 	  if((z = (ctou64(ip) ^ ctou64(ip+1)))) goto a; ip += 8;	
-        #endif
+          #endif
                                                             __builtin_prefetch(ip +256, 0);
       continue;
       a:;
       uint8_t c = *ip; 
-      ip += __builtin_ctzll(z)>>3; 				       
+      ip += ctzll(z)>>3; 				       
       SRLEC8(pp, ip, op, e);
 	  pp = ip++;											
+        #endif
     }
 
   for(;ip < in+inlen; ip++) 
@@ -134,27 +150,32 @@ unsigned srlec(const unsigned char *in,  unsigned inlen, unsigned char *out) {
   return inlen;
 }
 
+#undef USIZE
 #undef SRLE8
+
 #define USIZE 16
 #include "trlec.c"
+#undef USIZE
 
 #define USIZE 32
 #include "trlec.c"
+#undef USIZE
 
 #define USIZE 64
 #include "trlec.c"
+#undef USIZE
 
 //------------------------------------------------- TurboRLE ------------------------------------------
 struct u { unsigned c,i; };										
 
-#define TRLEC(pp, ip, op) do { __label__ a;\
+#define TRLEC(pp, ip, op, _lab_) do {\
   unsigned i = ip - pp, c = *ip;\
   if(i > 2) {\
     unsigned char *q = op; \
     vbzput(q, i-3, m, rmap); \
-    if((q-op) + 1 < i) { op = q; *op++ = c; goto a; }\
+    if((q-op) + 1 < i) { op = q; *op++ = c; goto _lab_; }\
   } \
-  while(i--) *op++ = c; a:;\
+  while(i--) *op++ = c; _lab_:;\
 } while(0)
 
 unsigned trlec(const unsigned char *in, unsigned inlen, unsigned char *out) {
@@ -202,11 +223,11 @@ unsigned trlec(const unsigned char *in, unsigned inlen, unsigned char *out) {
 
   for(ip = in, pp = in-1; ip < in+inlen-1; ip++) {
     if(*ip != *(ip+1)) {
-	  TRLEC(pp, ip, op);
+	  TRLEC(pp, ip, op, laba);
 	  pp = ip;
 	}
   }
-  TRLEC(pp,ip, op);
+  TRLEC(pp,ip, op, labb);
   
   if(op - out < inlen) 
    return op - out;
@@ -281,6 +302,5 @@ unsigned TEMPLATE2(srlec, USIZE)(const unsigned char *in, unsigned inlen, unsign
   memcpy(out, in, inlen);
   return inlen;
 }
-#undef USIZE
 #endif
 

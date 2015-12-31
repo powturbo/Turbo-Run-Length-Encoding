@@ -59,21 +59,23 @@ unsigned _srled8(const unsigned char *in, uint8_t *out, unsigned outlen, uint8_t
       a:;
       uint32_t i = __builtin_ctz(mask);
       op += i; ip += i+1;
+	  {
         #else
+	  uint8_t c;
       if(likely((c = *(uint8_t *)ip) != e)) {
 	    ip++;
 	    *op++ = c; 
-	  } 
-      else {  
+	  } else {  
 	    uint32_t i;
         #endif     
-      vbxget(ip, i);
-      if(likely(i)) { 
-	    uint8_t c = *ip++; 
-	    i  += 3; 
-	    rmemset(op, c, i);
-	  } else 
-	    *op++ = e;												      
+        vbxget(ip, i);
+        if(likely(i)) { 
+	      uint8_t c = *ip++; 
+	      i  += 3; 
+	      rmemset(op, c, i);
+	    } else 
+	      *op++ = e;												      
+	  }
     }
 
   #define rmemset8(_op_, _c_, _i_) while(_i_--) *_op_++ = _c_
@@ -178,7 +180,7 @@ unsigned trled(const unsigned char *in, unsigned inlen, uint8_t *out, unsigned o
 #define rmemset(_op_, _c_, _i_) do { \
   __m128i *_up = (__m128i *)_op_, cv = TEMPLATE2(_mm_set1_epi, USIZE)(_c_);\
   _op_ += _i_;\
-  do _mm_storeu_si128(  _up, cv),_mm_storeu_si128(++_up, cv); while(++_up < (__m128i *)_op_);\
+  do { _mm_storeu_si128(  _up, cv),_mm_storeu_si128(_up+1, cv); _up+=2; } while(_up < (__m128i *)_op_);\
 } while(0)
   #else
 #define _cset64(_cc,_c_) _cc = _c_

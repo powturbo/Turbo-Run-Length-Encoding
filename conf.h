@@ -44,28 +44,41 @@ static inline int bsr64(unsigned long long x) { return x?64 - __builtin_clzll(x)
 #define bsr16(_x_) bsr32(_x_)
     #else
 static inline int bsr32(int x               ) { return x?32 - __builtin_clz(  x):0; }
-static inline int bsr64(unsigned long long x) { return x?64 - __builtin_clzll(x):0;
-}
+static inline int bsr64(unsigned long long x) { return x?64 - __builtin_clzll(x):0; }
     #endif
 #define ctzll(_x_) __builtin_ctzll(_x_)
   #elif _MSC_VER
-#define ALIGNED(x) __declspec(align(x))
-#define ALWAYS_INLINE __forceinline
-#define NOINLINE __declspec(noinline)
-#define THREADLOCAL   __declspec(thread)
-#define likely(x)     	__builtin_expect((x),1)
-#define unlikely(x)   	__builtin_expect((x),0)
-#define __builtin_prefetch(x) /* _mm_prefetch(x, _MM_HINT_NTA) */
+#define ALIGNED(x)		__declspec(align(x))
+#define ALWAYS_INLINE	__forceinline
+#define NOINLINE		__declspec(noinline)
+#define inline          __inline
+#define THREADLOCAL		__declspec(thread)
+#define likely(x)     	(x)
+#define unlikely(x)   	(x)
+#define __builtin_prefetch(x) //_mm_prefetch(x, _MM_HINT_NTA)
+static inline int bsr32(int x) { return x ? 32 - __builtin_clz(x) : 0; }
+    #ifdef _WIN64
+static inline int bsr64(unsigned long long x) { unsigned long z = 0; _BitScanForward64(&z, x); return 64 - z; }
+static inline int ctzll(unsigned long long x) { unsigned long z = 0; _BitScanForward64(&z, x); return z; }
+    #endif
+#define fseeko _fseeki64
+#define ftello _ftelli64
+#define sleep(x) Sleep(x/1000)
+#define strcasecmp _stricmp
+#define strncasecmp _strnicmp
   #endif 
 
 //--------------- Unaligned memory access -------------------------------------
-  #if defined(__i386__) || defined(__x86_64__) || defined(__powerpc__) ||\
+/*# || defined(i386) || defined(_X86_) || defined(__THW_INTEL)*/
+  #if defined(__i386__) || defined(__x86_64__) || \
+    defined(_M_IX86) || defined(_M_AMD64) || /*MSC_VER*/\
+    defined(__powerpc__) ||\
     defined(__ARM_FEATURE_UNALIGNED) || defined(__aarch64__) || defined(__arm__) ||\
     defined(__ARM_ARCH_4__) || defined(__ARM_ARCH_4T__) || \
     defined(__ARM_ARCH_5__) || defined(__ARM_ARCH_5T__) || defined(__ARM_ARCH_5TE__) || defined(__ARM_ARCH_5TEJ__) || \
     defined(__ARM_ARCH_6__) || defined(__ARM_ARCH_6J__) || defined(__ARM_ARCH_6K__)  || defined(__ARM_ARCH_6T2__) || defined(__ARM_ARCH_6Z__)   || defined(__ARM_ARCH_6ZK__)
-#define ctou16(_cp_) (*(unsigned short *)(_cp_))
-#define ctou32(_cp_) (*(unsigned       *)(_cp_))
+#define ctou16(_cp_) *(unsigned short *)(_cp_)
+#define ctou32(_cp_) *(unsigned       *)(_cp_)
 
     #if defined(__i386__) || defined(__x86_64__) || defined(__powerpc__)
 #define ctou64(_cp_)       (*(unsigned long long *)(_cp_))
@@ -80,26 +93,28 @@ struct _PACKED longu     { unsigned long long l; };
 #define ctou16(_cp_) ((struct shortu    *)(_cp_))->s
 #define ctou32(_cp_) ((struct unsignedu *)(_cp_))->u
 #define ctou64(_cp_) ((struct longu     *)(_cp_))->l
+  #else
+#error "unknown cpu"	  
   #endif
 
   #ifdef ctou16
 #define utoc16(_x_,_cp_) ctou16(_cp_) = _x_
   #else
-static inline unsigned short     ctou16(const void *cp) { unsigned short     x; memcpy(&x, cp, sizeof(x); return x; }
+static inline unsigned short     ctou16(const void *cp) { unsigned short     x; memcpy(&x, cp, sizeof(x)); return x; }
 static inline               void utoc16(unsigned short     x, void *cp ) { memcpy(cp, &x, sizeof(x)); }
   #endif
 
   #ifdef ctou32
 #define utoc32(_x_,_cp_) ctou32(_cp_) = _x_
   #else
-static inline unsigned           ctou32(const void *cp) { unsigned           x; memcpy(&x, cp, sizeof(x); return x; }
+static inline unsigned           ctou32(const void *cp) { unsigned           x; memcpy(&x, cp, sizeof(x)); return x; }
 static inline               void utoc32(unsigned           x, void *cp ) { memcpy(cp, &x, sizeof(x)); }
   #endif
 
   #ifdef ctou64
 #define utoc64(_x_,_cp_) ctou64(_cp_) = _x_
   #else
-static inline unsigned long long ctou64(const void *cp) { unsigned long long x; memcpy(&x, cp, sizeof(x); return x; }
+static inline unsigned long long ctou64(const void *cp) { unsigned long long x; memcpy(&x, cp, sizeof(x)); return x; }
 static inline               void utoc64(unsigned long long x, void *cp ) { memcpy(cp, &x, sizeof(x)); }
   #endif
 
@@ -135,13 +150,25 @@ static inline               void utoc64(unsigned long long x, void *cp ) { memcp
 
 //--- NDEBUG -------
 #include <stdio.h>
-  #ifdef NDEBUG
+  #ifdef _MSC_VER
+    #ifdef NDEBUG
+#define AS(expr, fmt, ...)
+#define AC(expr, fmt, ...) if(!(expr)) { fprintf(stderr, fmt, __VA_ARGS__ ); fflush(stderr); abort(); }
+#define die(fmt, ...) do { fprintf(stderr, fmt, __VA_ARGS__ ); fflush(stderr); exit(-1); } while(0)
+    #else
+#define AS(expr, fmt, ...) if(!(expr)) { fflush(stdout);fprintf(stderr, "%s:%s:%d:", __FILE__, __FUNCTION__, __LINE__); fprintf(stderr, fmt, ,__VA_ARGS__ ); fflush(stderr); abort(); }
+#define AC(expr, fmt, ...) if(!(expr)) { fflush(stdout);fprintf(stderr, "%s:%s:%d:", __FILE__, __FUNCTION__, __LINE__); fprintf(stderr, fmt, ,__VA_ARGS__ ); fflush(stderr); abort(); }
+#define die(fmt, ...) do { fprintf(stderr, "%s:%s:%d:", __FILE__, __FUNCTION__, __LINE__); fprintf(stderr, fmt, ,__VA_ARGS__ ); fflush(stderr); exit(-1); } while(0)
+    #endif
+  #else 
+    #ifdef NDEBUG
 #define AS(expr, fmt,args...)
 #define AC(expr, fmt,args...) if(!(expr)) { fprintf(stderr, fmt, ## args ); fflush(stderr); abort(); }
 #define die(fmt,args...) do { fprintf(stderr, fmt, ## args ); fflush(stderr); exit(-1); } while(0)
-  #else
+    #else
 #define AS(expr, fmt,args...) if(!(expr)) { fflush(stdout);fprintf(stderr, "%s:%s:%d:", __FILE__, __FUNCTION__, __LINE__); fprintf(stderr, fmt, ## args ); fflush(stderr); abort(); }
 #define AC(expr, fmt,args...) if(!(expr)) { fflush(stdout);fprintf(stderr, "%s:%s:%d:", __FILE__, __FUNCTION__, __LINE__); fprintf(stderr, fmt, ## args ); fflush(stderr); abort(); }
 #define die(fmt,args...) do { fprintf(stderr, "%s:%s:%d:", __FILE__, __FUNCTION__, __LINE__); fprintf(stderr, fmt, ## args ); fflush(stderr); exit(-1); } while(0)
+    #endif
   #endif
 

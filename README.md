@@ -51,7 +51,8 @@ CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 5.2, ubuntu 15.10
 |21910714|  5.4|8300.55|10232.33|rle64 64|
 |403920058|100.0|8464.75|9160.88|memcpy|
 
- (**bold** = pareto)  MB=1.000.000
+(**bold** = pareto)  MB=1.000.000
+
 srle 0: RLE w/ auto escape
 <p>
 

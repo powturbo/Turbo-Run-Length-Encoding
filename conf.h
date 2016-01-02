@@ -46,7 +46,10 @@ static inline int bsr64(unsigned long long x) { return x?64 - __builtin_clzll(x)
 static inline int bsr32(int x               ) { return x?32 - __builtin_clz(  x):0; }
 static inline int bsr64(unsigned long long x) { return x?64 - __builtin_clzll(x):0; }
     #endif
-#define ctzll(_x_) __builtin_ctzll(_x_)
+
+#define ctz64(_x_) __builtin_ctzll(_x_)
+#define ctz32(_x_) __builtin_ctz(_x_)
+
   #elif _MSC_VER
 #define ALIGNED(x)		__declspec(align(x))
 #define ALWAYS_INLINE	__forceinline
@@ -59,8 +62,9 @@ static inline int bsr64(unsigned long long x) { return x?64 - __builtin_clzll(x)
 static inline int bsr32(int x) { return x ? 32 - __builtin_clz(x) : 0; }
     #ifdef _WIN64
 static inline int bsr64(unsigned long long x) { unsigned long z = 0; _BitScanForward64(&z, x); return 64 - z; }
-static inline int ctzll(unsigned long long x) { unsigned long z = 0; _BitScanForward64(&z, x); return z; }
+static inline int ctz64(unsigned long long x) { unsigned long z = 0; _BitScanForward64(&z, x); return z; }
     #endif
+static inline int ctz32(unsigned           x) { unsigned      z = 0; _BitScanForward(&z, x); return z; }
 #define fseeko _fseeki64
 #define ftello _ftelli64
 #define sleep(x) Sleep(x/1000)
@@ -68,6 +72,7 @@ static inline int ctzll(unsigned long long x) { unsigned long z = 0; _BitScanFor
 #define strncasecmp _strnicmp
   #endif 
 
+#define ctz16(_x_) ctz32(_x_)
 //--------------- Unaligned memory access -------------------------------------
 /*# || defined(i386) || defined(_X86_) || defined(__THW_INTEL)*/
   #if defined(__i386__) || defined(__x86_64__) || \

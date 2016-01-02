@@ -40,19 +40,19 @@
 #include "trled.c"
 
   #if SRLE8
-unsigned _srled8(const unsigned char *in, uint8_t *out, unsigned outlen, uint8_t e) { 
+unsigned _srled8(const unsigned char *__restrict in, unsigned char *__restrict out, unsigned outlen, unsigned char e) { 
   const uint8_t *ip = in;
         uint8_t *op = out;
     #ifdef __SSE__    
   __m128i ev = _mm_set1_epi8(e);
     #endif 
   if(outlen >= SRLE8)
-    for(; op < out+(outlen-SRLE8);) {	
-        #ifdef __SSE__
+    while(op < out+(outlen-SRLE8)) {	
+        #ifdef __SSE__ // TODO: test _mm_cmpestrm/_mm_cmpestri on sse4
       uint32_t mask;
-      __m128i v = _mm_loadu_si128((__m128i*)ip); mask = _mm_movemask_epi8(_mm_cmpeq_epi8(v, ev)); _mm_storeu_si128((__m128i *)op, v); if(mask) goto a; op += 16; ip += 16;
+      __m128i v = _mm_loadu_si128((__m128i*)ip); _mm_storeu_si128((__m128i *)op, v); mask = _mm_movemask_epi8(_mm_cmpeq_epi8(v, ev)); if(mask) goto a; op += 16; ip += 16;
         #if SRLE8 >= 32
-      __m128i u = _mm_loadu_si128((__m128i*)ip); mask = _mm_movemask_epi8(_mm_cmpeq_epi8(u, ev)); _mm_storeu_si128((__m128i *)op, u); if(mask) goto a; op += 16; ip += 16;
+      __m128i u = _mm_loadu_si128((__m128i*)ip); _mm_storeu_si128((__m128i *)op, u); mask = _mm_movemask_epi8(_mm_cmpeq_epi8(u, ev)); if(mask) goto a; op += 16; ip += 16;
         #endif
 	  											__builtin_prefetch(ip+256, 0);
       continue;
@@ -98,11 +98,11 @@ unsigned _srled8(const unsigned char *in, uint8_t *out, unsigned outlen, uint8_t
 } 
   #endif
 
-unsigned _srled(const unsigned char *in, uint8_t *out, unsigned outlen) {
+unsigned _srled(const unsigned char *__restrict in, unsigned char *__restrict out, unsigned outlen) {
   return _srled8(in+1, out, outlen, *in); 
 }
   
-unsigned srled(const unsigned char *in, unsigned inlen, uint8_t *out, unsigned outlen) {
+unsigned srled(const unsigned char *__restrict in, unsigned inlen, unsigned char *__restrict out, unsigned outlen) {
   if(inlen == outlen) 
     memcpy(out, in, outlen); 
   else if(inlen == 1) 
@@ -112,7 +112,7 @@ unsigned srled(const unsigned char *in, unsigned inlen, uint8_t *out, unsigned o
   return inlen;
 }
 //------------------------------------- TurboRLE ------------------------------------------
-unsigned _trled(const unsigned char *in, uint8_t *out, unsigned outlen) {
+unsigned _trled(const unsigned char *__restrict in, unsigned char *__restrict out, unsigned outlen) {
         uint8_t b[256] = {0},*op = out;
   const uint8_t *ip;
   int m = -1, i, c; 
@@ -127,7 +127,26 @@ unsigned _trled(const unsigned char *in, uint8_t *out, unsigned outlen) {
     for(i = 0; i < 8; ++i) 
 	  if(((*ip) >> i) & 1) 
 	    b[(ip-in)<<3 | i] = ++m+1; 		
-		
+  
+  if(outlen >= 32)
+  while(op < out+(outlen-32)) {				
+    if(b[*ip]) goto a; *op++ = *ip++; 						
+    if(b[*ip]) goto a; *op++ = *ip++; 						
+    if(b[*ip]) goto a; *op++ = *ip++; 						
+    if(b[*ip]) goto a; *op++ = *ip++; 		
+    if(b[*ip]) goto a; *op++ = *ip++; 						
+    if(b[*ip]) goto a; *op++ = *ip++; 						
+    if(b[*ip]) goto a; *op++ = *ip++; 						
+    if(b[*ip]) goto a; *op++ = *ip++; 		
+											__builtin_prefetch(ip+256, 0);						
+    continue;
+    a:
+    c = b[*ip++]; 
+	vbzget(ip, i, m, c-1);
+	c  = *ip++; 
+	i += 3; 
+	rmemset(op,c,i); 													
+  }
   while(op < out+outlen) {				
     if(likely(!(c = b[*ip]))) 
 	  *op++ = *ip++; 						
@@ -136,13 +155,13 @@ unsigned _trled(const unsigned char *in, uint8_t *out, unsigned outlen) {
 	  vbzget(ip, i, m, c-1);
 	  c  = *ip++; 
 	  i += 3; 
-	  rmemset(op,c,i); 					
+	  rmemset8(op,c,i); 					
     }								
   }
   return ip - in;
 }
 
-unsigned trled(const unsigned char *in, unsigned inlen, uint8_t *out, unsigned outlen) {
+unsigned trled(const unsigned char *__restrict in, unsigned inlen, unsigned char *__restrict out, unsigned outlen) {
   if(inlen == outlen) 
     memcpy(out, in, outlen); 
   else if(inlen == 1) 
@@ -200,7 +219,7 @@ unsigned trled(const unsigned char *in, unsigned inlen, uint8_t *out, unsigned o
 #define uint_t TEMPLATE3(uint, USIZE, _t)
   
   #if !SRLE8
-unsigned TEMPLATE2(_srled, USIZE)(const unsigned char *in, unsigned char *cout, unsigned outlen, uint_t e) {
+unsigned TEMPLATE2(_srled, USIZE)(const unsigned char *__restrict in, unsigned char *__restrict cout, unsigned outlen, uint_t e) {
   uint_t *out = (uint_t *)cout, *op = out, c; 
   const unsigned char *ip = in;
   
@@ -229,7 +248,7 @@ unsigned TEMPLATE2(_srled, USIZE)(const unsigned char *in, unsigned char *cout, 
 }
   #endif
 
-unsigned TEMPLATE2(srled, USIZE)(const unsigned char *in, unsigned inlen, uint8_t *out, unsigned outlen, uint_t e) {
+unsigned TEMPLATE2(srled, USIZE)(const unsigned char *__restrict in, unsigned inlen, unsigned char *__restrict out, unsigned outlen, uint_t e) {
   if(inlen == outlen) 
     memcpy(out, in, outlen); 
   else if(inlen == 1) 

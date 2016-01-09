@@ -99,7 +99,7 @@ unsigned _srlec8(const unsigned char *__restrict in, unsigned inlen, unsigned ch
       ip += __builtin_ctz((unsigned short)(~mask));
       SRLEC8(pp, ip, op, e);
 	  pp = ip++;
-        #else						
+        #elif __WORDSIZE == 64						
       unsigned long long z;
 	  if((z = (ctou64(ip) ^ ctou64(ip+1)))) goto a; ip += 8;
 	  if((z = (ctou64(ip) ^ ctou64(ip+1)))) goto a; ip += 8;
@@ -112,6 +112,21 @@ unsigned _srlec8(const unsigned char *__restrict in, unsigned inlen, unsigned ch
       a:;
       uint8_t c = *ip; 
       ip += ctz64(z)>>3; 				       
+      SRLEC8(pp, ip, op, e);
+	  pp = ip++;
+        #else
+      unsigned z;
+	  if((z = (ctou32(ip) ^ ctou32(ip+1)))) goto a; ip += 4;
+	  if((z = (ctou32(ip) ^ ctou32(ip+1)))) goto a; ip += 4;
+          #if SRLE8 >= 16
+	  if((z = (ctou32(ip) ^ ctou32(ip+1)))) goto a; ip += 4;
+	  if((z = (ctou32(ip) ^ ctou32(ip+1)))) goto a; ip += 4;	
+          #endif
+                                                            __builtin_prefetch(ip +256, 0);
+      continue;
+      a:;
+      uint8_t c = *ip; 
+      ip += ctz32(z)>>3; 				       
       SRLEC8(pp, ip, op, e);
 	  pp = ip++;											
         #endif

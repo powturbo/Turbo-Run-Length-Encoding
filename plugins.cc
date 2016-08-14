@@ -81,18 +81,24 @@ enum {
 #define C_C_BLOSC2	0
    #endif
  P_C_BLOSC2,
-#define C_CRUSH	 	COMP2	
+#define C_CRUSH	 	 COMP2	
  P_CRUSH, 
-#define C_CSC       COMP2    
+#define C_CSC        COMP2    
  P_CSC, 
-#define C_DENSITY   COMP2	
+#define C_DENSITY    COMP2	
  P_DENSITY, 
-#define C_DOBOZ		COMP2	 //crash
+#define C_DOBOZ		 COMP2	 //crash
  P_DOBOZ, 
-#define C_FASTLZ 	COMP2	
+#define C_FASTLZ 	 COMP2	
  P_FASTLZ, 
 #define C_GIPFELI    COMP2	 
  P_GIPFELI,
+   #ifdef GLZA
+#define C_GLZA       COMP2
+   #else
+#define C_GLZA       0
+   #endif
+ P_GLZA,
 #define C_HEATSHRINK COMP2    
  P_KRAKEN,
 #define C_KRAKEN     COMP2    
@@ -350,6 +356,11 @@ static size_t cscwrite(MemISeqOutStream *so, const void *out, size_t outlen) {
 
   #if C_GIPFELI
 #include "gipfeli/gipfeli.h"
+  #endif
+
+  #if C_GLZA
+#include "glza/GLZAcomp.h"
+#include "glza/GLZAdecode.h"
   #endif
 
   #if C_HEATSHRINK
@@ -690,7 +701,8 @@ struct plugs plugs[] = {
   { P_DENSITY, 	"density",        	C_DENSITY,	"0.12.0",	"Density",				"BSD license",		"https://github.com/centaurean/density",												"1,2,3" },
   { P_DOBOZ,	"doboz",			C_DOBOZ, 	"14-01-14",	"Doboz",				"BSD Like",			"https://bitbucket.org/attila_afra\thttps://github.com/nemequ/doboz", 					"" },  //crash on windows
   { P_FASTLZ,	"fastlz", 			C_FASTLZ,	"0.1.0",	"FastLz",				"BSD like",			"http://fastlz.org\thttps://github.com/ariya/FastLZ",									"1,2" },
-  { P_GIPFELI, 	"gipfeli", 			C_GIPFELI, 	"15.12",	"Gipfeli",				"Apache license",	"https://github.com/google/gipfeli",													"" }, 
+  { P_GIPFELI, 	"gipfeli", 			C_GIPFELI, 	"15-12",	"Gipfeli",				"Apache license",	"https://github.com/google/gipfeli",													"" }, 
+  { P_GLZA, 	"glza", 			C_GLZA, 	"16-08",	"glza",					"Apache license",	"https://github.com/jrmuizel/GLZA",													    "" }, 
   { P_HEATSHRINK,"heatshrink",		C_HEATSHRINK,"0.4.1",	"heatshrink",			"BSD license",		"https://github.com/atomicobject/heatshrink",											"" },
 // { P_KRAKEN, 	"kraken", 			C_KRAKEN, 	"2016",		"Kraken/memcpy demo",	"Closed",			"http://www.radgametools.com/oodlewhatsnew.htm",										"1,2,3,4,5,6,7,8,9" },
   { P_LIBBSC_ST,"bsc_st", 			C_LIBBSC, 	"3.1.0",	"bsc",					"Apache license",	"https://github.com/IlyaGrebnov/libbsc",												"3,4,5,6,7,8" }, 
@@ -977,6 +989,10 @@ int codcomp(unsigned char *in, int inlen, unsigned char *out, int outsize, int c
 	  }	
 	  #endif
  
+      #if C_GLZA
+    case P_GLZA:  { size_t outsize; return GLZAcomp(inlen, (uint8_t *)in, &outsize, (uint8_t *)out, (FILE *)0)?outsize:0; }
+	  #endif
+
       #if C_HEATSHRINK
     case P_HEATSHRINK:   return hscompress(in, inlen, out);
       #endif
@@ -1426,6 +1442,10 @@ int coddecomp(unsigned char *in, int inlen, unsigned char *out, int outlen, int 
         outlen = c->UncompressStream(&src, &sink); delete c; return outlen;
 	  }  
       break;
+	  #endif
+
+	  #if C_GLZA
+    case P_GLZA: { size_t outsize; GLZAdecode(inlen, (uint8_t *)in, &outsize, (uint8_t *)out, (FILE *)0); break; }
 	  #endif
 
       #if C_HEATSHRINK

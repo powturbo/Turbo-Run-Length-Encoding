@@ -538,7 +538,7 @@ static const Lzma_options option_mapping[] =  {
   #endif  
 
   #if C_ZSTD
-#include "zstd/lib/common/zstd.h"
+#include "zstd/lib/zstd.h"
   #endif
 
   #ifdef LZTURBO
@@ -1237,8 +1237,8 @@ int codcomp(unsigned char *in, int inlen, unsigned char *out, int outsize, int c
       #endif	
     //------------------------- Entropy Coders -------------------------
       #if C_MEMCPY 
-    case P_MCPY:   memcpy(out, in, inlen);    return inlen;
-    case P_LMCPY:   libmemcpy(out, in, inlen); return inlen;
+    case P_MCPY:     memcpy(out, in, inlen); return inlen;
+    case P_LMCPY: libmemcpy(out, in, inlen); return inlen;
 	  #endif	
 
       #if C_BCMEC
@@ -1632,8 +1632,8 @@ int coddecomp(unsigned char *in, int inlen, unsigned char *out, int outlen, int 
       #endif	
       //------------ Entropy Coders ------------------------------------------------------------------
       #if C_MEMCPY 
-    case P_MCPY:    memcpy(out, in, inlen); 	break;
-    case P_LMCPY:   libmemcpy(out, in, outlen); break;
+    case P_MCPY:     memcpy(out, in, inlen);  break;
+    case P_LMCPY: libmemcpy(out, in, outlen); break;
       #endif
 
       #if C_BCMEC

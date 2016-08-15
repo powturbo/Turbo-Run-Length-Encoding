@@ -107,5 +107,5 @@ srle 0: RLE w/ auto escape
 - Windows: MinGW
 - Windows: Visual Studio 2015
 
-Last update: 01 JAN 2016
+Last update: 15 AUG 2016
 

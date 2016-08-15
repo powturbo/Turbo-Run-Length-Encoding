@@ -768,10 +768,10 @@ struct plugs plugs[] = {
   { P_FQZ0, 	"fqz0",				C_FQZ, 		"15-03",	"FQZ/PPMD Range Coder",	"Public Domain",	"http://encode.ru/threads/2149-ao0ec-Bytewise-adaptive-order-0-entropy-coder",			""},
   { P_PPMDEC, 	"ppmdec", 			C_PPMDEC,	"15-03",	"PPMD Range Coder",		"Public Domain",	"http://encode.ru/threads/2149-ao0ec-Bytewise-adaptive-order-0-entropy-coder",  		""},
 
-  { P_JRANS4_16o0,"rans_static4x16",  C_JRANS,	"16-08",	"ANS/J.Bonfield",		"Public Domain",	"https://github.com/jkbonfield/rans_static",											"", E_ANS},
-  { P_JRANS4_16o1,"rans_static4x16o1",C_JRANS,  "16-08",	"ANS/J.Bonfield",		"Public Domain",	"https://github.com/jkbonfield/rans_static",											"", E_ANS},
-  { P_JRANS4_8o0, "rans_static4x8",	  C_JRANS, 	"16-08",	"ANS/J.Bonfield",		"Public Domain",	"https://github.com/jkbonfield/rans_static",											"", E_ANS},
-  { P_JRANS4_8o1, "rans_static4x8o1", C_JRANS, 	"16-08",	"ANS/J.Bonfield",		"Public Domain",	"https://github.com/jkbonfield/rans_static",											"", E_ANS},
+  { P_JRANS4_16o0,"rans_static16",  C_JRANS,	"16-08",	"ANS/J.Bonfield",		"Public Domain",	"https://github.com/jkbonfield/rans_static",											"", E_ANS},
+  { P_JRANS4_16o1,"rans_static16o1",C_JRANS,    "16-08",	"ANS/J.Bonfield",		"Public Domain",	"https://github.com/jkbonfield/rans_static",											"", E_ANS},
+  { P_JRANS4_8o0, "rans_static8",	C_JRANS, 	"16-08",	"ANS/J.Bonfield",		"Public Domain",	"https://github.com/jkbonfield/rans_static",											"", E_ANS},
+  { P_JRANS4_8o1, "rans_static8o1", C_JRANS, 	"16-08",	"ANS/J.Bonfield",		"Public Domain",	"https://github.com/jkbonfield/rans_static",											"", E_ANS},
   
   { P_NANS,	    "naniarans",		C_NANS, 	"2015",	    "Nania Adaptive rANS",	"           ",		"http://encode.ru/threads/2079-nARANS-(Nania-Adaptive-Range-Variant-of-ANS)",			"", E_ANS},
   { P_POLHF,    "polar", 			C_POLHF, 	"10-07",	"Polar Codes",			"GPL license",		"http://www.ezcodesample.com/prefixer/prefixer_article.html",							"" },

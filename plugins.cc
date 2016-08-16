@@ -99,9 +99,13 @@ enum {
 #define C_GLZA       0
    #endif
  P_GLZA,
-#define C_HEATSHRINK COMP2    
- P_KRAKEN,
-#define C_KRAKEN     COMP2    
+   #ifdef _WIN32
+#define C_OODLE     COMP2
+   #else
+#define C_OODLE     0
+   #endif	  
+ P_OODLE, 
+#define C_HEATSHRINK COMP2
  P_HEATSHRINK,
 #define C_LIBBSC     COMP2    
  P_LIBBSC, P_LIBBSC_ST,  
@@ -367,8 +371,11 @@ static size_t cscwrite(MemISeqOutStream *so, const void *out, size_t outlen) {
 #include "heatshrink_/heatshrink.h"
   #endif
 
-  #if C_KRAKEN
-//#include "kraken/kraken.h"
+  #if C_OODLE
+typedef __int64(__cdecl *OODLE_COMPRESS)(int codec, void *in, __int64 inlen, void *out, int lev, void *p5, void *buf, __int64 p6);
+typedef __int64(__cdecl *OODLE_DECOMPRESS)(void *in, __int64 inlen, void *out, __int64 outlen, int crc, int p5, __int64 verb, void *dic, __int64 diclen, void *p9, __int64 p10, void *p11=0, __int64 p12=0, int p13=0);
+static OODLE_COMPRESS   OodleLZ_Compress;
+static OODLE_DECOMPRESS OodleLZ_Decompress;
   #endif
 
   #if C_LIBLZG
@@ -704,7 +711,7 @@ struct plugs plugs[] = {
   { P_GIPFELI, 	"gipfeli", 			C_GIPFELI, 	"15-12",	"Gipfeli",				"Apache license",	"https://github.com/google/gipfeli",													"" }, 
   { P_GLZA, 	"glza", 			C_GLZA, 	"16-08",	"glza",					"Apache license",	"https://github.com/jrmuizel/GLZA",													    "" }, 
   { P_HEATSHRINK,"heatshrink",		C_HEATSHRINK,"0.4.1",	"heatshrink",			"BSD license",		"https://github.com/atomicobject/heatshrink",											"" },
-// { P_KRAKEN, 	"kraken", 			C_KRAKEN, 	"2016",		"Kraken/memcpy demo",	"Closed",			"http://www.radgametools.com/oodlewhatsnew.htm",										"1,2,3,4,5,6,7,8,9" },
+  { P_OODLE, 	"oodle", 			C_OODLE, 	"2016",		"oodle",	            "Closed",			"http://www.radgametools.com/oodle.htm",										        "11,12,13,14,15,16,17,18,21,22,23,24,25,26,27,28,41,42,43,44,45,46,47,48,51,52,53,54,55,56,57,58" },
   { P_LIBBSC_ST,"bsc_st", 			C_LIBBSC, 	"3.1.0",	"bsc",					"Apache license",	"https://github.com/IlyaGrebnov/libbsc",												"3,4,5,6,7,8" }, 
   { P_LIBBSC, 	"bsc", 				C_LIBBSC, 	"3.1.0",	"bsc",					"Apache license",	"https://github.com/IlyaGrebnov/libbsc",												"1,2"}, 
   { P_LIBDEFLATE,"libdeflate", 	    C_LIBDEFLATE,"16-06",	"libdeflate",			"CC0 license",		"https://github.com/ebiggers/libdeflate",												"1,2,3,4,5,6,7,8,9,12"}, 
@@ -873,7 +880,14 @@ int codini(size_t insize, int codec) {
 
       #if C_LIBBSC
     case P_LIBBSC: case P_LIBBSC_ST: bsc_init(LIBBSC_FEATURE_FASTMODE); bsc_st_init(LIBBSC_FEATURE_FASTMODE); break;
-    #endif
+      #endif
+	
+      #if C_OODLE
+    case P_OODLE: { HINSTANCE hdll = LoadLibrary("oodle230x64.dll");                   if(!hdll) { printf("oodle230x64.dll not found\n");    exit(-1); }
+	    if(!(OodleLZ_Compress   = (OODLE_COMPRESS  )GetProcAddress(hdll, "OodleLZ_Compress"  ))) { printf("OodleLZ_Compress not found\n");   exit(-1); }
+	    if(!(OodleLZ_Decompress = (OODLE_DECOMPRESS)GetProcAddress(hdll, "OodleLZ_Decompress"))) { printf("OodleLZ_Decompress not found\n"); exit(-1); }
+	  } break;
+	  #endif
   }
   if(!workmemsize) return 0;
   if(workmemsize > sizeof(_workmem) && !(workmem = (char *)malloc(workmemsize)) ) { 
@@ -997,8 +1011,8 @@ int codcomp(unsigned char *in, int inlen, unsigned char *out, int outsize, int c
     case P_HEATSHRINK:   return hscompress(in, inlen, out);
       #endif
 
-      #if C_KRAKEN
-//    case P_KRAKEN:   memcpy(out, in, inlen); return inlen;
+      #if C_OODLE
+    case P_OODLE: return OodleLZ_Compress( lev/10, in, inlen, out, lev%10, 0, in, 0 );
       #endif
 
 	  #if C_LIBLZF  
@@ -1452,8 +1466,8 @@ int coddecomp(unsigned char *in, int inlen, unsigned char *out, int outlen, int 
     case P_HEATSHRINK: return hsdecompress(in, inlen, out, outlen); 
       #endif
 
-      #if C_KRAKEN
-//    case P_KRAKEN: memcpy(out, in, outlen); break; // REPLACE 
+      #if C_OODLE
+    case P_OODLE: OodleLZ_Decompress( in, inlen, out, outlen, 0,0,0,0,0,0,0,0,0,0 ); break;
       #endif
 
 	  #if C_LIBLZF 

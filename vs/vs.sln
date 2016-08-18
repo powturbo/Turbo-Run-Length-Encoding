@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
+<<<<<<< HEAD
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TurboBench", "TurboBench\TurboBench.vcxproj", "{05035042-0365-467E-B47D-003BDFBC9121}"
+=======
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vs", "vs.vcxproj", "{E4962CF1-D09A-4A8E-A3B8-E96B4C0B6640}"
+>>>>>>> 867c28b270cfc64028077d475639f3b67b6ae544
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,6 +17,16 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+<<<<<<< HEAD
+		{05035042-0365-467E-B47D-003BDFBC9121}.Debug|x64.ActiveCfg = Debug|x64
+		{05035042-0365-467E-B47D-003BDFBC9121}.Debug|x64.Build.0 = Debug|x64
+		{05035042-0365-467E-B47D-003BDFBC9121}.Debug|x86.ActiveCfg = Debug|x64
+		{05035042-0365-467E-B47D-003BDFBC9121}.Debug|x86.Build.0 = Debug|x64
+		{05035042-0365-467E-B47D-003BDFBC9121}.Release|x64.ActiveCfg = Release|x64
+		{05035042-0365-467E-B47D-003BDFBC9121}.Release|x64.Build.0 = Release|x64
+		{05035042-0365-467E-B47D-003BDFBC9121}.Release|x86.ActiveCfg = Release|x64
+		{05035042-0365-467E-B47D-003BDFBC9121}.Release|x86.Build.0 = Release|x64
+=======
 		{E4962CF1-D09A-4A8E-A3B8-E96B4C0B6640}.Debug|x64.ActiveCfg = Release|x64
 		{E4962CF1-D09A-4A8E-A3B8-E96B4C0B6640}.Debug|x64.Build.0 = Release|x64
 		{E4962CF1-D09A-4A8E-A3B8-E96B4C0B6640}.Debug|x86.ActiveCfg = Debug|x64
@@ -21,6 +35,7 @@ Global
 		{E4962CF1-D09A-4A8E-A3B8-E96B4C0B6640}.Release|x64.Build.0 = Release|x64
 		{E4962CF1-D09A-4A8E-A3B8-E96B4C0B6640}.Release|x86.ActiveCfg = Release|x64
 		{E4962CF1-D09A-4A8E-A3B8-E96B4C0B6640}.Release|x86.Build.0 = Release|x64
+>>>>>>> 867c28b270cfc64028077d475639f3b67b6ae544
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,9 +1,17 @@
 language: c
+<<<<<<< HEAD
+
+=======
+>>>>>>> 867c28b270cfc64028077d475639f3b67b6ae544
 compiler: gcc
 
 branches:
   only:
+<<<<<<< HEAD
+    - master   
+=======
     - master
+>>>>>>> 867c28b270cfc64028077d475639f3b67b6ae544
 script:
     - make
 os:

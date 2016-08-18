@@ -1,0 +1,3 @@
+[submodule "TurboRLE"]
+	path = TurboRLE
+	url = https://github.com/powturbo/TurboRLE.git

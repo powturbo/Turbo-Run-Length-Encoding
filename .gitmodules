@@ -1,88 +1,36 @@
 [submodule "brotli"]
 	path = brotli
 	url = https://github.com/google/brotli.git
-[submodule "brieflz"]
-	path = brieflz
-	url = https://github.com/jibsen/brieflz.git
-[submodule "CSC"]
-	path = CSC
-	url = https://github.com/fusiyuan2010/CSC.git
-[submodule "FastARI"]
-	path = FastARI
-	url = https://github.com/davidcatt/FastARI.git
 [submodule "FastLZ"]
 	path = FastLZ
 	url = https://github.com/ariya/FastLZ.git
-[submodule "LZMA-SDK"]
-	path = LZMA-SDK
-	url = https://github.com/jljusten/LZMA-SDK.git
-[submodule "bzip2"]
-	path = bzip2
-	url = https://github.com/asimonov-im/bzip2.git
 [submodule "lzoma"]
 	path = lzoma
 	url = https://github.com/alef78/lzoma.git
-[submodule "c-blosc2"]
-	path = c-blosc2
-	url = https://github.com/Blosc/c-blosc2.git
-[submodule "density"]
-	path = density
-	url = https://github.com/centaurean/density.git
-	branch = dev
 [submodule "doboz"]
 	path = doboz
 	url = https://github.com/nemequ/doboz.git
 [submodule "fsc"]
 	path = fsc
 	url = https://github.com/skal65535/fsc.git
-[submodule "gipfeli"]
-	path = gipfeli
-	url = https://github.com/google/gipfeli.git
-[submodule "heatshrink"]
-	path = heatshrink
-	url = https://github.com/atomicobject/heatshrink.git
-[submodule "libbsc"]
-	path = libbsc
-	url = https://github.com/IlyaGrebnov/libbsc.git
-[submodule "liblzf"]
-	path = liblzf
-	url = https://github.com/nemequ/liblzf.git
 [submodule "liblzg"]
 	path = liblzg
 	url = https://github.com/mbitsnbites/liblzg.git
 [submodule "libzling"]
 	path = libzling
 	url = https://github.com/richox/libzling.git
-[submodule "lz4"]
-	path = lz4
-	url = https://github.com/Cyan4973/lz4.git
-[submodule "lz5"]
-	path = lz5
-	url = https://github.com/inikep/lz5.git
 [submodule "lzham_codec_devel"]
 	path = lzham_codec_devel
 	url = https://github.com/richgel999/lzham_codec_devel.git
 [submodule "lzmat"]
 	path = lzmat
 	url = https://github.com/nemequ/lzmat.git
-[submodule "lzo"]
-	path = lzo
-	url = https://github.com/nemequ/lzo.git
-[submodule "ms-compress"]
-	path = ms-compress
-	url = https://github.com/coderforlife/ms-compress.git
-[submodule "pithy"]
-	path = pithy
-	url = https://github.com/johnezang/pithy.git
 [submodule "pysap"]
 	path = pysap
 	url = https://github.com/CoreSecurity/pysap.git
 [submodule "quicklz"]
 	path = quicklz
 	url = https://github.com/robottwo/quicklz.git
-[submodule "snappy"]
-	path = snappy
-	url = https://github.com/google/snappy.git
 [submodule "snappy-c"]
 	path = snappy-c
 	url = https://github.com/andikleen/snappy-c.git
@@ -92,9 +40,6 @@
 [submodule "wflz"]
 	path = wflz
 	url = https://github.com/ShaneWF/wflz.git
-[submodule "yalz77"]
-	path = yalz77
-	url = https://github.com/ivan-tkatchev/yalz77.git
 [submodule "zlib"]
 	path = zlib
 	url = https://github.com/madler/zlib.git
@@ -116,21 +61,9 @@
 [submodule "miniz"]
 	path = miniz
 	url = https://github.com/richgel999/miniz.git
-[submodule "LZSSE"]
-	path = LZSSE
-	url = https://github.com/ConorStokes/LZSSE.git
-[submodule "bcm"]
-	path = bcm
-	url = https://github.com/encode84/bcm.git
-[submodule "libdeflate"]
-	path = libdeflate
-	url = https://github.com/ebiggers/libdeflate.git
 [submodule "xpack"]
 	path = xpack
 	url = https://github.com/ebiggers/xpack.git
-[submodule "rans_static"]
-	path = rans_static
-	url = https://github.com/jkbonfield/rans_static.git
 [submodule "lzfse"]
 	path = lzfse
 	url = https://github.com/lzfse/lzfse.git

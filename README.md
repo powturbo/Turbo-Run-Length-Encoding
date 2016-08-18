@@ -7,6 +7,7 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 - Most efficient compression 
 - No other RLE compress or decompress faster with better compression
 - :new: faster compression and 2x faster decompression with :+1: SIMD
+- :new: **Java** Critical Natives Interface. Access TurboRLE **incl. SIMD!** :+1: from Java as fast as calling from C
 - Compress better and up to 8 times faster and decompress up to 4 times faster than other fast RLEs
 - Can be faster than memcpy
 - :new: **ZERO!** byte overhead
@@ -107,5 +108,5 @@ srle 0: RLE w/ auto escape
 - Windows: MinGW
 - Windows: Visual Studio 2015
 
-Last update: 15 AUG 2016
+Last update: 18 AUG 2016
 

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # powturbo  (c) Copyright 2013-2016
 # ----------- Downloading + Compiling ----------------------
 # git clone --recursive git://github.com/powturbo/TurboBench.git 
@@ -8,17 +9,23 @@
 # Minimum make: "make NCOMP2=1 NECODER=1 NSIMD=1" to compile only lz4,brotli,lzma,zlib and zstd
 
 # Linux: "export CC=clang" "export CXX=clang". windows mingw: "set CC=gcc" "set CXX=g++" or uncomment the CC,CXX lines
+=======
+# powturbo  (c) Copyright 2015-2016
+>>>>>>> 867c28b270cfc64028077d475639f3b67b6ae544
 CC ?= gcc
 CXX ?= g++
 #CC=clang
 #CXX=clang++
 
+<<<<<<< HEAD
 #----- Compile for 'American Fuzzy Lop (http://lcamtuf.coredump.cx/afl/) 
 # add '-static' to LDFLAG
 # Run turbobench w/o output : afl-fuzz -i testcase_dir -o finding_dir -- ./turbobench -elzturbo,12 -v0 -gg -k0
 #CC=~/b/afl/afl-gcc 
 #CXX=~/b/afl/afl-g++
 #----------------------------------------------
+=======
+>>>>>>> 867c28b270cfc64028077d475639f3b67b6ae544
 ifeq ($(OS),Windows_NT)
   UNAME := Windows
 CC=gcc
@@ -26,6 +33,7 @@ CXX=g++
 else
   UNAME := $(shell uname -s)
 ifeq ($(UNAME),$(filter $(UNAME),Linux Darwin FreeBSD GNU/kFreeBSD))
+<<<<<<< HEAD
 LDFLAGS+=-lpthread -lrt
 endif
 endif
@@ -375,4 +383,28 @@ cleanw:
 	del /S *.o 
 	del /S *~
 	del /S *.exe
+=======
+LDFLAGS+= -lrt
+endif
+endif
+
+CFLAGS=-march=native -minline-all-stringops
+
+all: trle
+
+#trled.o: trle_.h trle.h trled.c
+#	gcc -O3 $(CFLAGS) -c trled.c
+
+trle: trlec.o trled.o trle.o
+	$(CC) trle.o trlec.o trled.o $(LDFLAGS) -o trle
+ 
+.c.o:
+	$(CC) -O3 $(CFLAGS) $< -c -o $@
+
+clean:
+	rm  *.o
+
+cleanw:
+	del .\*.o
+>>>>>>> 867c28b270cfc64028077d475639f3b67b6ae544
 

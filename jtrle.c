@@ -22,6 +22,7 @@
     - email    : powturbo [_AT_] gmail [_DOT_] com
 **/
 // TurboRLE - Java Critical Natives
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "trle.h"

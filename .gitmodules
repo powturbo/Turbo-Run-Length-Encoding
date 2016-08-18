@@ -1,21 +1,3 @@
-[submodule "libzling"]
-	path = libzling
-	url = https://github.com/richox/libzling.git
-[submodule "lzham_codec_devel"]
-	path = lzham_codec_devel
-	url = https://github.com/richgel999/lzham_codec_devel.git
-[submodule "wflz"]
-	path = wflz
-	url = https://github.com/ShaneWF/wflz.git
-[submodule "zlib"]
-	path = zlib
-	url = https://github.com/madler/zlib.git
-[submodule "zopfli"]
-	path = zopfli
-	url = https://github.com/google/zopfli.git
-[submodule "zstd"]
-	path = zstd
-	url = https://github.com/Cyan4973/zstd.git
 [submodule "TurboRLE"]
 	path = TurboRLE
 	url = https://github.com/powturbo/TurboRLE.git

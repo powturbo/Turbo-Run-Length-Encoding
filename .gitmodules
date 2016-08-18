@@ -1,42 +1,9 @@
-[submodule "brotli"]
-	path = brotli
-	url = https://github.com/google/brotli.git
-[submodule "FastLZ"]
-	path = FastLZ
-	url = https://github.com/ariya/FastLZ.git
-[submodule "lzoma"]
-	path = lzoma
-	url = https://github.com/alef78/lzoma.git
-[submodule "doboz"]
-	path = doboz
-	url = https://github.com/nemequ/doboz.git
-[submodule "fsc"]
-	path = fsc
-	url = https://github.com/skal65535/fsc.git
-[submodule "liblzg"]
-	path = liblzg
-	url = https://github.com/mbitsnbites/liblzg.git
 [submodule "libzling"]
 	path = libzling
 	url = https://github.com/richox/libzling.git
 [submodule "lzham_codec_devel"]
 	path = lzham_codec_devel
 	url = https://github.com/richgel999/lzham_codec_devel.git
-[submodule "lzmat"]
-	path = lzmat
-	url = https://github.com/nemequ/lzmat.git
-[submodule "pysap"]
-	path = pysap
-	url = https://github.com/CoreSecurity/pysap.git
-[submodule "quicklz"]
-	path = quicklz
-	url = https://github.com/robottwo/quicklz.git
-[submodule "snappy-c"]
-	path = snappy-c
-	url = https://github.com/andikleen/snappy-c.git
-[submodule "tornado"]
-	path = tornado
-	url = https://github.com/nemequ/tornado.git
 [submodule "wflz"]
 	path = wflz
 	url = https://github.com/ShaneWF/wflz.git
@@ -49,21 +16,6 @@
 [submodule "zstd"]
 	path = zstd
 	url = https://github.com/Cyan4973/zstd.git
-[submodule "zpaq"]
-	path = zpaq
-	url = https://github.com/zpaq/zpaq.git
-[submodule "shoco"]
-	path = shoco
-	url = https://github.com/Ed-von-Schleck/shoco.git
 [submodule "TurboRLE"]
 	path = TurboRLE
 	url = https://github.com/powturbo/TurboRLE.git
-[submodule "miniz"]
-	path = miniz
-	url = https://github.com/richgel999/miniz.git
-[submodule "xpack"]
-	path = xpack
-	url = https://github.com/ebiggers/xpack.git
-[submodule "lzfse"]
-	path = lzfse
-	url = https://github.com/lzfse/lzfse.git

@@ -4,22 +4,22 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 ###### Efficient and fastest **Run Length Encoding** library
 - 100% C (C++ compatible headers), without inline assembly
 <p>
-- Most efficient compression 
-- No other RLE compress or decompress faster with better compression
-- :new: faster compression and 2x faster decompression with :+1: SIMD
-- :new: **Java** Critical Natives Interface. Access TurboRLE **incl. SIMD!** :+1: from Java as fast as calling from C
-- Compress better and up to 8 times faster and decompress up to 4 times faster than other fast RLEs
-- Can be faster than memcpy
-- :new: **ZERO!** byte overhead
+  - Most efficient compression 
+  - No other RLE compress or decompress faster with better compression
+  - :new: faster compression and 2x faster decompression with :+1: SIMD
+  - :new: **Java** Critical Natives Interface. Access TurboRLE **incl. SIMD!** :+1: from Java as fast as calling from C
+  - Compress better and up to 8 times faster and decompress up to 4 times faster than other fast RLEs
+  - Can be faster than memcpy
+  - :new: **ZERO!** byte overhead
   
 <p>
-- No modification of the raw data, preserving compressibility
-- Order preserving 
+  - No modification of the raw data, preserving compressibility
+  - Order preserving 
 
 ###### TurboRLE
-- **TRLE**: TurboRLE - Efficient and fast Run Length Encoding
+  - **TRLE**: TurboRLE - Efficient and fast Run Length Encoding
 <p>
-- **SRLE**: TurboRLE Escape - Fast Run Length Encoding with automatic escape determination 
+  - **SRLE**: TurboRLE Escape - Fast Run Length Encoding with automatic escape determination 
 
 <p>
 ## Benchmark:

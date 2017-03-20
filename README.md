@@ -15,8 +15,8 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
   - Order preserving 
 
 ###### TurboRLE
-  - **TRLE**: TurboRLE - Efficient and fast Run Length Encoding
-  - **SRLE**: TurboRLE Escape - Fast Run Length Encoding with automatic escape determination 
+    - **TRLE**: TurboRLE - Efficient and fast Run Length Encoding
+    - **SRLE**: TurboRLE Escape - Fast Run Length Encoding with automatic escape determination 
 
 <p>
 ## Benchmark:
@@ -72,7 +72,7 @@ srle 0: RLE w/ auto escape
 |419225629|100.0|**8367.04**|**8934.25**|**memcpy**|
 
 <p>
-- Text File: [enwik9bwt](http://mattmahoney.net/dc/textdata.html) enwik9 bwt generated w.<br>
+  - Text File: [enwik9bwt](http://mattmahoney.net/dc/textdata.html) enwik9 bwt generated w.<br>
 [libdivsufsort](https://code.google.com/p/libdivsufsort/)
 
 |C Size|ratio%|C MB/s|D MB/s|Name|

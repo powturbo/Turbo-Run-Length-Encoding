@@ -1,7 +1,7 @@
 TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powturbo/TurboRLE.svg?branch=master)](https://travis-ci.org/powturbo/TurboRLE)
 ===================================
 
-###### Efficient and fastest **Run Length Encoding** library
+##### Efficient and fastest **Run Length Encoding** library
   - 100% C (C++ compatible headers), without inline assembly
   - Most efficient compression 
   - No other RLE compress or decompress faster with better compression
@@ -14,11 +14,10 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
   - No modification of the raw data, preserving compressibility
   - Order preserving 
 
-###### TurboRLE
+##### TurboRLE
   - **TRLE**: TurboRLE - Efficient and fast Run Length Encoding
   - **SRLE**: TurboRLE Escape - Fast Run Length Encoding with automatic escape determination 
 
-<p>
 ## Benchmark:
 CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 5.2, ubuntu 15.10
 - with [TurboBench](https://github.com/powturbo/TurboBench)

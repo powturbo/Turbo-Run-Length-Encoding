@@ -2,7 +2,7 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 ===================================
 
 ###### Efficient and fastest **Run Length Encoding** library
-- 100% C (C++ compatible headers), without inline assembly
+  - 100% C (C++ compatible headers), without inline assembly
   - Most efficient compression 
   - No other RLE compress or decompress faster with better compression
   - :new: faster compression and 2x faster decompression with :+1: SIMD
@@ -16,7 +16,6 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 
 ###### TurboRLE
   - **TRLE**: TurboRLE - Efficient and fast Run Length Encoding
-<p>
   - **SRLE**: TurboRLE Escape - Fast Run Length Encoding with automatic escape determination 
 
 <p>
@@ -36,7 +35,7 @@ CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 5.2, ubuntu 15.10
 - BMP File: [girl.bmp in RLE64Samples](http://sourceforge.net/projects/nikkhokkho/files/RLE64/3.00/)
 
 |C Size|ratio%|C MB/s|D MB/s|Name|
-|--------:|-----:|--------:|--------:|----------------|----------------|
+|--------:|-----:|--------:|--------:|----------------|
 |3293899|  0.8|**2086.17**|**13113.37**|**trle**|
 |4482388|  1.1|297.68|9209.99|mrle|
 |4821162|  1.2|**11092.86**|13006.29|**srle 8**|
@@ -106,6 +105,6 @@ srle 0: RLE w/ auto escape
 - Windows: MinGW
 - Windows: Visual Studio 2015
 
-Last update: 18 AUG 2016
+Last update: 20 MAR 2017
 
 

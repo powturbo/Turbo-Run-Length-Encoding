@@ -3,7 +3,6 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 
 ###### Efficient and fastest **Run Length Encoding** library
 - 100% C (C++ compatible headers), without inline assembly
-<p>
   - Most efficient compression 
   - No other RLE compress or decompress faster with better compression
   - :new: faster compression and 2x faster decompression with :+1: SIMD
@@ -11,8 +10,7 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
   - Compress better and up to 8 times faster and decompress up to 4 times faster than other fast RLEs
   - Can be faster than memcpy
   - :new: **ZERO!** byte overhead
-  
-<p>
+
   - No modification of the raw data, preserving compressibility
   - Order preserving 
 
@@ -60,7 +58,7 @@ srle 0: RLE w/ auto escape
 - Checkers program "End Game Table Base": [1034.db](http://encode.ru/threads/2077-EGTB-compression?p=41392&viewfull=1#post41392)
 
 |C Size|ratio%|C MB/s|D MB/s|Name|
-|--------:|-----:|--------:|--------:|----------------|----------------|
+|--------:|-----:|--------:|--------:|----------------|
 |82452164| 19.7|**770.97**|**3337.61**|**trle**|
 |88055364| 21.0|233.07|1573.62|mrle|
 |92539191| 22.1|**1147.88**|**5726.42**|**srle 8**|
@@ -78,7 +76,7 @@ srle 0: RLE w/ auto escape
 - Text File: [enwik9bwt](http://mattmahoney.net/dc/textdata.html) enwik9 bwt generated w. [libdivsufsort](https://code.google.com/p/libdivsufsort/)
 
 |C Size|ratio%|C MB/s|D MB/s|Name|
-|--------:|-----:|--------:|--------:|----------------|----------------|
+|--------:|-----:|--------:|--------:|----------------|
 |378458015| 37.8|**485.51**|**2005.02**|**trle**|
 |419346351| 41.9|**606.05**|**4297.19**|**srle 8**|
 |419346352| 41.9|491.16|4294.26|srle 0|

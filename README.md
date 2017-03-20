@@ -27,7 +27,6 @@ CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 5.2, ubuntu 15.10
 
 ###### Functions benchmarked
   - **MRLE**: Mespotine RLE [MRLE](http://encode.ru/threads/2121-No-more-encoding-overhead-in-Run-Length-Encoding-Read-about-Mespotine-RLE-here-)
-<p>
   - **RLE64**: Run Length Encoding - [RLE64](http://sourceforge.net/projects/nikkhokkho/files/RLE64/)
 <p>
 

@@ -104,6 +104,11 @@ srle 0: RLE w/ auto escape
 - Windows: MinGW
 - Windows: Visual Studio 2015
 
+#### References
+  - [Real-Time Compression of IEC 61869-9 Sampled Value Data](https://pure.strath.ac.uk/portal/files/55444712/Blair_etal_AMPS2016_Real_time_compression_of_IEC_61869_9_sampled_value_data.pdf)
+  - [Understanding Compression: Data Compression for Modern Developers](https://books.google.de/books?id=2C2rDAAAQBAJ&pg=PA216&lpg=PA216&dq=%22turborle%22&source=bl&ots=TiLU4Qf47s&sig=tkk0Dnk9NnU0JMR3Z6iW4TRquxg&hl=de&sa=X&ved=0ahUKEwjZq-Li5uXSAhXFCJoKHe77B6cQ6AEIyAEwHQ#v=onepage&q=%22turborle%22&f=false)
+  - [Understanding Compression](http://file.allitebooks.com/20160805/Understanding%20Compression.pdf)
+  
 Last update: 20 MAR 2017
 
 

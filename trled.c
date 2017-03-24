@@ -1,5 +1,5 @@
 /**
-    Copyright (C) powturbo 2015-2016
+    Copyright (C) powturbo 2015-2017
     GPL v2 License
 
     This program is free software; you can redistribute it and/or modify
@@ -49,12 +49,12 @@ unsigned _srled8(const unsigned char *__restrict in, unsigned char *__restrict o
   if(outlen >= SRLE8)
     while(op < out+(outlen-SRLE8)) {	
         #ifdef __SSE__ // TODO: test _mm_cmpestrm/_mm_cmpestri on sse4
-      uint32_t mask;
+      uint32_t mask; 
       __m128i v = _mm_loadu_si128((__m128i*)ip); _mm_storeu_si128((__m128i *)op, v); mask = _mm_movemask_epi8(_mm_cmpeq_epi8(v, ev)); if(mask) goto a; op += 16; ip += 16;
         #if SRLE8 >= 32
       __m128i u = _mm_loadu_si128((__m128i*)ip); _mm_storeu_si128((__m128i *)op, u); mask = _mm_movemask_epi8(_mm_cmpeq_epi8(u, ev)); if(mask) goto a; op += 16; ip += 16;
         #endif
-	  											__builtin_prefetch(ip+256, 0);
+	  											__builtin_prefetch(ip+512, 0);
       continue;
       a:;
       uint32_t i = __builtin_ctz(mask);
@@ -68,7 +68,7 @@ unsigned _srled8(const unsigned char *__restrict in, unsigned char *__restrict o
 	  } else {  
 	    uint32_t i;
         #endif     
-        vbxget(ip, i);
+        vbget32(ip, i);
         if(likely(i)) { 
 	      uint8_t c = *ip++; 
 	      i  += 3; 
@@ -86,7 +86,7 @@ unsigned _srled8(const unsigned char *__restrict in, unsigned char *__restrict o
 	  *op++ = c; 
 	} else { 
 	  ip++;
-	  int i; vbxget(ip, i);
+	  int i; vbget32(ip, i);
 	  if(likely(i)) { 
 	    c   = *ip++;  
 		i  += 3; 
@@ -230,7 +230,7 @@ unsigned TEMPLATE2(_srled, USIZE)(const unsigned char *__restrict in, unsigned c
 	} else { 				
 	  ip += sizeof(uint_t);			
 	  int i; 
-      vbxget(ip, i);
+      vbget32(ip, i);
 	  if(likely(i)) { 
 	    c   = *(uint_t *)ip; 
 		ip += sizeof(uint_t); 		

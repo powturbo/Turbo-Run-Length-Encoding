@@ -1,5 +1,5 @@
 /**
-    Copyright (C) powturbo 2015-2016
+    Copyright (C) powturbo 2015-2017
     GPL v2 License
 
     This program is free software; you can redistribute it and/or modify
@@ -77,9 +77,9 @@ static inline unsigned hist(const unsigned char *__restrict in, unsigned inlen, 
   #if SRLE8
 #define SRLEC8(pp, ip, op, e) do {\
   unsigned i = ip - pp;\
-  if(i > 3) { *op++ = e; i -= 3; vbxput(op, i); *op++ = c; }\
+  if(i > 3) { *op++ = e; i -= 3; vbput32(op, i); *op++ = c; }\
   else if(c == e) {\
-	while(i--) { *op++ = e; vbxput(op, 0); }\
+	while(i--) { *op++ = e; vbput32(op, 0); }\
   } else while(i--) *op++ = c;\
 } while(0)
 
@@ -278,9 +278,9 @@ unsigned trlec(const unsigned char *__restrict in, unsigned inlen, unsigned char
 
 #define SRLEC(pp, ip, op, e) do {\
   unsigned i = ip - pp;\
-  if(i > 3) { *(uint_t *)op = e; op+=sizeof(uint_t); i -= 3; vbxput(op, i); *(uint_t *)op = c; op+=sizeof(uint_t); }\
+  if(i > 3) { *(uint_t *)op = e; op+=sizeof(uint_t); i -= 3; vbput32(op, i); *(uint_t *)op = c; op+=sizeof(uint_t); }\
   else if(c == e) {\
-	while(i--) { *(uint_t *)op = e; op+=sizeof(uint_t); vbxput(op, 0); }\
+	while(i--) { *(uint_t *)op = e; op+=sizeof(uint_t); vbput32(op, 0); }\
   } else while(i--) { *(uint_t *)op = c; op+=sizeof(uint_t); }\
 } while(0)
 

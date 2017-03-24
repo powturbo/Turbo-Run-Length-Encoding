@@ -1,5 +1,5 @@
 /**
-    Copyright (C) powturbo 2015-2016
+    Copyright (C) powturbo 2015-2017
     GPL v2 License
 
     This program is free software; you can redistribute it and/or modify
@@ -36,92 +36,88 @@
   #else
 #include <getopt.h> 
 #endif
+#include "time_.h"
 
-#include "trle.h"
-   
-//-------------------------------------- Time ---------------------------------------------------------------------  
-typedef unsigned long long tm_t;
-#define TM_T 1000000.0
-#define TM_MAX (1ull<<63)
-  #ifdef _WIN32
-#include <windows.h>
-static LARGE_INTEGER tps;
-static tm_t tmtime(void) { LARGE_INTEGER tm; QueryPerformanceCounter(&tm); return (tm_t)(tm.QuadPart*1000000/tps.QuadPart); }
-static tm_t tminit() { QueryPerformanceFrequency(&tps); tm_t t0=tmtime(),ts; while((ts = tmtime())==t0); return ts; } 
-  #else
-#include <time.h>
-static   tm_t tmtime(void)    { struct timespec tm; clock_gettime(CLOCK_MONOTONIC, &tm); return (tm_t)tm.tv_sec*1000000ull + tm.tv_nsec/1000; }
-static   tm_t tminit()        { tm_t t0=tmtime(),ts; while((ts = tmtime())==t0) {}; return ts; }
-  #endif
-//---------------------------------------- bench ---------------------------------------------------------------------
-#define TMPRINT(__x) { printf("%7.2f MB/s\t%s", (double)(tm>=0.000001?(((double)n*rm/MBS)/(((double)tm/1)/TM_T)):0.0), __x); fflush(stdout); }
-#define TMDEF unsigned r,t,rm; tm_t tx = 2000000,t0,tc,tm
-#define TMBEG for(tm = TM_MAX,t = 0; t < trips; t++) {  for(t0 = tminit(), r=0; r < reps;) { 
-#define TMEND                                            r++; if((tc = tmtime() - t0) > tx) break; } if(tc < tm) tm = tc,rm=r; }
-#define MBS 1000000.0 //MiBS 1048576.0
-
-unsigned argtoi(char *s) {
-  char *p; unsigned n = strtol(s, &p, 10),f=1; 
-  switch(*p) {
-     case 'k': f = 1000;       break;
-     case 'm': f = 1000000;    break;
-     case 'g': f = 1000000000; break;
-     case 'K': f = 1<<10; 	   break;
-     case 'M': f = 1<<20; 	   break;
-     case 'G': f = 1<<30; 	   break;
-  }
-  return n*f;
-}
-//-------------------------------------------------------------------------------------------------------------------------------------
+#include "trle.h"  
 #include "ext/mrle.c"
 
-void check(const unsigned char *in, unsigned char *cpy, unsigned n) { int i;
-  for(i = 0; i < n; i++) 
-    if(in[i] != cpy[i]) { printf("ERROR at %d ", i); break; }
-  memset(cpy,0xff,n); 
+int memcheck(unsigned char *in, unsigned n, unsigned char *cpy) { 
+  int i;
+  for(i = 0; i < n; i++)
+    if(in[i] != cpy[i]) {
+      printf("ERROR in[%d]=%x, dec[%d]=%x\n", i, in[i], i, cpy[i]);
+	  return i+1; 
+	} 
+  return 0;
 }
 
-int main(int argc, char *argv[]) {
-  unsigned reps = 1<<30, trips = 3,cmp=0, b = 1 << 30;
+void libmemcpy(unsigned char *dst, unsigned char *src, int len) {
+  void *(*memcpy_ptr)(void *, const void *, size_t) = memcpy;
+  if (time(NULL) == 1) 
+    memcpy_ptr = NULL;
+  memcpy_ptr(dst, src, len);
+}
+
+#define ID_MEMCPY 8
+unsigned bench(unsigned char *in, unsigned n, unsigned char *out, unsigned char *cpy, int id) { 
+  unsigned l;
+  memrcpy(cpy,in,n); 
+  switch(id) {
+    case 1: TMBENCH("\ntrle   ", l=trlec(  in, n, out) ,n); 						 printf("%10u %.1f%%", l, (double)l*100.0/n); TMBENCH("",trled(  out, l, cpy, n) ,n); break;
+    case 2: TMBENCH("\nsrle 0 ", l=srlec(  in, n, out) ,n); 						 printf("%10u %.1f%%", l, (double)l*100.0/n); TMBENCH("",srled(  out, l, cpy, n) ,n); break;      
+    case 3: TMBENCH("\nsrle 8 ", l=srlec8( in, n, out, 0xda) ,n); 				     printf("%10u %.1f%%", l, (double)l*100.0/n); TMBENCH("",srled8( out, l, cpy, n, 0xda) ,n); break;      
+    case 4: TMBENCH("\nsrle 16", l=srlec16(in, n, out, 0xdada) ,n); 				 printf("%10u %.1f%%", l, (double)l*100.0/n); TMBENCH("",srled16(out, l, cpy, n, 0xdada) ,n); break;      
+    case 5: TMBENCH("\nsrle 32", l=srlec32(in, n, out, 0xdadadadau) ,n); 			 printf("%10u %.1f%%", l, (double)l*100.0/n); TMBENCH("",srled32(out, l, cpy, n, 0xdadadadau) ,n); break;      
+    case 6: TMBENCH("\nsrle 64", l=srlec64(in, n, out, 0xdadadadadadadadaull) ,n); 	 printf("%10u %.1f%%", l, (double)l*100.0/n); TMBENCH("",srled64(out, l, cpy, n, 0xdadadadadadadadaull) ,n); break;      
+    case 7: TMBENCH("\nmrle   ", l=mrlec(  in, n, out), n);						 	 printf("%10u %.1f%%", l, (double)l*100.0/n); TMBENCH("",mrled(  out, cpy, n), n); break;
+    case 8: TMBENCH("\nmemcpy ", libmemcpy(in,out,n) ,n);  							 printf("%10u %.1f%%", l, (double)l*100.0/n); return n;
+	default: return l;
+  }
+  memcheck(in,n,cpy);
+  return l;
+}
+
+int main(int argc, char* argv[]) {
+  unsigned trips = 15,cmp=1, b = 1 << 30, esize=4, lz=0, fno,id=0;
+  
   int c, digit_optind = 0, this_option_optind = optind ? optind : 1, option_index = 0;
-  static struct option long_options[] = { {"blocsize", 	0, 0, 'b'}, {0,0, 0, 0}  };
+  static struct option long_options[] = { {"blocsize", 	0, 0, 'b'}, {0, 0, 0}  };
   for(;;) {
-    if((c = getopt_long(argc, argv, "cb:r:R:", long_options, &option_index)) == -1) break;
+    if((c = getopt_long(argc, argv, "B:ce:i:I:", long_options, &option_index)) == -1) break;
     switch(c) {
       case  0 : printf("Option %s", long_options[option_index].name); if(optarg) printf (" with arg %s", optarg);  printf ("\n"); break;								
-      case 'r': reps  = atoi(optarg); break;
-      case 'R': trips = atoi(optarg); break;
-      case 'b': b = argtoi(optarg);   break;
-      case 'c': cmp++; 				  break;
+      case 'e': id     = atoi(optarg);  break;
+      case 'i': tm_rep = atoi(optarg); if(!tm_rep) tm_rep=1,trips=1;  break;
+      case 'I': trips  = atoi(optarg); if(!trips) trips=1;  break;
+      case 'B': b = argtoi(optarg,1); 	break;
+      case 'c': cmp++; 				  	break;
     }
   }
   if(argc - optind < 1) { fprintf(stderr, "File not specified\n"); exit(-1); }
 
   unsigned char *in,*out,*cpy;
-  char *inname = argv[optind];  
-  FILE *fi = fopen(inname, "rb"); if(!fi ) perror(inname), exit(1);  							
-  fseek(fi, 0, SEEK_END); long long flen = ftell(fi); fseek(fi, 0, SEEK_SET);
-  if(flen > b) flen = b;
-  int n = flen; 
-  if(!(in  =        (unsigned char*)malloc(n+1024)))        { fprintf(stderr, "malloc error\n"); exit(-1); } cpy = in;
-  if(!(out =        (unsigned char*)malloc(flen*4/3+1024))) { fprintf(stderr, "malloc error\n"); exit(-1); } 
-  if(cmp && !(cpy = (unsigned char*)malloc(n+1024)))        { fprintf(stderr, "malloc error\n"); exit(-1); }
-  n = fread(in, 1, n, fi);
-  fclose(fi);
-  if(n <= 0) exit(0); 																printf("'%s' %u\n", inname, n);
-    
-  unsigned l;
-  TMDEF; memcpy(out, in,  n); memcpy(out,cpy,n);
-  TMBEG l = trlec(in, n, out); 				  TMEND; printf("%10u ", l); TMPRINT(""); TMBEG trled(out, l, cpy, n); 				TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE\n");
-  TMBEG l = srlec(in, n, out); 				  TMEND; printf("%10u ", l); TMPRINT(""); TMBEG srled(out, l, cpy, n); 				TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE esc\n");
-  TMBEG l = mrlec(in, n, out); 				  TMEND; printf("%10u ", l); TMPRINT(""); TMBEG mrled(out, cpy, n); 				TMEND; if(cmp) check(in,cpy,n); TMPRINT("Mespotine RLE\n");
-  
-    #if 1
-  TMBEG l = srlec8( in, n, out, 0xda);  	  TMEND; printf("%10u ", l); TMPRINT(""); TMBEG srled8( out, l, cpy, n, 0xda);  		TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE esc  8\n");
-  TMBEG l = srlec16(in, n, out, 0xdada); 	  TMEND; printf("%10u ", l); TMPRINT(""); TMBEG srled16(out, l, cpy, n, 0xdada); 		TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE esc 16\n");
-  TMBEG l = srlec32(in, n, out, 0xdadadadau); TMEND; printf("%10u ", l); TMPRINT(""); TMBEG srled32(out, l, cpy, n, 0xdadadadau);	TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE esc 32\n");
-  unsigned long long esc = 0xdadadadau; esc=esc<<32|esc;
-  TMBEG l = srlec64(in, n, out, esc); 		  TMEND; printf("%10u ", l); TMPRINT(""); TMBEG srled64(out, l, cpy, n, esc);TMEND; if(cmp) check(in,cpy,n); TMPRINT("TurboRLE esc 64\n");
-	#endif
-  TMBEG memcpy(out, in,  n);   				  TMEND; printf("%10u ", n); TMPRINT(""); TMBEG memcpy(cpy,out, n); 				TMEND; if(cmp) check(in,cpy,n); TMPRINT("memcpy\n"); 
+  unsigned long long totlen=0,tot[3]={0};
+  for(fno = optind; fno < argc; fno++) {
+    char *inname = argv[fno];  									
+    FILE *fi = fopen(inname, "rb"); 							if(!fi ) { perror(inname); continue; } 							
+    fseek(fi, 0, SEEK_END); 
+    long long flen = ftell(fi); 
+	fseek(fi, 0, SEEK_SET);
+	
+    if(flen > b) flen = b;
+    int n = flen,i; 
+    if(!(in  =        (unsigned char*)malloc(n+1024)))        { fprintf(stderr, "malloc error\n"); exit(-1); } cpy = in;
+    if(!(out =        (unsigned char*)malloc(flen*4/3+1024))) { fprintf(stderr, "malloc error\n"); exit(-1); } 
+    if(cmp && !(cpy = (unsigned char*)malloc(n+1024)))        { fprintf(stderr, "malloc error\n"); exit(-1); }
+    n = fread(in, 1, n, fi);									printf("File='%s' Length=%u\n", inname, n);			
+    fclose(fi);
+    if(n <= 0) exit(0); 
+    if(fno == optind)
+      tm_init(trips, 1);  
+    if(!id) {
+      for(i=1; i <= ID_MEMCPY; i++) bench(in,n,out,cpy,i);      
+    } else 
+      bench(in,n,out,cpy,id);    
+  }
 }
+

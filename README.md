@@ -33,7 +33,7 @@ CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 6.2, ubuntu 16.10
 - BMP File: [girl.bmp in RLE64Samples](http://sourceforge.net/projects/nikkhokkho/files/RLE64/3.00/)
 
 |C Size|ratio%|C MB/s|D MB/s|Name|
-|--------:|-----:|--------:|--------:|----------------|
+|---------:|-----:|--------:|--------:|----------------|
 |3289669|  0.8|**2122**|**10499**|**trle**|
 |4482388|  1.1|346|3467|mrle|
 |4732081|  1.2|**7971**|10156|**srle 8**|

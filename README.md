@@ -33,11 +33,11 @@ CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 6.2, ubuntu 16.10
 - BMP File: [girl.bmp in RLE64Samples](http://sourceforge.net/projects/nikkhokkho/files/RLE64/3.00/)
 
 |C Size|ratio%|C MB/s|D MB/s|Name|
-|---------:|-----:|--------:|--------:|----------------|
+|--------:|-----:|--------:|--------:|----------------|
 |3289669|  0.8|**2122**|**10499**|**trle**|
 |4482388|  1.1|346|3467|mrle|
 |4732081|  1.2|**7971**|10156|**srle 8**|
-|4732082|  1.2|2110.03|10159|srle 0|
+|4732082|  1.2|2110.03|10159|srle 0 (auto escape)|
 |8431853|  2.1|4846|10272|srle 16|
 |8832647|  2.2|1274.23|2921|rle64 8|
 |9265516|  2.3|2241.56|5722|rle64 16|
@@ -46,6 +46,7 @@ CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 6.2, ubuntu 16.10
 |19844801|  4.9|**14114**|10611|**srle 64**|
 |21910714|  5.4|8301|10232|rle64 64|
 |403920058|100.0|9391|9161|memcpy|
+
 (**bold** = pareto)  MB=1.000.000.
 
 - Checkers program "End Game Table Base": [1034.db](http://encode.ru/threads/2077-EGTB-compression?p=41392&viewfull=1#post41392)

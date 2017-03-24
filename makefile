@@ -1,4 +1,4 @@
-# powturbo  (c) Copyright 2015-2016
+# powturbo  (c) Copyright 2015-2017
 CC ?= gcc
 CXX ?= g++
 #CC=clang
@@ -19,8 +19,8 @@ CFLAGS=-march=native -minline-all-stringops
 
 all: trle
 
-#trled.o: trle_.h trle.h trled.c
-#	gcc -O3 $(CFLAGS) -c trled.c
+trle.o: $(TP)trle.c
+	$(CC) -O2 $(CFLAGS) -c $(TP)trle.c -o trle.o
 
 trle: trlec.o trled.o trle.o
 	$(CC) trle.o trlec.o trled.o $(LDFLAGS) -o trle

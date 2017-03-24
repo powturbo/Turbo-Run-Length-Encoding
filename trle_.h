@@ -24,29 +24,38 @@
     TurboRLE - "Most efficient and fastest Run Length Encoding"
 **/
 #include <stdint.h>
-//------------------------------------- Variable Byte -----------------------------------------------------
-#define vbputa(_op_, _x_, _act_) {\
-       if(likely(_x_ < (1<< 7))) {		   			  *_op_++ = _x_ << 1; 			 		      		_act_;}\
-  else if(likely(_x_ < (1<<14))) { *(unsigned short *)_op_ = _x_ << 2 | 0x01; _op_ += 2; 		      	_act_;}\
-  else if(likely(_x_ < (1<<21))) { *(unsigned short *)_op_ = _x_ << 3 | 0x03; _op_ += 2; *_op_++ = _x_ >> 13; _act_;}\
-  else if(likely(_x_ < (1<<28))) { *(unsigned       *)_op_ = _x_ << 4 | 0x07; _op_ += 4; 		      	_act_;}\
-  else { 		           *(unsigned       *)_op_ = _x_ << 4 | 0x0f; _op_ += 4; *_op_++ = _x_ >> 28; 	_act_;}\
+//------------------------- Variable Byte from https://github.com/powturbo/TurboPFor -----------------------------------------------------
+#define VB_SIZE 64
+#define VB_MAX 254
+#define VB_B2 6
+#define VB_B3 3
+#define VB_BA3 (VB_MAX - (VB_SIZE/8 - 3))
+#define VB_BA2 (VB_BA3 - (1<<VB_B3))  
+
+#define VB_OFS1 (VB_BA2 - (1<<VB_B2))
+#define VB_OFS2 (VB_OFS1 + (1 << (8+VB_B2)))
+#define VB_OFS3 (VB_OFS2 + (1 << (16+VB_B3)))
+
+#define _vblen32(_x_)  ((_x_) < VB_OFS1?1:((_x_) < VB_OFS2?2:((_x_) < VB_OFS3)?3:(bsr32(_x_)+7)/8+1))
+#define _vbvlen32(_x_) ((_x_) < VB_OFS1?1:((_x_) < VB_BA2?2:((_x_) < VB_BA3)?3:(_x_-VB_BA3)))
+
+#define _vbput32(_op_, _x_, _act_) {\
+  if(likely((_x_) < VB_OFS1)){ *_op_++ = (_x_);																	_act_;}\
+  else if  ((_x_) < VB_OFS2) { ctou16(_op_) = bswap16((VB_OFS1<<8)+((_x_)-VB_OFS1));             _op_  += 2; /*(_x_) -= VB_OFS1; *_op_++ = VB_OFS1 + ((_x_) >> 8); *_op_++ = (_x_);*/ _act_; }\
+  else if  ((_x_) < VB_OFS3) { *_op_++ = VB_BA2 + (((_x_) -= VB_OFS2) >> 16); ctou16(_op_) = (_x_); _op_  += 2;  _act_;}\
+  else { unsigned _b = (bsr32((_x_))+7)/8; *_op_++ = VB_BA3 + (_b - 3);    ctou32(_op_) = (_x_); _op_  += _b; _act_;}\
 }
- 
-#define vbgeta(_ip_, _x_, _act_) do { _x_ = *_ip_;\
-       if(!(_x_ & (1<<0))) { _x_			     >>= 1; 		                      _ip_++;    _act_;}\
-  else if(!(_x_ & (1<<1))) { _x_ = (*(unsigned short *)_ip_) >>  2;		              _ip_ += 2; _act_;}\
-  else if(!(_x_ & (1<<2))) { _x_ = (*(unsigned short *)_ip_) >>  3 | *(_ip_+2) << 13; _ip_ += 3; _act_;}\
-  else if(!(_x_ & (1<<3))) { _x_ = (*(unsigned       *)_ip_) >>  4; 		      	  _ip_ += 4; _act_;}\
-  else 			   	       { _x_ = (*(unsigned       *)_ip_) >>  4 | *(_ip_+4) << 28; _ip_ += 5; _act_;}\
+
+#define _vbget32(_ip_, _x_, _act_) do { _x_ = *_ip_++;\
+       if(likely(_x_ < VB_OFS1)) { _act_ ;}\
+  else if(likely(_x_ < VB_BA2))  { _x_ = /*bswap16(ctou16(_ip_-1))*/ ((_x_<<8) + (*_ip_)) + (VB_OFS1 - (VB_OFS1 <<  8)); _ip_++; _act_;} \
+  else if(likely(_x_ < VB_BA3))  { _x_ = ctou16(_ip_) + ((_x_ - VB_BA2 ) << 16) + VB_OFS2; _ip_ += 2; _act_;}\
+  else { unsigned _b = _x_-VB_BA3; _x_ = ctou32(_ip_) & ((1u << 8 * _b << 24) - 1); _ip_ += 3 + _b; _act_;}\
 } while(0)
 
-#define vbput(_op_, _x_) { unsigned _x = _x_; vbputa(_op_, _x, ;); }
-#define vbget(_ip_, _x_) vbgeta(_ip_, _x_, ;);
+#define vbput32(_op_, _x_) { register unsigned  _x = _x_; _vbput32(_op_, _x, ;); }
+#define vbget32(_ip_, _x_) _vbget32(_ip_, _x_, ;)
 
-#define vbxput(_op_, _x_) { *_op_++ = _x_; if(unlikely((_x_) >= 0xff)) { unsigned _xi = (_x_) - 0xff; _op_[-1] = 0xff; vbput(_op_, _xi); } }
-#define vbxget(_ip_, _x_) { _x_ = *_ip_++; if(unlikely( _x_ == 0xff)) { vbget(_ip_,_x_); _x_+=0xff; } }
-
-#define vbzput(_op_, _x_, _m_, _emap_) do { if(unlikely((_x_) < _m_)) *_op_++ = _emap_[_x_]; else { unsigned _xi = (_x_) - _m_; *_op_++ = _emap_[_m_]; vbput(_op_, _xi); } } while(0)
-#define vbzget(_ip_, _x_, _m_, _e_) { _x_ = _e_; if(unlikely(_x_ == _m_)) { vbget(_ip_,_x_); _x_+=_m_; } }
+#define vbzput(_op_, _x_, _m_, _emap_) do { if(unlikely((_x_) < _m_)) *_op_++ = _emap_[_x_]; else { unsigned _xi = (_x_) - _m_; *_op_++ = _emap_[_m_]; vbput32(_op_, _xi); } } while(0)
+#define vbzget(_ip_, _x_, _m_, _e_) { _x_ = _e_; if(unlikely(_x_ == _m_)) { vbget32(_ip_,_x_); _x_+=_m_; } }
 

@@ -6,7 +6,7 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
   - Most efficient compression 
   - No other RLE compress or decompress faster with better compression
   - :sparkles: faster compression and 2x faster decompression with :+1: SIMD
-  - :+1: **Java** Critical Natives Interface. Access TurboRLE **incl. SIMD!** :+1: from Java
+  - :+1: **Java** Critical Natives Interface. Access TurboRLE **incl. SIMD!** from Java
   - Compress better and up to 8 times faster and decompress up to 4 times faster than other fast RLEs
   - Can be faster than memcpy
   - :+1: **ZERO!** byte overhead

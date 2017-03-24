@@ -5,11 +5,11 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
   - 100% C (C++ compatible headers), without inline assembly
   - Most efficient compression 
   - No other RLE compress or decompress faster with better compression
-  - :new: faster compression and 2x faster decompression with :+1: SIMD
-  - :new: **Java** Critical Natives Interface. Access TurboRLE **incl. SIMD!** :+1: from Java as fast as calling from C
+  - :sparkles: faster compression and 2x faster decompression with :+1: SIMD
+  - :+1: **Java** Critical Natives Interface. Access TurboRLE **incl. SIMD!** :+1: from Java
   - Compress better and up to 8 times faster and decompress up to 4 times faster than other fast RLEs
   - Can be faster than memcpy
-  - :new: **ZERO!** byte overhead
+  - :+1: **ZERO!** byte overhead
 
   - No modification of the raw data, preserving compressibility
   - Order preserving 
@@ -19,7 +19,7 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
   - **SRLE**: TurboRLE Escape - Fast Run Length Encoding with automatic escape determination 
 
 ## Benchmark:
-CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 5.2, ubuntu 15.10
+CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 6.2, ubuntu 16.10
 - with [TurboBench](https://github.com/powturbo/TurboBench)
 - Single thread
 - Realistic and practical benchmark with large files
@@ -34,59 +34,54 @@ CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 5.2, ubuntu 15.10
 
 |C Size|ratio%|C MB/s|D MB/s|Name|
 |--------:|-----:|--------:|--------:|----------------|
-|3293899|  0.8|**2086.17**|**13113.37**|**trle**|
-|4482388|  1.1|297.68|9209.99|mrle|
-|4821162|  1.2|**11092.86**|13006.29|**srle 8**|
-|4821163|  1.2|2110.03|13004.84|srle 0|
-|8501660|  2.1|4598.45|10014.59|srle 16|
-|8832647|  2.2|1274.23|2920.96|rle64 8|
-|9265516|  2.3|2241.56|5721.46|rle64 16|
-|13777939|  3.4|8135.31|10257.84|srle 32|
-|15175482|  3.8|4609.31|9360.16|rle64 32|
-|19872605|  4.9|**13711.42**|10189.19|**srle 64**|
-|21910714|  5.4|8300.55|10232.33|rle64 64|
-|403920058|100.0|8464.75|9160.88|memcpy|
-
-(**bold** = pareto)  MB=1.000.000
-
-srle 0: RLE w/ auto escape
-<p>
+|3289669|  0.8|**2122**|**10499**|**trle**|
+|4482388|  1.1|346|3467|mrle|
+|4732081|  1.2|**7971**|10156|**srle 8**|
+|4732082|  1.2|2110.03|10159|srle 0 (auto escape)|
+|8431853|  2.1|4846|10272|srle 16|
+|8832647|  2.2|1274.23|2921|rle64 8|
+|9265516|  2.3|2241.56|5722|rle64 16|
+|13727062|  3.4|8515|10421|srle 32|
+|15175482|  3.8|4609|9360|rle64 32|
+|19844801|  4.9|**14114**|10611|**srle 64**|
+|21910714|  5.4|8301|10232|rle64 64|
+|403920058|100.0|9391|9161|memcpy|
+(**bold** = pareto)  MB=1.000.000.
 
 - Checkers program "End Game Table Base": [1034.db](http://encode.ru/threads/2077-EGTB-compression?p=41392&viewfull=1#post41392)
 
 |C Size|ratio%|C MB/s|D MB/s|Name|
 |--------:|-----:|--------:|--------:|----------------|
-|82452164| 19.7|**770.97**|**3337.61**|**trle**|
-|88055364| 21.0|233.07|1573.62|mrle|
-|92539191| 22.1|**1147.88**|**5726.42**|**srle 8**|
-|92539192| 22.1|794.21|5723.42|srle 0|
-|93905327| 22.4|780.05|1659.48|rle64 8|
-|113627625| 27.1|**1823.40**|5185.73|**srle 16**|
-|117590491| 28.0|1341.02|2825.66|rle64 16|
-|136924740| 32.7|**3335.59**|**7912.62**|**srle 32**|
-|143953177| 34.3|2970.51|5506.36|rle64 32|
-|165545036| 39.5|**5693.58**|**8185.73**|**srle 64**|
-|176442237| 42.1|5090.87|7871.78|rle64 64|
-|419225629|100.0|**8367.04**|**8934.25**|**memcpy**|
-
+|82421332| 19.7|**801**|**4145**|**trle**|
+|88055364| 21.0|273|1255|mrle|
+|92422320| 22.0|**814**|**5936**|**srle 0**|
+|92423009| 22.0|**1178**|**6697**|**srle 8**|
+|93905327| 22.4|780|1660|rle64 8|
+|113620895| 27.1|**1906**|5550|**srle 16**|
+|117590491| 28.0|1341|2826|rle64 16|
+|136948765| 32.7|**3581**|**8360**|**srle 32**|
+|143953177| 34.3|2971|5506|rle64 32|
+|165561604| 39.5|**5924**|**8953**|**srle 64**|
+|176442237| 42.1|5090|7872|rle64 64|
+|419225629|100.0|**9323**|**9179**|**memcpy**|
 
 - Text File: [enwik9bwt](http://mattmahoney.net/dc/textdata.html) enwik9 bwt generated w.<br>
 [libdivsufsort](https://code.google.com/p/libdivsufsort/)
 
 |C Size|ratio%|C MB/s|D MB/s|Name|
 |--------:|-----:|--------:|--------:|----------------|
-|378458015| 37.8|**485.51**|**2005.02**|**trle**|
-|419346351| 41.9|**606.05**|**4297.19**|**srle 8**|
-|419346352| 41.9|491.16|4294.26|srle 0|
-|422296235| 42.2|557.84|1364.10|**rle64 8**|
-|487466207| 48.7|**1323.56**|4139.54|**srle 16**|
-|498420792| 49.8|1113.81|2511.38|rle64 16|
-|549218833| 54.9|**2682.93**|**6979.69**|**srle 32**|
-|563503744| 56.4|**2730.54**|5073.81|**rle64 32**|
-|576619945| 57.7|205.83|570.93|mrle|enwik9bwt|
-|605766094| 60.6|**4801.43**|**7593.65**|**srle 64**|
-|620676412| 62.1|**5247.28**|7376.44|**rle64 64**|
-|1000000012|100.0|**8517.76**|**9176.59**|**memcpy**|
+|378377069| 37.8|**500**|**2090**|**trle**|
+|419339698| 41.9|**506**|**5937**|**srle 0**|
+|419340318| 41.9|**626**|4408|**srle 8**|
+|422296235| 42.2|558|1364|rle64 8|
+|487461871| 48.7|**1396**|4373|**srle 16**|
+|498420792| 49.8|1113|2511|rle64 16|
+|549214826| 54.9|**2778**|**7540**|**srle 32**|
+|563503744| 56.4|2730|5074|rle64 32|
+|576619945| 57.7|217|793|mrle|
+|605764304| 60.6|**4998**|**7784**|**srle 64**|
+|620676412| 62.1|**5247**|7376.44|**rle64 64**|
+|1000000012|100.0|**9364**|**9184**|**memcpy**|
 
 ## Compile:
 
@@ -109,6 +104,6 @@ srle 0: RLE w/ auto escape
   - [Understanding Compression: Data Compression for Modern Developers](https://books.google.de/books?id=2C2rDAAAQBAJ&pg=PA216&lpg=PA216&dq=%22turborle%22&source=bl&ots=TiLU4Qf47s&sig=tkk0Dnk9NnU0JMR3Z6iW4TRquxg&hl=de&sa=X&ved=0ahUKEwjZq-Li5uXSAhXFCJoKHe77B6cQ6AEIyAEwHQ#v=onepage&q=%22turborle%22&f=false)
   - [Understanding Compression](http://file.allitebooks.com/20160805/Understanding%20Compression.pdf)
   
-Last update: 20 MAR 2017
+Last update: 24 MAR 2017
 
 

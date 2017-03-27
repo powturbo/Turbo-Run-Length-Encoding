@@ -63,14 +63,14 @@ unsigned bench(unsigned char *in, unsigned n, unsigned char *out, unsigned char 
   unsigned l;
   memrcpy(cpy,in,n); 
   switch(id) {
-    case 1: TMBENCH("\ntrle   ", l=trlec(  in, n, out) ,n); 						 printf("%10u %.1f%%", l, (double)l*100.0/n); TMBENCH("",trled(  out, l, cpy, n) ,n); break;
-    case 2: TMBENCH("\nsrle 0 ", l=srlec(  in, n, out) ,n); 						 printf("%10u %.1f%%", l, (double)l*100.0/n); TMBENCH("",srled(  out, l, cpy, n) ,n); break;      
-    case 3: TMBENCH("\nsrle 8 ", l=srlec8( in, n, out, 0xda) ,n); 				     printf("%10u %.1f%%", l, (double)l*100.0/n); TMBENCH("",srled8( out, l, cpy, n, 0xda) ,n); break;      
-    case 4: TMBENCH("\nsrle 16", l=srlec16(in, n, out, 0xdada) ,n); 				 printf("%10u %.1f%%", l, (double)l*100.0/n); TMBENCH("",srled16(out, l, cpy, n, 0xdada) ,n); break;      
-    case 5: TMBENCH("\nsrle 32", l=srlec32(in, n, out, 0xdadadadau) ,n); 			 printf("%10u %.1f%%", l, (double)l*100.0/n); TMBENCH("",srled32(out, l, cpy, n, 0xdadadadau) ,n); break;      
-    case 6: TMBENCH("\nsrle 64", l=srlec64(in, n, out, 0xdadadadadadadadaull) ,n); 	 printf("%10u %.1f%%", l, (double)l*100.0/n); TMBENCH("",srled64(out, l, cpy, n, 0xdadadadadadadadaull) ,n); break;      
-    case 7: TMBENCH("\nmrle   ", l=mrlec(  in, n, out), n);						 	 printf("%10u %.1f%%", l, (double)l*100.0/n); TMBENCH("",mrled(  out, cpy, n), n); break;
-    case 8: TMBENCH("\nmemcpy ", libmemcpy(in,out,n) ,n);  							 printf("%10u %.1f%%", l, (double)l*100.0/n); return n;
+    case 1: TMBENCH("\ntrle   ", l=trlec(  in, n, out) ,n); 						 printf("%10u %5.1f%%", l, (double)l*100.0/n); TMBENCH("",trled(  out, l, cpy, n) ,n); break;
+    case 2: TMBENCH("\nsrle 0 ", l=srlec(  in, n, out) ,n); 						 printf("%10u %5.1f%%", l, (double)l*100.0/n); TMBENCH("",srled(  out, l, cpy, n) ,n); break;      
+    case 3: TMBENCH("\nsrle 8 ", l=srlec8( in, n, out, 0xda) ,n); 				     printf("%10u %5.1f%%", l, (double)l*100.0/n); TMBENCH("",srled8( out, l, cpy, n, 0xda) ,n); break;      
+    case 4: TMBENCH("\nsrle 16", l=srlec16(in, n, out, 0xdada) ,n); 				 printf("%10u %5.1f%%", l, (double)l*100.0/n); TMBENCH("",srled16(out, l, cpy, n, 0xdada) ,n); break;      
+    case 5: TMBENCH("\nsrle 32", l=srlec32(in, n, out, 0xdadadadau) ,n); 			 printf("%10u %5.1f%%", l, (double)l*100.0/n); TMBENCH("",srled32(out, l, cpy, n, 0xdadadadau) ,n); break;      
+    case 6: TMBENCH("\nsrle 64", l=srlec64(in, n, out, 0xdadadadadadadadaull) ,n); 	 printf("%10u %5.1f%%", l, (double)l*100.0/n); TMBENCH("",srled64(out, l, cpy, n, 0xdadadadadadadadaull) ,n); break;      
+    case 7: TMBENCH("\nmrle   ", l=mrlec(  in, n, out), n);						 	 printf("%10u %5.1f%%", l, (double)l*100.0/n); TMBENCH("",mrled(  out, cpy, n), n); break;
+    case 8: TMBENCH("\nmemcpy ", libmemcpy(in,out,n) ,n);  							 printf("%10u %5.1f%%", n, (double)100.0); return n;
 	default: return l;
   }
   memcheck(in,n,cpy);
@@ -78,7 +78,7 @@ unsigned bench(unsigned char *in, unsigned n, unsigned char *out, unsigned char 
 }
 
 int main(int argc, char* argv[]) {
-  unsigned trips = 15,cmp=1, b = 1 << 30, esize=4, lz=0, fno,id=0;
+  unsigned trips = 4,cmp=1, b = 1 << 30, esize=4, lz=0, fno,id=0;
   
   int c, digit_optind = 0, this_option_optind = optind ? optind : 1, option_index = 0;
   static struct option long_options[] = { {"blocsize", 	0, 0, 'b'}, {0, 0, 0}  };
@@ -115,9 +115,11 @@ int main(int argc, char* argv[]) {
     if(fno == optind)
       tm_init(trips, 1);  
     if(!id) {
-      for(i=1; i <= ID_MEMCPY; i++) bench(in,n,out,cpy,i);      
+      printf("function  E MB/s   size      ratio   D MB/s");      
+      for(i=1; i <= ID_MEMCPY; i++) bench(in,n,out,cpy,i);
     } else 
       bench(in,n,out,cpy,id);    
+    printf("\n");      
   }
 }
 

@@ -59,3 +59,4 @@
 #define vbzput(_op_, _x_, _m_, _emap_) do { if(unlikely((_x_) < _m_)) *_op_++ = _emap_[_x_]; else { unsigned _xi = (_x_) - _m_; *_op_++ = _emap_[_m_]; vbput32(_op_, _xi); } } while(0)
 #define vbzget(_ip_, _x_, _m_, _e_) { _x_ = _e_; if(unlikely(_x_ == _m_)) { vbget32(_ip_,_x_); _x_+=_m_; } }
 
+#define TMIN 3

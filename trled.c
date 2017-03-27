@@ -71,7 +71,7 @@ unsigned _srled8(const unsigned char *__restrict in, unsigned char *__restrict o
         vbget32(ip, i);
         if(likely(i)) { 
 	      uint8_t c = *ip++; 
-	      i  += 3; 
+	      i  += TMIN; 
 	      rmemset(op, c, i);
 	    } else 
 	      *op++ = e;												      
@@ -89,7 +89,7 @@ unsigned _srled8(const unsigned char *__restrict in, unsigned char *__restrict o
 	  int i; vbget32(ip, i);
 	  if(likely(i)) { 
 	    c   = *ip++;  
-		i  += 3; 
+		i  += TMIN; 
 		rmemset8(op, c, i);
 	  } else 
 	    *op++ = e;

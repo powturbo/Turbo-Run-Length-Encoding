@@ -168,14 +168,18 @@ unsigned srlec(const unsigned char *__restrict in,  unsigned inlen, unsigned cha
 //------------------------------------------------- TurboRLE ------------------------------------------
 struct u { unsigned c,i; };										
 
+#define PUTC(op, x) *op++ = x
 #define TRLEC(pp, ip, op, _goto_) do {\
-  unsigned i = ip - pp;\
-  if(i > 2) {\
+  unsigned _i = ip - pp;\
+  if(_i >= TMIN) {\
     unsigned char *q = op; \
-    vbzput(q, i-3, m, rmap); \
-    if((q-op) + 1 < i) { op = q; *op++ = c; _goto_; }\
-  } \
-  while(i--) *op++ = c;\
+    vbzput(op, _i-TMIN, m, rmap); \
+    if((op-q) + 1 < _i) { *op++ = c; _goto_; } op=q;\
+  } while(_i--) PUTC(op,c);\
+} while(0)
+  
+#define TRLEC0(pp, ip, op, _goto_) do { unsigned _i = ip - pp;\
+  if(_i >= TMIN) { vbzput(op, _i-TMIN, m, rmap); *op++ = c; } else while(_i--) PUTC(op,c);\
 } while(0)
 
 unsigned trlec(const unsigned char *__restrict in, unsigned inlen, unsigned char *__restrict out) {

@@ -78,9 +78,8 @@ static tm_t tminit() { QueryPerformanceFrequency(&tps); tm_t t0=tmtime(),ts; whi
         #ifndef MAC_OS_X_VERSION_10_12
 #define MAC_OS_X_VERSION_10_12 101200
         #endif
-      #endif
 #define CIVETWEB_APPLE_HAVE_CLOCK_GETTIME defined(__APPLE__) && MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12
-      #if !(CIVETWEB_APPLE_HAVE_CLOCK_GETTIME)
+        #if !(CIVETWEB_APPLE_HAVE_CLOCK_GETTIME)
 #include <sys/time.h>
 #define CLOCK_REALTIME 0
 #define CLOCK_MONOTONIC 0
@@ -92,6 +91,7 @@ int clock_gettime(int /*clk_id*/, struct timespec* t) {
     t->tv_nsec = now.tv_usec * 1000;
     return 0;
 }
+        #endif
       #endif
 static   tm_t tmtime(void)    { struct timespec tm; clock_gettime(CLOCK_MONOTONIC, &tm); return (tm_t)tm.tv_sec*1000000ull + tm.tv_nsec/1000; }
 static   tm_t tminit()        { tm_t t0=tmtime(),ts; while((ts = tmtime())==t0); return ts; }

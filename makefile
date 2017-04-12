@@ -10,7 +10,7 @@ CC=gcc
 CXX=g++
 else
   UNAME := $(shell uname -s)
-ifeq ($(UNAME),$(filter $(UNAME),Linux Darwin FreeBSD GNU/kFreeBSD))
+ifeq ($(UNAME),$(filter $(UNAME),Linux FreeBSD GNU/kFreeBSD))
 LDFLAGS+= -lrt
 endif
 endif

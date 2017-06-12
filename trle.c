@@ -79,6 +79,7 @@ unsigned bench(unsigned char *in, unsigned n, unsigned char *out, unsigned char 
 
 int main(int argc, char* argv[]) {
   unsigned trips = 4,cmp=1, b = 1 << 30, esize=4, lz=0, fno,id=0;
+  unsigned char *in,*out,*cpy;
   
   int c, digit_optind = 0, this_option_optind = optind ? optind : 1, option_index = 0;
   static struct option long_options[] = { {"blocsize", 	0, 0, 'b'}, {0, 0, 0}  };
@@ -95,17 +96,17 @@ int main(int argc, char* argv[]) {
   }
   if(argc - optind < 1) { fprintf(stderr, "File not specified\n"); exit(-1); }
 
-  unsigned char *in,*out,*cpy;
-  unsigned long long totlen=0,tot[3]={0};
   for(fno = optind; fno < argc; fno++) {
     char *inname = argv[fno];  									
+    int n,i; 
+	long long flen;
     FILE *fi = fopen(inname, "rb"); 							if(!fi ) { perror(inname); continue; } 							
     fseek(fi, 0, SEEK_END); 
-    long long flen = ftell(fi); 
+    flen = ftell(fi); 
 	fseek(fi, 0, SEEK_SET);
 	
     if(flen > b) flen = b;
-    int n = flen,i; 
+    n = flen; 
     if(!(in  =        (unsigned char*)malloc(n+1024)))        { fprintf(stderr, "malloc error\n"); exit(-1); } cpy = in;
     if(!(out =        (unsigned char*)malloc(flen*4/3+1024))) { fprintf(stderr, "malloc error\n"); exit(-1); } 
     if(cmp && !(cpy = (unsigned char*)malloc(n+1024)))        { fprintf(stderr, "malloc error\n"); exit(-1); }
@@ -122,4 +123,3 @@ int main(int argc, char* argv[]) {
     printf("\n");      
   }
 }
-

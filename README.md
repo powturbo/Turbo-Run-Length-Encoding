@@ -121,6 +121,6 @@ CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 6.2, ubuntu 16.10
   - [Understanding Compression: Data Compression for Modern Developers](https://books.google.de/books?id=2C2rDAAAQBAJ&pg=PA216&lpg=PA216&dq=%22turborle%22&source=bl&ots=TiLU4Qf47s&sig=tkk0Dnk9NnU0JMR3Z6iW4TRquxg&hl=de&sa=X&ved=0ahUKEwjZq-Li5uXSAhXFCJoKHe77B6cQ6AEIyAEwHQ#v=onepage&q=%22turborle%22&f=false)
   - [Understanding Compression](http://file.allitebooks.com/20160805/Understanding%20Compression.pdf)
   
-Last update: 27 MAR 2017
+Last update: 12 JUN 2017
 
 

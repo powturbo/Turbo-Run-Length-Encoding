@@ -23,8 +23,8 @@
 
     TurboRLE - "Most efficient and fastest Run Length Encoding"
 **/
-#include <stdint.h>
 //------------------------- Variable Byte from https://github.com/powturbo/TurboPFor -----------------------------------------------------
+#include "conf.h"
 #define VB_SIZE 64
 #define VB_MAX 254
 #define VB_B2 6

@@ -84,9 +84,22 @@ CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 6.2, ubuntu 16.10
 |620676412| 62.1|**5247**|7376|**rle64 64**|
 |1000000012|100.0|**9364**|**9184**|**memcpy**|
 
-## Compile:
+### Compile:
 
-        make
+  		git clone git://github.com/powturbo/TurboRLE.git
+        cd TurboRLE
+
+##### Linux + Windows MingW 
+ 
+  		make
+        or
+  		make AVX2=1
+
+##### Windows Visual C++
+
+  		nmake /f makefile.vs
+        or
+  		nmake AVX2=1 /f makefile.vs
 
 ## Usage:
 
@@ -101,7 +114,7 @@ CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 6.2, ubuntu 16.10
 - Linux: GNU GCC (>=4.6)
 - clang (>=3.2) 
 - Windows: MinGW
-- Windows: Visual Studio 2015
+- Windows: Visual c++
 
 #### References
   - [Real-Time Compression of IEC 61869-9 Sampled Value Data](https://pure.strath.ac.uk/portal/files/55444712/Blair_etal_AMPS2016_Real_time_compression_of_IEC_61869_9_sampled_value_data.pdf)

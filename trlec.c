@@ -38,7 +38,8 @@ static inline unsigned hist(const unsigned char *__restrict in, unsigned inlen, 
   unsigned c0[256+8]={0},c1[256+8]={0},c2[256+8]={0},c3[256+8]={0},c4[256+8]={0},c5[256+8]={0},c6[256+8]={0},c7[256+8]={0}; 
 
   const unsigned char *ip;
-  unsigned 					  cp = *(unsigned *)in;  
+  unsigned 					  cp = *(unsigned *)in,a;  
+  int i;
   for(ip = in; ip != in+(inlen&~(16-1));) {  
     unsigned 	c = cp,	d = *(unsigned *)(ip+=4); cp = *(unsigned *)(ip+=4);    
     c0[(unsigned char) c    ]++;
@@ -62,10 +63,9 @@ static inline unsigned hist(const unsigned char *__restrict in, unsigned inlen, 
   }
   while(ip < in+inlen) c0[*ip++]++; 
 
-  int i;
   for(i = 0; i < 256; i++) 
     cc[i] += c0[i]+c1[i]+c2[i]+c3[i]+c4[i]+c5[i]+c6[i]+c7[i];
-  unsigned a = 256; 
+  a = 256; 
   while(a > 1 && !cc[a-1]) a--; 
   return a;
 }
@@ -85,7 +85,7 @@ static inline unsigned hist(const unsigned char *__restrict in, unsigned inlen, 
 
 unsigned _srlec8(const unsigned char *__restrict in, unsigned inlen, unsigned char *__restrict out, uint8_t e) {
   const uint8_t *ip = in, *pp = in - 1;
-  uint8_t *op = out;
+  uint8_t *op = out,c;
 
   if(inlen > SRLE8)
     while(ip <  in+(inlen-1-SRLE8)) {	
@@ -94,13 +94,12 @@ unsigned _srlec8(const unsigned char *__restrict in, unsigned inlen, unsigned ch
 	  unsigned mask = _mm_movemask_epi8(_mm_cmpeq_epi8(_mm_loadu_si128((const __m128i*)(ip+1)), cv)); if(mask != 0xffffu) goto a; ip += 16;
 	           mask = _mm_movemask_epi8(_mm_cmpeq_epi8(_mm_loadu_si128((const __m128i*)(ip+1)), cv)); if(mask != 0xffffu) goto a; ip += 16;
       continue;
-      a:;
-      uint8_t c = *ip; 
+      a: c = *ip; 
       ip += __builtin_ctz((unsigned short)(~mask));
       SRLEC8(pp, ip, op, e);
 	  pp = ip++;
         #elif __WORDSIZE == 64						
-      unsigned long long z;
+		{unsigned long long z;
 	  if((z = (ctou64(ip) ^ ctou64(ip+1)))) goto a; ip += 8;
 	  if((z = (ctou64(ip) ^ ctou64(ip+1)))) goto a; ip += 8;
           #if SRLE8 >= 32
@@ -109,13 +108,13 @@ unsigned _srlec8(const unsigned char *__restrict in, unsigned inlen, unsigned ch
           #endif
                                                             __builtin_prefetch(ip +256, 0);
       continue;
-      a:;
-      uint8_t c = *ip; 
+      a: c = *ip; 
       ip += ctz64(z)>>3; 				       
       SRLEC8(pp, ip, op, e);
 	  pp = ip++;
+		}
         #else
-      unsigned z;
+	  { unsigned z;
 	  if((z = (ctou32(ip) ^ ctou32(ip+1)))) goto a; ip += 4;
 	  if((z = (ctou32(ip) ^ ctou32(ip+1)))) goto a; ip += 4;
           #if SRLE8 >= 16
@@ -124,31 +123,32 @@ unsigned _srlec8(const unsigned char *__restrict in, unsigned inlen, unsigned ch
           #endif
                                                             __builtin_prefetch(ip +256, 0);
       continue;
-      a:;
-      uint8_t c = *ip; 
+      a: c = *ip; 
       ip += ctz32(z)>>3; 				       
       SRLEC8(pp, ip, op, e);
-	  pp = ip++;											
+	  pp = ip++;	
+	  }	  
         #endif
     }
 
   for(;ip < in+inlen; ip++) 
     if(*ip != ip[1]) {
-      uint8_t c = *ip;
+      c = *ip;
 	  SRLEC8(pp,ip, op, e);
 	  pp = ip;
 	}
-  uint8_t c = *ip; 
+  c = *ip; 
   SRLEC8(pp, ip, op, e);
   return op - out;
 }
 #endif
 
 unsigned srlec(const unsigned char *__restrict in,  unsigned inlen, unsigned char *__restrict out) {
-  unsigned m = 0xffffffffu, mi = 0, i, b[256] = {0}; 
+  unsigned m = 0xffffffffu, mi = 0, i, b[256] = {0},a; 
+  size_t l;
   if(inlen < 1) return 0;
 
-  unsigned a = hist(in,inlen,b);  		
+  a = hist(in,inlen,b);  		
   if(b[a-1] == inlen) {
     *out = *in;
     return 1;
@@ -158,7 +158,7 @@ unsigned srlec(const unsigned char *__restrict in,  unsigned inlen, unsigned cha
     if(b[i] <= m) 
 	  m = b[i],mi = i;
   *out = mi;                                  
-  size_t l = _srlec8(in, inlen, out+1, mi)+1;
+  l = _srlec8(in, inlen, out+1, mi)+1;
   if(l < inlen) 
     return l;
   memcpy(out, in, inlen);
@@ -184,18 +184,20 @@ struct u { unsigned c,i; };
 
 unsigned trlec(const unsigned char *__restrict in, unsigned inlen, unsigned char *__restrict out) {
   int m,i;
-  unsigned b[256] = {0}, rmap[256];
+  unsigned b[256] = {0}, rmap[256],a;
+  struct u u[256],*v; // sort
+  unsigned char *op;
+  const unsigned char *ip,*pp;
+  uint8_t c;
   if(inlen < 1) return 0;
 
-  unsigned a = hist(in,inlen,b);  		
+  a = hist(in,inlen,b);  		
   if(b[a-1] == inlen) {
     *out = *in;
     return 1;
   }
   
-  struct u u[256]; // sort
   for(i = 0; i < 256; i++) u[i].c = b[i], u[i].i = i,b[i]=0;  		
-  struct u *v;													
   for(v = u + 1; v < u + 256; ++v)
     if(v->c < v[-1].c) { 
 	  struct u *w, tmp = *v;
@@ -206,12 +208,13 @@ unsigned trlec(const unsigned char *__restrict in, unsigned inlen, unsigned char
   for(m = -1,i = 0; i < 256 && !u[i].c; i++) 
     b[u[i].i]++, ++m;
 
-  unsigned char *op = out;
+  op = out;
 
   if(m < 0) { // no unused bytes found
+    size_t l;
     *op++ = 0; 
 	*op++ = u[0].i; 
-    size_t l = _srlec8(in, inlen, op, u[0].i)+2;
+    l = _srlec8(in, inlen, op, u[0].i)+2;
     if(l < inlen) return l;
     memcpy(out, in, inlen);
     return inlen;
@@ -226,7 +229,7 @@ unsigned trlec(const unsigned char *__restrict in, unsigned inlen, unsigned char
     } 
   op += 32;
 
-  const unsigned char *ip=in, *pp=in-1;
+  ip = in; pp=in-1;
   if(inlen > SRLE8)
     while(ip < in+(inlen-1-SRLE8)) {
       unsigned long long z;
@@ -238,8 +241,7 @@ unsigned trlec(const unsigned char *__restrict in, unsigned inlen, unsigned char
         #endif
                                                             __builtin_prefetch(ip +256, 0);
       continue;
-      a:;
-      uint8_t c = *ip; 
+      a: c = *ip; 
       ip += ctz64(z)>>3; 				       
       TRLEC(pp, ip, op, goto laba);
 	  laba:pp = ip++;
@@ -247,13 +249,13 @@ unsigned trlec(const unsigned char *__restrict in, unsigned inlen, unsigned char
   
   for(;ip < in+inlen; ip++) {
     if(*ip != *(ip+1)) {
-      uint8_t c = *ip; 
+      c = *ip; 
 	  TRLEC(pp, ip, op, goto labb);
 	  labb:pp = ip;
 	}
   }
 
-  uint8_t c = *ip; 
+  c = *ip; 
   TRLEC(pp,ip, op, goto labc);
   labc:
   if(op - out < inlen) 
@@ -291,9 +293,9 @@ unsigned trlec(const unsigned char *__restrict in, unsigned inlen, unsigned char
   #if !SRLE8
 unsigned TEMPLATE2(_srlec, USIZE)(const unsigned char *__restrict cin, unsigned inlen, unsigned char *__restrict out, uint_t e) {
   unsigned char *op = out;
-  uint_t *in = (uint_t *)cin, *pp = in-1, *ip=in; 
+  uint_t *in = (uint_t *)cin, *pp = in-1, *ip=in,c; 
   unsigned n = inlen/sizeof(uint_t);
-
+  unsigned char *p;
   if(n > 4)
     for(; ip < in+(n-1-4);) {
         #if 0 
@@ -312,22 +314,22 @@ unsigned TEMPLATE2(_srlec, USIZE)(const unsigned char *__restrict cin, unsigned 
       continue;
       a:;
         #endif  
-      uint_t c = *ip;
+      c = *ip;
       SRLEC(pp,ip, op, e);
 	  pp = ip++;								
     }
 
   for(;ip < in+n; ip++) 
     if(*ip != ip[1]) {
-      uint_t c = *ip;
+      c = *ip;
 	  SRLEC(pp,ip, op, e);
 	  pp = ip;
 	}
-  uint_t c = *ip; 
+  c = *ip; 
   SRLEC(pp, ip, op, e);
   
     #if USIZE > 8
-  unsigned char *p = (unsigned char *)ip; 
+  p = (unsigned char *)ip; 
   while(p < cin+inlen) 
 	*op++ = *p++; 
     #endif

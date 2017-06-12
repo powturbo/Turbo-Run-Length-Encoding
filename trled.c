@@ -29,7 +29,6 @@
 #include <emmintrin.h>
     #endif
 
-#include "conf.h"
 #include "trle.h"
 #include "trle_.h"
          
@@ -41,32 +40,31 @@
 
   #if SRLE8
 unsigned _srled8(const unsigned char *__restrict in, unsigned char *__restrict out, unsigned outlen, unsigned char e) { 
-  const uint8_t *ip = in;
-        uint8_t *op = out;
+  const uint8_t *ip = in; 
+  uint8_t *op = out, c; 
+  uint32_t i;
     #ifdef __SSE__    
   __m128i ev = _mm_set1_epi8(e);
     #endif 
   if(outlen >= SRLE8)
-    while(op < out+(outlen-SRLE8)) {	
+    while(op < out+(outlen-SRLE8)) {
+		
         #ifdef __SSE__ // TODO: test _mm_cmpestrm/_mm_cmpestri on sse4
-      uint32_t mask; 
-      __m128i v = _mm_loadu_si128((__m128i*)ip); _mm_storeu_si128((__m128i *)op, v); mask = _mm_movemask_epi8(_mm_cmpeq_epi8(v, ev)); if(mask) goto a; op += 16; ip += 16;
+      uint32_t mask;
+      __m128i u,v = _mm_loadu_si128((__m128i*)ip); _mm_storeu_si128((__m128i *)op, v); mask = _mm_movemask_epi8(_mm_cmpeq_epi8(v, ev)); if(mask) goto a; op += 16; ip += 16;
         #if SRLE8 >= 32
-      __m128i u = _mm_loadu_si128((__m128i*)ip); _mm_storeu_si128((__m128i *)op, u); mask = _mm_movemask_epi8(_mm_cmpeq_epi8(u, ev)); if(mask) goto a; op += 16; ip += 16;
+              u = _mm_loadu_si128((__m128i*)ip); _mm_storeu_si128((__m128i *)op, u); mask = _mm_movemask_epi8(_mm_cmpeq_epi8(u, ev)); if(mask) goto a; op += 16; ip += 16;
         #endif
 	  											__builtin_prefetch(ip+512, 0);
       continue;
-      a:;
-      uint32_t i = __builtin_ctz(mask);
+      a: i = ctz32(mask);
       op += i; ip += i+1;
 	  {
         #else
-	  uint8_t c;
       if(likely((c = *(uint8_t *)ip) != e)) {
 	    ip++;
 	    *op++ = c; 
 	  } else {  
-	    uint32_t i;
         #endif     
         vbget32(ip, i);
         if(likely(i)) { 
@@ -79,14 +77,14 @@ unsigned _srled8(const unsigned char *__restrict in, unsigned char *__restrict o
     }
 
   #define rmemset8(_op_, _c_, _i_) while(_i_--) *_op_++ = _c_
-  uint8_t c;
   while(op < out+outlen) 
     if(likely((c = *ip) != e)) {
 	  ip++;
 	  *op++ = c; 
 	} else { 
+	  int i; 
 	  ip++;
-	  int i; vbget32(ip, i);
+	  vbget32(ip, i);
 	  if(likely(i)) { 
 	    c   = *ip++;  
 		i  += TMIN; 
@@ -199,7 +197,7 @@ unsigned trled(const unsigned char *__restrict in, unsigned inlen, unsigned char
 #define rmemset(_op_, _c_, _i_) do { \
   __m128i *_up = (__m128i *)_op_, cv = TEMPLATE2(_mm_set1_epi, USIZE)(_c_);\
   _op_ += _i_;\
-  do { _mm_storeu_si128(  _up, cv),_mm_storeu_si128(_up+1, cv); _up+=2; } while(_up < (__m128i *)_op_);\
+  do { _mm_storeu_si128(  _up, cv); _mm_storeu_si128(_up+1, cv); _up+=2; } while(_up < (__m128i *)_op_);\
 } while(0)
   #else
 #define _cset64(_cc,_c_) _cc = _c_
@@ -207,8 +205,8 @@ unsigned trled(const unsigned char *__restrict in, unsigned inlen, unsigned char
 #define _cset16(_cc,_c_) _cc = _c_; _cc = _cc<<48|_cc<<32|_cc<<16|_cc
 #define _cset8( _cc,_c_) _cc = (uint32_t)_c_<<24 | (uint32_t)_c_<<16 | (uint32_t)_c_<<8 | (uint32_t)_c_; _cc = _cc<<32|_cc
 
-#define rmemset(_op_, _c_, _i_) do { uint8_t *_up = (uint8_t *)_op_; _op_ +=_i_;\
-  uint64_t _cc; TEMPLATE2(_cset, USIZE)(_cc,_c_);\
+#define rmemset(_op_, _c_, _i_) do {  uint64_t _cc; uint8_t *_up = (uint8_t *)_op_; _op_ +=_i_;\
+ TEMPLATE2(_cset, USIZE)(_cc,_c_);\
   do {\
     TEMPLATE2(ctou, USIZE)(_up) = _c_; _up += USIZE/8;\
     TEMPLATE2(ctou, USIZE)(_up) = _c_; _up += USIZE/8;\
@@ -228,8 +226,8 @@ unsigned TEMPLATE2(_srled, USIZE)(const unsigned char *__restrict in, unsigned c
 	  ip   += sizeof(uint_t);
 	  *op++ = c;								 
 	} else { 				
-	  ip += sizeof(uint_t);			
 	  int i; 
+	  ip += sizeof(uint_t);			
       vbget32(ip, i);
 	  if(likely(i)) { 
 	    c   = *(uint_t *)ip; 
@@ -241,8 +239,9 @@ unsigned TEMPLATE2(_srled, USIZE)(const unsigned char *__restrict in, unsigned c
     } 							
   }	
     #if USIZE > 8
-  unsigned char *p = (unsigned char *)op; 
-  while(p < cout+outlen) *p++ = *ip++; 
+  { unsigned char *p = (unsigned char *)op; 
+    while(p < cout+outlen) *p++ = *ip++; 
+  }
     #endif
   return ip - in;
 }

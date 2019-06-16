@@ -94,6 +94,7 @@ CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 6.2, ubuntu 16.10
 |187099490| 18.7|23|**2560**|**trle + TurboHF 0** (Huffman Coding)|
 |192420471| 19.2|**1527**|**3834**|**trle + TurboANX 12** (Asymmetric Numeral Systems)|
 |193455670| 19.3|**2192**|2986|**trle + TurboHF 12**|
+|197974078| 19.8|1077.70|1405.88|fse|
 |254312056| 25.4|119|105|mrle + TurboRC 0|
 
 for more info, see also: [Entropy Coder Benchmark](https://sites.google.com/site/powturbo/entropy-coder)

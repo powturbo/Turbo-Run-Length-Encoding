@@ -1,5 +1,5 @@
 /**
-    Copyright (C) powturbo 2015-2018
+    Copyright (C) powturbo 2015-2019
     GPL v2 License
 
     This program is free software; you can redistribute it and/or modify
@@ -23,40 +23,38 @@
 
     TurboRLE - "Most efficient and fastest Run Length Encoding"
 **/
-//------------------------- Variable Byte from https://github.com/powturbo/TurboPFor -----------------------------------------------------
+//------------------------- Variable Byte ( see https://github.com/powturbo/TurboPFor )-----------------------------------------------------
 #include "conf.h"
-#define VB_SIZE 64
-#define VB_MAX 254
-#define VB_B2 6
-#define VB_B3 3
-#define VB_BA3 (VB_MAX - (VB_SIZE/8 - 3))
-#define VB_BA2 (VB_BA3 - (1<<VB_B3))  
+#define TMIN 3
 
-#define VB_OFS1 (VB_BA2 - (1<<VB_B2))
-#define VB_OFS2 (VB_OFS1 + (1 << (8+VB_B2)))
-#define VB_OFS3 (VB_OFS2 + (1 << (16+VB_B3)))
+#define VL_SIZE 32
+#define VL_MAX 0xff
+#define VL_B2 4
+#define VL_B3 3
+#define VL_BA3 (VL_MAX - (VL_SIZE/8 - 3))
+#define VL_BA2 (VL_BA3 - (1<<VL_B3))  
 
-#define _vblen32(_x_)  ((_x_) < VB_OFS1?1:((_x_) < VB_OFS2?2:((_x_) < VB_OFS3)?3:(bsr32(_x_)+7)/8+1))
-#define _vbvlen32(_x_) ((_x_) < VB_OFS1?1:((_x_) < VB_BA2?2:((_x_) < VB_BA3)?3:(_x_-VB_BA3)))
+#define VL_OFS1 (VL_BA2 - (1<<VL_B2))
+#define VL_OFS2 (VL_OFS1 + (1 << ( 8+VL_B2)))
+#define VL_OFS3 (VL_OFS2 + (1 << (16+VL_B3)))
 
-#define _vbput32(_op_, _x_, _act_) {\
-  if(likely((_x_) < VB_OFS1)){ *_op_++ = (_x_);																	_act_;}\
-  else if  ((_x_) < VB_OFS2) { ctou16(_op_) = bswap16((VB_OFS1<<8)+((_x_)-VB_OFS1));             _op_  += 2; /*(_x_) -= VB_OFS1; *_op_++ = VB_OFS1 + ((_x_) >> 8); *_op_++ = (_x_);*/ _act_; }\
-  else if  ((_x_) < VB_OFS3) { *_op_++ = VB_BA2 + (((_x_) -= VB_OFS2) >> 16); ctou16(_op_) = (_x_); _op_  += 2;  _act_;}\
-  else { unsigned _b = (bsr32((_x_))+7)/8; *_op_++ = VB_BA3 + (_b - 3);    ctou32(_op_) = (_x_); _op_  += _b; _act_;}\
+#define _vlput32(_op_, _x_, _act_) {\
+  if(likely((_x_) < VL_OFS1)){ *_op_++ = (_x_);																	 _act_;}\
+  else if  ((_x_) < VL_OFS2) { ctou16(_op_) = bswap16((VL_OFS1<<8)+((_x_)-VL_OFS1));             _op_  += 2;     _act_;}\
+  else if  ((_x_) < VL_OFS3) { *_op_++ = VL_BA2 + (((_x_) -= VL_OFS2) >> 16); ctou16(_op_) = (_x_); _op_  += 2;  _act_;}\
+  else { unsigned _b = (bsr32((_x_))+7)/8; *_op_++ = VL_BA3 + (_b - 3); ctou32(_op_) = (_x_); _op_  += _b; _act_;}\
 }
 
-#define _vbget32(_ip_, _x_, _act_) do { _x_ = *_ip_++;\
-       if(likely(_x_ < VB_OFS1)) { _act_ ;}\
-  else if(likely(_x_ < VB_BA2))  { _x_ = /*bswap16(ctou16(_ip_-1))*/ ((_x_<<8) + (*_ip_)) + (VB_OFS1 - (VB_OFS1 <<  8)); _ip_++; _act_;} \
-  else if(likely(_x_ < VB_BA3))  { _x_ = ctou16(_ip_) + ((_x_ - VB_BA2 ) << 16) + VB_OFS2; _ip_ += 2; _act_;}\
-  else { unsigned _b = _x_-VB_BA3; _x_ = ctou32(_ip_) & ((1u << 8 * _b << 24) - 1); _ip_ += 3 + _b; _act_;}\
+#define _vlget32(_ip_, _x_, _act_) do { _x_ = *_ip_++;\
+       if(likely(_x_ < VL_OFS1)) { _act_ ;}\
+  else if(likely(_x_ < VL_BA2))  { _x_ = ((_x_<<8) + (*_ip_)) + (VL_OFS1 - (VL_OFS1 <<  8)); _ip_++; _act_;} \
+  else if(likely(_x_ < VL_BA3))  { _x_ = ctou16(_ip_) + ((_x_ - VL_BA2 ) << 16) + VL_OFS2; _ip_ += 2; _act_;}\
+  else { unsigned _b = _x_-VL_BA3; _x_ = ctou32(_ip_) & ((1u << 8 * _b << 24) - 1); _ip_ += 3 + _b; _act_;}\
 } while(0)
 
-#define vbput32(_op_, _x_) { register unsigned  _x = _x_; _vbput32(_op_, _x, ;); }
-#define vbget32(_ip_, _x_) _vbget32(_ip_, _x_, ;)
+#define vlput32(_op_, _x_) { register unsigned  _x = _x_; _vlput32(_op_, _x, ;); }
+#define vlget32(_ip_, _x_) _vlget32(_ip_, _x_, ;)
 
-#define vbzput(_op_, _x_, _m_, _emap_) do { if(unlikely((_x_) < _m_)) *_op_++ = _emap_[_x_]; else { unsigned _xi = (_x_) - _m_; *_op_++ = _emap_[_m_]; vbput32(_op_, _xi); } } while(0)
-#define vbzget(_ip_, _x_, _m_, _e_) { _x_ = _e_; if(unlikely(_x_ == _m_)) { vbget32(_ip_,_x_); _x_+=_m_; } }
+#define vlzput(_op_, _x_, _m_, _rmap_) do { if(unlikely((_x_) < _m_)) *_op_++ = _rmap_[_x_]; else { unsigned _xi = (_x_) - _m_; *_op_++ = _rmap_[_m_]; vlput32(_op_, _xi); } } while(0)
+#define vlzget(_ip_, _x_, _m_, _e_) { _x_ = _e_; if(unlikely(_x_ == _m_)) { vlget32(_ip_,_x_ ); _x_+=_m_; } }
 
-#define TMIN 3

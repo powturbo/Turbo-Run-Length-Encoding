@@ -2,16 +2,17 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 ===================================
 
 ##### Efficient and fastest **Run Length Encoding** library
+  - :new: The fastest now up to 50% more faster incl. SSE/AVX2
   - 100% C (C++ compatible headers), without inline assembly
   - Most efficient compression 
   - No other RLE compress or decompress faster with better compression
   - :sparkles: faster compression and 2x faster decompression with :+1: SIMD
   - :+1: **Java** Critical Natives Interface. Access TurboRLE **incl. SIMD!** from Java
-  - Compress better and up to 8 times faster and decompress up to 4 times faster than other fast RLEs
-  - Can be faster than memcpy
+  - Compress better and up to 12 times faster and decompress up to 6 times faster than other fast RLEs
+  - Can be faster than memcpy!
   - :+1: **ZERO!** byte overhead
 
-  - No modification of the raw data, preserving compressibility
+  - No modification of the raw data, preserving compressibility for further postprocessing (ex. entropy coding)
   - Order preserving 
 
 ##### TurboRLE
@@ -51,7 +52,7 @@ CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 6.2, ubuntu 16.10
 
 - Checkers program "End Game Table Base": [1034.db](http://encode.ru/threads/2077-EGTB-compression?p=41392&viewfull=1#post41392)
 
-|C Size|ratio%|C MB/s|D MB/s|Name|
+|C Size|ratio%|C MB/s|D MB/s|Name (2018.06)|
 |--------:|-----:|--------:|--------:|----------------|
 |82421332| 19.7|**801**|**4145**|**trle**|
 |88055364| 21.0|273|1255|mrle|
@@ -69,7 +70,7 @@ CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 6.2, ubuntu 16.10
 - Text File: [enwik9bwt](http://mattmahoney.net/dc/textdata.html) enwik9 bwt generated w.<br>
 [libdivsufsort](https://code.google.com/p/libdivsufsort/)
 
-|C Size|ratio%|C MB/s|D MB/s|Name|
+|C Size|ratio%|C MB/s|D MB/s|Name  (2018.06) |
 |--------:|-----:|--------:|--------:|----------------|
 |378377069| 37.8|**500**|**2090**|**trle**|
 |419339698| 41.9|**506**|**5937**|**srle 0**|
@@ -83,6 +84,18 @@ CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 6.2, ubuntu 16.10
 |605764304| 60.6|**4998**|**7784**|**srle 64**|
 |620676412| 62.1|**5247**|7376|**rle64 64**|
 |1000000012|100.0|**9364**|**9184**|**memcpy**|
+
+- Post-processing with entropy coding 
+  direct entropy encoding after "trle" (no additional "move to front" or other transformation)
+
+|C Size|ratio%|C MB/s|D MB/s|Name /                 CPU Skylake 3.4 GHz (2019.06)|
+|--------:|-----:|--------:|--------:|------------------------------------------------|
+|180510948| 18.1|**154**| **132**|trle + TurboRC,o0 (order 0 bitwise Range Coder)|
+|187099490| 18.7|22.65|**2560**[trle + TurboHF 0 (Huffman Coding)|
+|192420471| 19.2|**1527**|**3834**|trle + TurboANX 12 (Asymmetric Numeral Systems)|
+|193455670| 19.3|**2192**|2986|trle + TurboHF 12|
+
+for more info, see also: [Entropy Coder Benchmark](https://sites.google.com/site/powturbo/entropy-coder)
 
 ### Compile:
 
@@ -113,6 +126,7 @@ CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 6.2, ubuntu 16.10
 ###### OS/Compiler (32 + 64 bits):
 - Linux: GNU GCC (>=4.6)
 - clang (>=3.2) 
+- Intel ICC 19.0
 - Windows: MinGW
 - Windows: Visual c++
 
@@ -120,7 +134,8 @@ CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 6.2, ubuntu 16.10
   - [Real-Time Compression of IEC 61869-9 Sampled Value Data](https://pure.strath.ac.uk/portal/files/55444712/Blair_etal_AMPS2016_Real_time_compression_of_IEC_61869_9_sampled_value_data.pdf)
   - [Understanding Compression: Data Compression for Modern Developers](https://books.google.de/books?id=2C2rDAAAQBAJ&pg=PA216&lpg=PA216&dq=%22turborle%22&source=bl&ots=TiLU4Qf47s&sig=tkk0Dnk9NnU0JMR3Z6iW4TRquxg&hl=de&sa=X&ved=0ahUKEwjZq-Li5uXSAhXFCJoKHe77B6cQ6AEIyAEwHQ#v=onepage&q=%22turborle%22&f=false)
   - [Understanding Compression](http://file.allitebooks.com/20160805/Understanding%20Compression.pdf)
-  
-Last update: 06 Jan 2018
+  - [Entropy Coder Benchmark](https://sites.google.com/site/powturbo/entropy-coder)
+
+Last update: 16 Jan 2019
 
 

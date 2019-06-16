@@ -1,5 +1,5 @@
 /**
-    Copyright (C) powturbo 2015-2018
+    Copyright (C) powturbo 2015-2019
     GPL v2 License
 
     This program is free software; you can redistribute it and/or modify
@@ -25,73 +25,91 @@
 **/
   #ifndef USIZE
 #include <string.h> 
-    #ifdef __SSE__
+  #ifdef __AVX2__
+#include <immintrin.h>
+  #elif defined(__AVX__)
+#include <immintrin.h>
+  #elif defined(__SSE4_1__)
+#include <smmintrin.h>
+  #elif defined(__SSSE3__)
+#include <tmmintrin.h>
+  #elif defined(__SSE2__)
 #include <emmintrin.h>
-    #endif
+  #elif defined(__ARM_NEON)
+#define ARM_NEON_ON
+//#define ARM_NEON_ON1
+#include <arm_neon.h>
+  #endif
 
 #include "trle.h"
-#include "trle_.h"
-         
-//------------------------------------- RLE with Escape char ------------------------------------------------------------------
+#include "trle_.h"        
+//------------------------------------- RLE 8 with Escape char ------------------------------------------------------------------
 //#define MEMSAFE
-#define SRLE8 32 // 16//
+#define SRLE8 32 
 #define USIZE 8
 #include "trled.c"
 
   #if SRLE8
+#define rmemset8(_op_, _c_, _i_) while(_i_--) *_op_++ = _c_
+
 unsigned _srled8(const unsigned char *__restrict in, unsigned char *__restrict out, unsigned outlen, unsigned char e) { 
-  const uint8_t *ip = in; 
-  uint8_t *op = out, c; 
-  uint32_t i;
-    #ifdef __SSE__    
+  uint8_t *ip = in, *op = out, c, *oe = out+outlen; 
+  uint32_t r;
+    
+    #ifdef __AVX2__    
+  __m256i ev = _mm256_set1_epi8(e);
+    #elif defined(__SSE__)
   __m128i ev = _mm_set1_epi8(e);
     #endif 
   if(outlen >= SRLE8)
-    while(op < out+(outlen-SRLE8)) {
-		
-        #ifdef __SSE__ // TODO: test _mm_cmpestrm/_mm_cmpestri on sse4
+    while(op < out+(outlen-SRLE8)) {	
+        #ifdef __AVX2__
       uint32_t mask;
-      __m128i u,v = _mm_loadu_si128((__m128i*)ip); _mm_storeu_si128((__m128i *)op, v); mask = _mm_movemask_epi8(_mm_cmpeq_epi8(v, ev)); if(mask) goto a; op += 16; ip += 16;
-        #if SRLE8 >= 32
-              u = _mm_loadu_si128((__m128i*)ip); _mm_storeu_si128((__m128i *)op, u); mask = _mm_movemask_epi8(_mm_cmpeq_epi8(u, ev)); if(mask) goto a; op += 16; ip += 16;
-        #endif
-	  											__builtin_prefetch(ip+512, 0);
+      __m256i v = _mm256_loadu_si256((__m256i*)ip); _mm256_storeu_si256((__m256i *)op, v); mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(v, ev)); if(mask) goto a; op += 32; ip += 32;
+	  																__builtin_prefetch(ip+512, 0);
       continue;
-      a: i = ctz32(mask);
-      op += i; ip += i+1;
-	  {
+      a: r = ctz32(mask);
+      op += r; ip += r+1;											__builtin_prefetch(ip+512, 0);
+        #elif defined(__SSE__)
+      uint32_t mask;
+      __m128i v = _mm_loadu_si128((__m128i*)ip); _mm_storeu_si128((__m128i *)op, v); mask = _mm_movemask_epi8(_mm_cmpeq_epi8(v, ev)); if(mask) goto a; ip += 16; op += 16; 
+          #if SRLE8 >= 32
+              v = _mm_loadu_si128((__m128i*)ip); _mm_storeu_si128((__m128i *)op, v); mask = _mm_movemask_epi8(_mm_cmpeq_epi8(v, ev)); if(mask) goto a; ip += 16; op += 16; 
+          #endif
+	  																__builtin_prefetch(ip+512, 0);
+      continue;
+      a: r = ctz32(mask); ip += r+1;                                __builtin_prefetch(ip+512, 0);
+      op += r;                               
         #else
-      if(likely((c = *(uint8_t *)ip) != e)) {
+      if(likely((c = *ip) != e)) {
 	    ip++;
-	    *op++ = c; 
-	  } else {  
+	    *op++ = c;
+        continue;		
+	  }    
         #endif     
-        vbget32(ip, i);
-        if(likely(i)) { 
-	      uint8_t c = *ip++; 
-	      i  += TMIN; 
-	      rmemset(op, c, i);
-	    } else 
-	      *op++ = e;												      
-	  }
+      vlget32(ip, r);
+      if(likely(r) >= 3) { 
+	    uint8_t c = *ip++; 
+	    r = r-3+4;
+	    rmemset(op, c, r);
+	  } else { r++;
+	    rmemset8(op, e, r);
+      } 
     }
-
-  #define rmemset8(_op_, _c_, _i_) while(_i_--) *_op_++ = _c_
+	 
   while(op < out+outlen) 
-    if(likely((c = *ip) != e)) {
-	  ip++;
-	  *op++ = c; 
+    if(likely((c = *ip++) != e)) {                     
+	  *op++ = c; 										 
 	} else { 
-	  int i; 
-	  ip++;
-	  vbget32(ip, i);
-	  if(likely(i)) { 
-	    c   = *ip++;  
-		i  += TMIN; 
-		rmemset8(op, c, i);
-	  } else 
-	    *op++ = e;
-    }
+	  vlget32(ip, r); 							 	
+	  if(likely(r) >= 3) { 
+	    c   = *ip++;                                    
+		r  = r-3+4; 									 														 
+		rmemset8(op, c, r);			   					 
+	  } else { r++;
+	    rmemset8(op, e, r);
+      } 
+    }													 
   return ip - in;
 } 
   #endif
@@ -100,63 +118,73 @@ unsigned _srled(const unsigned char *__restrict in, unsigned char *__restrict ou
   return _srled8(in+1, out, outlen, *in); 
 }
   
-unsigned srled(const unsigned char *__restrict in, unsigned inlen, unsigned char *__restrict out, unsigned outlen) {
+unsigned srled(const unsigned char *__restrict in, unsigned inlen, unsigned char *__restrict out, unsigned outlen) { unsigned l; unsigned char *ip=in;
   if(inlen == outlen) 
     memcpy(out, in, outlen); 
   else if(inlen == 1) 
     memset(out, in[0], outlen);
-  else 
-    return _srled8(in+1, out, outlen, *in);
+  else { ip++;															
+    ip += _srled8(ip, out, outlen, *in);							//AS((ip-in) == inlen,"FatalI l>inlen %d ", (ip-in) - inlen); 
+  }
   return inlen;
 }
 //------------------------------------- TurboRLE ------------------------------------------
-unsigned _trled(const unsigned char *__restrict in, unsigned char *__restrict out, unsigned outlen) {
-        uint8_t b[256] = {0},*op = out;
-  const uint8_t *ip;
-  int m = -1, i, c; 
+unsigned _trled(const unsigned char *__restrict _in, unsigned char *__restrict out, unsigned outlen) {
+  uint8_t rmap[256] = {0}, *op = out, *oe = out+outlen, *in = _in, *ip = in;
+  unsigned m = 0, i, c, j; 
 
-  if(outlen < 1) 
+  if(!outlen)
     return 0;
 
-  if(!*in++) 
+  if(!(c = *in++)) 
     return _srled8(in+1, out, outlen, *in)+2;
 
-  for(ip = in; ip < in+32; ip++)
-    for(i = 0; i < 8; ++i) 
-	  if(((*ip) >> i) & 1) 
-	    b[(ip-in)<<3 | i] = ++m+1; 		
-  
-  if(outlen >= 32)
-  while(op < out+(outlen-32)) {				
-    if(b[*ip]) goto a; *op++ = *ip++; 						
-    if(b[*ip]) goto a; *op++ = *ip++; 						
-    if(b[*ip]) goto a; *op++ = *ip++; 						
-    if(b[*ip]) goto a; *op++ = *ip++; 		
-    if(b[*ip]) goto a; *op++ = *ip++; 						
-    if(b[*ip]) goto a; *op++ = *ip++; 						
-    if(b[*ip]) goto a; *op++ = *ip++; 						
-    if(b[*ip]) goto a; *op++ = *ip++; 		
-											__builtin_prefetch(ip+256, 0);						
-    continue;
-    a:
-    c = b[*ip++]; 
-	vbzget(ip, i, m, c-1);
-	c  = *ip++; 
-	i += 3; 
-	rmemset(op,c,i); 													
+  for(i = 0; i != c; i++) { uint8_t *pb = &rmap[i<<3]; unsigned u = in[i],v;
+	v = (u >> 0) & 1; m += v; pb[0] = v?m:0;
+	v = (u >> 1) & 1; m += v; pb[1] = v?m:0;
+	v = (u >> 2) & 1; m += v; pb[2] = v?m:0;
+	v = (u >> 3) & 1; m += v; pb[3] = v?m:0;
+	v = (u >> 4) & 1; m += v; pb[4] = v?m:0;
+	v = (u >> 5) & 1; m += v; pb[5] = v?m:0;
+	v = (u >> 6) & 1; m += v; pb[6] = v?m:0;
+	v = (u >> 7) & 1; m += v; pb[7] = v?m:0;
   }
-  while(op < out+outlen) {				
-    if(likely(!(c = b[*ip]))) 
-	  *op++ = *ip++; 						
-	else { 
-	  ip++; 
-	  vbzget(ip, i, m, c-1);
-	  c  = *ip++; 
-	  i += 3; 
+  for(i = c*8; i != 256; i++) rmap[i] = ++m;
+  ip = in+c; m--;
+
+  if(outlen >= 32)
+    while(op < out+(outlen-32)) {
+        #if __WORDSIZE == 64																							
+      uint64_t z = (uint64_t)rmap[ip[7]]<<56 | (uint64_t)rmap[ip[6]] << 48 | (uint64_t)rmap[ip[5]] << 40 | (uint64_t)rmap[ip[4]] << 32 | (uint32_t)rmap[ip[3]] << 24 | (uint32_t)rmap[ip[2]] << 16| (uint32_t)rmap[ip[1]] << 8| rmap[ip[0]];       
+      ctou64(op) = ctou64(ip); if(z) goto a; ip += 8; op += 8; 																		
+      continue;
+      a: z = ctz64(z)>>3; 
+        #else
+      uint32_t z = (uint32_t)rmap[ip[3]] << 24 | (uint32_t)rmap[ip[2]] << 16| (uint32_t)rmap[ip[1]] << 8| rmap[ip[0]];       
+      ctou32(op) = ctou32(ip); if(z) goto a; ip += 4; op += 4; 
+	  continue;
+      a: z = ctz32(z)>>3; 
+        #endif
+
+      ip += z; op += z;
+      c = rmap[*ip++]; 
+	  vlzget(ip, i, m, c-1);
+	  c  = *ip++;       					
+	  i += TMIN; 							     
+	  rmemset(op,c,i); 														__builtin_prefetch(ip+512, 0);												
+    } 
+
+  while(op < oe) {					    		
+    if(likely(!(c = rmap[*ip]))) *op++ = *ip++;  	  																	    
+    else { 
+	  ip++;										
+	  vlzget(ip, i, m, c-1);
+	  c  = *ip++;         
+	  i += TMIN; 								    												
 	  rmemset8(op,c,i); 					
     }								
-  }
-  return ip - in;
+  }								
+  return ip - _in;
 }
 
 unsigned trled(const unsigned char *__restrict in, unsigned inlen, unsigned char *__restrict out, unsigned outlen) {
@@ -164,8 +192,9 @@ unsigned trled(const unsigned char *__restrict in, unsigned inlen, unsigned char
     memcpy(out, in, outlen); 
   else if(inlen == 1) 
     memset(out, in[0], outlen);
-  else 
-    return _trled(in, out, outlen);
+  else {
+    unsigned l = _trled(in, out, outlen);   									//AS(l == inlen,"FatalI l>inlen %d ", l - inlen); 
+  }
   return inlen;
 }
 
@@ -173,6 +202,7 @@ unsigned trled(const unsigned char *__restrict in, unsigned inlen, unsigned char
 #undef rmemset
 #undef SRLE8
 
+//------------------------------------- RLE 16, 32, 64 -------------------------------------------------- 
 #define USIZE 16
 #include "trled.c"
 #undef rmemset
@@ -190,7 +220,7 @@ unsigned trled(const unsigned char *__restrict in, unsigned inlen, unsigned char
 #undef rmemset
 #undef USIZE
 
- #else
+ #else // ---------------------------- include 16, 32, 64----------------------------------------------
   #ifdef MEMSAFE
 #define rmemset(_op_, _c_, _i_) while(_i_--) *_op_++ = _c_
   #elif defined(__SSE__) && USIZE < 64
@@ -215,34 +245,86 @@ unsigned trled(const unsigned char *__restrict in, unsigned inlen, unsigned char
   #endif 
 
 #define uint_t TEMPLATE3(uint, USIZE, _t)
-  
+#define ctout(_x_) *(uint_t *)(_x_)
   #if !SRLE8
 unsigned TEMPLATE2(_srled, USIZE)(const unsigned char *__restrict in, unsigned char *__restrict cout, unsigned outlen, uint_t e) {
   uint_t *out = (uint_t *)cout, *op = out, c; 
   const unsigned char *ip = in;
+
+    #ifdef __AVX2__    
+  #define _mm256_set1_epi64 _mm256_set1_epi64x
+  __m256i ev = TEMPLATE2(_mm256_set1_epi, USIZE)(e);		  
+    #elif defined(__SSE__)
+       // #if USIZE != 64
+  #define _mm_set1_epi64 _mm_set1_epi64x
+  __m128i ev = TEMPLATE2(_mm_set1_epi, USIZE)(e);       
+       // #endif
+    #endif 
   
-  while(op < out+outlen/sizeof(uint_t)) { 	__builtin_prefetch(ip +384, 0);
-    if(likely((c = *(uint_t *)ip) != e)) { 
-	  ip   += sizeof(uint_t);
+  if(outlen >= sizeof(uint_t)*8)
+    while(op < out+outlen/sizeof(uint_t)-sizeof(uint_t)*8) { int r;					
+        #if __AVX2__ != 0 && USIZE != 64
+      uint32_t mask;
+      __m256i v = _mm256_loadu_si256((__m256i*)ip); _mm256_storeu_si256((__m256i *)op, v); mask = _mm256_movemask_epi8(TEMPLATE2(_mm256_cmpeq_epi,USIZE)(v, ev)); if(mask) goto a; ip += 32; op += 256/USIZE;
+              v = _mm256_loadu_si256((__m256i*)ip); _mm256_storeu_si256((__m256i *)op, v); mask = _mm256_movemask_epi8(TEMPLATE2(_mm256_cmpeq_epi,USIZE)(v, ev)); if(mask) goto a; ip += 32; op += 256/USIZE;
+	  																			__builtin_prefetch(ip+512, 0);
+      continue;
+      a: r = ctz32(mask)/(USIZE/8); 
+      op += r; 
+      ip += (r+1)*sizeof(uint_t);												__builtin_prefetch(ip+512, 0);			
+        #elif __SSE__ != 0 && USIZE != 64
+      uint32_t mask;  
+    __m128i v = _mm_loadu_si128((__m128i*)ip); _mm_storeu_si128((__m128i *)op, v); mask = _mm_movemask_epi8(TEMPLATE2(_mm_cmpeq_epi,USIZE)(v, ev)); if(mask) goto a; ip += 16; op += 128/USIZE;
+            v = _mm_loadu_si128((__m128i*)ip); _mm_storeu_si128((__m128i *)op, v); mask = _mm_movemask_epi8(TEMPLATE2(_mm_cmpeq_epi,USIZE)(v, ev)); if(mask) goto a; ip += 16; op += 128/USIZE;
+            v = _mm_loadu_si128((__m128i*)ip); _mm_storeu_si128((__m128i *)op, v); mask = _mm_movemask_epi8(TEMPLATE2(_mm_cmpeq_epi,USIZE)(v, ev)); if(mask) goto a; ip += 16; op += 128/USIZE;
+            v = _mm_loadu_si128((__m128i*)ip); _mm_storeu_si128((__m128i *)op, v); mask = _mm_movemask_epi8(TEMPLATE2(_mm_cmpeq_epi,USIZE)(v, ev)); if(mask) goto a; ip += 16; op += 128/USIZE;
+																				__builtin_prefetch(ip+512, 0); 
+      continue;
+      a: r = ctz32(mask)/(USIZE/8); 
+      op += r;
+      ip += (r+1)*sizeof(uint_t);  												__builtin_prefetch(ip+512, 0);	                                        
+       #else      
+    if(((c = ctout(ip)) == e)) goto a; ip += sizeof(uint_t); *op++ = c;								 
+    if(((c = ctout(ip)) == e)) goto a; ip += sizeof(uint_t); *op++ = c;								 
+    if(((c = ctout(ip)) == e)) goto a; ip += sizeof(uint_t); *op++ = c;								 
+    if(((c = ctout(ip)) == e)) goto a; ip += sizeof(uint_t); *op++ = c;		
+    if(((c = ctout(ip)) == e)) goto a; ip += sizeof(uint_t); *op++ = c;								 
+    if(((c = ctout(ip)) == e)) goto a; ip += sizeof(uint_t); *op++ = c;								 
+    if(((c = ctout(ip)) == e)) goto a; ip += sizeof(uint_t); *op++ = c;								 
+    if(((c = ctout(ip)) == e)) goto a; ip += sizeof(uint_t); *op++ = c;		     __builtin_prefetch(ip +512, 0);	
+    continue;		
+	a: ip += sizeof(uint_t);	                                                __builtin_prefetch(ip +512, 0);			
+	   #endif
+      vlget32(ip, r);
+	  if(likely(r) >= 3) { 
+	    c   = ctout(ip); ip += sizeof(uint_t); 		
+	    r = r-3+4;
+	    rmemset(op, c, r);			
+	  } else { r++;
+	    rmemset(op, e, r);
+      } 
+  }	
+
+  while(op < out+outlen/sizeof(uint_t)) { 
+    c = ctout(ip); ip += sizeof(uint_t);
+    if(likely(c != e)) { 
 	  *op++ = c;								 
 	} else { 				
-	  int i; 
-	  ip += sizeof(uint_t);			
-      vbget32(ip, i);
-	  if(likely(i)) { 
-	    c   = *(uint_t *)ip; 
-		ip += sizeof(uint_t); 		
-		i  += 3; 
-		rmemset(op, c, i);			
-	  } else 
-	    *op++ = e;
-    } 							
+	  int r; 
+      vlget32(ip, r);
+	  if(likely(r) >= 3) { 
+	    c   = ctout(ip); ip += sizeof(uint_t); 		
+	    r = r-3+4;
+	    rmemset(op, c, r);			
+	  } else { 
+        r++;
+	    rmemset(op, e, r);
+      } 
+    }
   }	
-    #if USIZE > 8
   { unsigned char *p = (unsigned char *)op; 
     while(p < cout+outlen) *p++ = *ip++; 
   }
-    #endif
   return ip - in;
 }
   #endif
@@ -257,3 +339,4 @@ unsigned TEMPLATE2(srled, USIZE)(const unsigned char *__restrict in, unsigned in
   return inlen;
 }
  #endif
+

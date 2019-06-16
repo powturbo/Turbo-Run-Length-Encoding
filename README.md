@@ -85,7 +85,7 @@ CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 6.2, ubuntu 16.10
 |620676412| 62.1|**5247**|7376|**rle64 64**|
 |1000000012|100.0|**9364**|**9184**|**memcpy**|
 
-- Post-processing with entropy coding 
+- Post-processing with entropy coding<br> 
   direct entropy encoding after "trle" (no additional "move to front" or other transformation)
 
 |C Size|ratio%|C MB/s|D MB/s|Name /                 CPU Skylake 3.4 GHz (2019.06)|

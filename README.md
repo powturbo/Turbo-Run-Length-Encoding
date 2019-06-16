@@ -90,7 +90,7 @@ CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 6.2, ubuntu 16.10
 
 |C Size|ratio%|C MB/s|D MB/s|Name /             CPU Skylake 3.4 GHz (2019-06)|
 |--------:|-----:|--------:|--------:|-----------------------------------------------|
-|180510948| 18.1|**154**| **132**|trle + TurboRC,o0 (order 0 bitwise Range Coder)|
+|180510948| 18.1|**154**| **132**|TRLE + TurboRC,o0 (order 0 bitwise Range Coder)|
 |187099490| 18.7|23|**2560**|TRLE + TurboHF 0 (Huffman Coding)|
 |192420471| 19.2|**1527**|**3834**|TRLE + TurboANX 12 (Asymmetric Numeral Systems)|
 |193455670| 19.3|**2192**|2986|TRLE + TurboHF 12|

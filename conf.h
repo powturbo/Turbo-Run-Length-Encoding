@@ -39,8 +39,8 @@
 #define popcnt64(_x_) 	__builtin_popcountll(_x_)
 
     #if defined(__i386__) || defined(__x86_64__)
-//__bsr32     1:0,2:1,3:1,4:2,5:2,6:2,7:2,8:3,9:3,10:3,11:3,12:3,13:3,14:3,15:3,16:4,17:4,18:4,19:4,20:4,21:4,22:4,23:4,24:4,25:4,26:4,27:4,28:4,29:4,30:4,31:4,32:5
-//bsr32:  0:0,1:1,2:2,3:2,4:3,5:3,6:3,7:3,8:4,9:4,10:4,11:4,12:4,13:4,14:4,15:4,16:5,17:5,18:5,19:5,20:5,21:5,22:5,23:5,24:5,25:5,26:5,27:5,28:5,29:5,30:5,31:5,32:6,
+//__bsr32:     1:0,2:1,3:1,4:2,5:2,6:2,7:2,8:3,9:3,10:3,11:3,12:3,13:3,14:3,15:3,16:4,17:4,18:4,19:4,20:4,21:4,22:4,23:4,24:4,25:4,26:4,27:4,28:4,29:4,30:4,31:4,32:5
+//  bsr32: 0:0,1:1,2:2,3:2,4:3,5:3,6:3,7:3,8:4,9:4,10:4,11:4,12:4,13:4,14:4,15:4,16:5,17:5,18:5,19:5,20:5,21:5,22:5,23:5,24:5,25:5,26:5,27:5,28:5,29:5,30:5,31:5,32:6,
 static inline int    __bsr32(               int x) {             asm("bsr  %1,%0" : "=r" (x) : "rm" (x) ); return x; }
 static inline int      bsr32(               int x) { int b = -1; asm("bsrl %1,%0" : "+r" (b) : "rm" (x) ); return b + 1; }
 static inline int      bsr64(uint64_t x) { return x?64 - __builtin_clzll(x):0; }
@@ -61,7 +61,7 @@ static inline unsigned ror64(unsigned x, int s) { return x >> s | x << (64 - s);
     #endif
 
 #define ctz64(_x_) __builtin_ctzll(_x_)
-#define ctz32(_x_) __builtin_ctz(_x_)
+#define ctz32(_x_) __builtin_ctz(_x_)    // 0:32  ctz32(1<<a) = a (a=1..31)
 #define clz64(_x_) __builtin_clzll(_x_)
 #define clz32(_x_) __builtin_clz(_x_)
 
@@ -75,9 +75,11 @@ static inline unsigned short bswap16(unsigned short x) { return __builtin_bswap3
 
   #elif _MSC_VER //----------------------------------------------------
 #include <windows.h>
+#include <intrin.h>
     #if _MSC_VER < 1600
 #include "vs/stdint.h"
 #define __builtin_prefetch(x,a)
+#define inline          __inline
     #else 
 #include <stdint.h>
 #define __builtin_prefetch(x,a) _mm_prefetch(x, _MM_HINT_NTA)
@@ -86,20 +88,20 @@ static inline unsigned short bswap16(unsigned short x) { return __builtin_bswap3
 #define ALIGNED(x)		__declspec(align(x))
 #define ALWAYS_INLINE	__forceinline
 #define NOINLINE		__declspec(noinline)
-#define inline          __inline
 #define THREADLOCAL		__declspec(thread)
 #define likely(x)     	(x)
 #define unlikely(x)   	(x)
 
-static inline int __bsr32(int x) { unsigned long z; _BitScanReverse(&z, x); return z; }
-static inline int bsr32(  int x) { unsigned long z; _BitScanReverse(&z, x); return x?z+1:0; }
+static inline int __bsr32(unsigned x) { unsigned long z=0; _BitScanReverse(&z, x); return z; }
+static inline int bsr32(  unsigned x) { unsigned long z;   _BitScanReverse(&z, x); return x?z+1:0; }
+static inline int ctz32(  unsigned x) { unsigned long z;   _BitScanForward(&z, x); return x?z:32; }
+static inline int clz32(  unsigned x) { unsigned long z;   _BitScanReverse(&z, x); return x?31-z:32; }
     #ifdef _WIN64
-static inline int bsr64(uint64_t x) { unsigned long z=0; _BitScanForward64(&z, x); return x?z+1:0; }
-static inline int ctz64(uint64_t x) { unsigned long z=0; _BitScanForward64(&z, x); return x?z:64;; }
-static inline int clz64(uint64_t x) { unsigned long z=0; _BitScanReverse64(&z, x); return x?63-z:64; }
+#pragma intrinsic(_BitScanReverse)
+static inline int bsr64(uint64_t x) { unsigned long z=0; _BitScanReverse64(&z, x); return x?z+1:0; }
+static inline int ctz64(uint64_t x) { unsigned long z;   _BitScanForward64(&z, x); return x?z:64; }
+static inline int clz64(uint64_t x) { unsigned long z;   _BitScanReverse64(&z, x); return x?63-z:64; }
     #endif
-static inline int ctz32(unsigned x) { unsigned long z=0; _BitScanForward(  &z, x); return x?z:32; }
-static inline int clz32(unsigned x) { unsigned long z=0; _BitScanReverse(  &z, x); return x?31-z:32; }
 #define rol32(x,s) _lrotl(x, s)
 #define ror32(x,s) _lrotr(x, s)
 
@@ -123,8 +125,11 @@ static inline double round(double num) { return (num > 0.0) ? floor(num + 0.5) :
 #define bsr16(_x_) bsr32(_x_)
 #define ctz8(_x_)  ctz32(_x_)
 #define ctz16(_x_) ctz32(_x_)
-#define clz8(_x_)  (clz32(_x_)-8)
+#define clz8(_x_)  (clz32(_x_)-24)
 #define clz16(_x_) (clz32(_x_)-16)
+
+#define popcnt8(x)  popcnt32(x) 
+#define popcnt16(x) popcnt32(x) 
 
 //--------------- Unaligned memory access -------------------------------------
 /*# || defined(i386) || defined(_X86_) || defined(__THW_INTEL)*/
@@ -137,9 +142,11 @@ static inline double round(double num) { return (num > 0.0) ? floor(num + 0.5) :
     defined(__ARM_ARCH_6__) || defined(__ARM_ARCH_6J__) || defined(__ARM_ARCH_6K__)  || defined(__ARM_ARCH_6T2__) || defined(__ARM_ARCH_6Z__)   || defined(__ARM_ARCH_6ZK__)
 #define ctou16(_cp_) (*(unsigned short *)(_cp_))
 #define ctou32(_cp_) (*(unsigned       *)(_cp_))
+#define ctof32(_cp_) (*(float          *)(_cp_))
 
     #if defined(__i386__) || defined(__x86_64__) || defined(__powerpc__) || defined(_MSC_VER)
 #define ctou64(_cp_)       (*(uint64_t *)(_cp_))
+#define ctof64(_cp_)       (*(double   *)(_cp_))
     #elif defined(__ARM_FEATURE_UNALIGNED)
 struct _PACKED longu     { uint64_t l; };
 #define ctou64(_cp_) ((struct longu     *)(_cp_))->l
@@ -148,11 +155,15 @@ struct _PACKED longu     { uint64_t l; };
   #elif defined(__ARM_ARCH_7__) || defined(__ARM_ARCH_7A__) || defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7R__) || defined(__ARM_ARCH_7S__)
 struct _PACKED shortu    { unsigned short     s; };
 struct _PACKED unsignedu { unsigned           u; };
-struct _PACKED longu     { uint64_t l; };
+struct _PACKED longu     { uint64_t           l; };
+struct _PACKED floatu    { float              f; };
+struct _PACKED doubleu   { double             d; };
 
 #define ctou16(_cp_) ((struct shortu    *)(_cp_))->s
 #define ctou32(_cp_) ((struct unsignedu *)(_cp_))->u
 #define ctou64(_cp_) ((struct longu     *)(_cp_))->l
+#define ctof32(_cp_) ((struct floatu    *)(_cp_))->f
+#define ctof64(_cp_) ((struct doubleu   *)(_cp_))->d
   #else
 #error "unknown cpu"	  
   #endif
@@ -180,7 +191,7 @@ static inline uint64_t ctou64(void *cp) { uint64_t x; memcpy((void *)&x, cp, (un
 
 #define ctou24(_cp_) (ctou32(_cp_) & 0xffffff)
 #define ctou48(_cp_) (ctou64(_cp_) & 0xffffffffffffull)
-#define ctou8(_cp_) (*_cp_)
+#define ctou8(_cp_) (*(_cp_))
 //--------------------- wordsize ----------------------------------------------
   #if defined(__64BIT__) || defined(_LP64) || defined(__LP64__) || defined(_WIN64) ||\
     defined(__x86_64__) || defined(_M_X64) ||\
@@ -196,7 +207,13 @@ static inline uint64_t ctou64(void *cp) { uint64_t x; memcpy((void *)&x, cp, (un
 #endif
 
 //---------------------misc ---------------------------------------------------
+#define BZHI64(_u_, _b_) ((_u_) & ((1ull<<(_b_))-1))
+#define BZHI32(_u_, _b_) ((_u_) & ((1u  <<(_b_))-1))
+#define BZHI16(_u_, _b_) BZHI32(_u_, _b_)
+#define BZHI8(_u_, _b_)  BZHI32(_u_, _b_)
+
 #define SIZE_ROUNDUP(_n_, _a_) (((size_t)(_n_) + (size_t)((_a_) - 1)) & ~(size_t)((_a_) - 1))
+#define ALIGN_DOWN(__ptr, __a) ((void *)((uintptr_t)(__ptr) & ~(uintptr_t)((__a) - 1)))
   
 #define TEMPLATE2_(_x_, _y_) _x_##_y_
 #define TEMPLATE2(_x_, _y_) TEMPLATE2_(_x_,_y_)
@@ -204,6 +221,8 @@ static inline uint64_t ctou64(void *cp) { uint64_t x; memcpy((void *)&x, cp, (un
 #define TEMPLATE3_(_x_,_y_,_z_) _x_##_y_##_z_
 #define TEMPLATE3(_x_,_y_,_z_) TEMPLATE3_(_x_, _y_, _z_)
 
+#define CACHE_LINE_SIZE     64
+#define PREFETCH_DISTANCE   (CACHE_LINE_SIZE*4)
 //--- NDEBUG -------
 #include <stdio.h>
   #ifdef _MSC_VER

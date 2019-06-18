@@ -129,28 +129,31 @@ unsigned srled(const unsigned char *__restrict in, unsigned inlen, unsigned char
   return inlen;
 }
 //------------------------------------- TurboRLE ------------------------------------------
-unsigned _trled(const unsigned char *__restrict _in, unsigned char *__restrict out, unsigned outlen) {
-  uint8_t rmap[256] = {0}, *op = out, *oe = out+outlen, *in = _in, *ip = in;
-  unsigned m = 0, i, c, j; 
+unsigned _trled(const unsigned char *__restrict in, unsigned char *__restrict out, unsigned outlen) {
+  uint8_t rmap[256] = {0}, *op = out, *ip = in;
+  unsigned m = 0, i, c; 
 
   if(!outlen)
     return 0;
 
-  if(!(c = *in++)) 
-    return _srled8(in+1, out, outlen, *in)+2;
+  if(!(c = *ip++)) 
+    return _srled8(ip+1, out, outlen, *ip)+2;
 
-  for(i = 0; i != c; i++) { uint8_t *pb = &rmap[i<<3]; unsigned u = in[i],v;
-	v = (u >> 0) & 1; m += v; pb[0] = v?m:0;
-	v = (u >> 1) & 1; m += v; pb[1] = v?m:0;
-	v = (u >> 2) & 1; m += v; pb[2] = v?m:0;
-	v = (u >> 3) & 1; m += v; pb[3] = v?m:0;
-	v = (u >> 4) & 1; m += v; pb[4] = v?m:0;
-	v = (u >> 5) & 1; m += v; pb[5] = v?m:0;
-	v = (u >> 6) & 1; m += v; pb[6] = v?m:0;
-	v = (u >> 7) & 1; m += v; pb[7] = v?m:0;
+  for(ip += (c+7)/8, i = 0; i != c; i++) { uint8_t *pb = &rmap[i<<3], *q = in+1; 
+    if(BIT_ISSET(q,i)) {
+      unsigned u = *ip++,v;                    
+	  v = (u >> 0) & 1; m += v; pb[0] = v?m:0;
+	  v = (u >> 1) & 1; m += v; pb[1] = v?m:0;
+	  v = (u >> 2) & 1; m += v; pb[2] = v?m:0;
+	  v = (u >> 3) & 1; m += v; pb[3] = v?m:0;
+	  v = (u >> 4) & 1; m += v; pb[4] = v?m:0;
+	  v = (u >> 5) & 1; m += v; pb[5] = v?m:0;
+	  v = (u >> 6) & 1; m += v; pb[6] = v?m:0;
+	  v = (u >> 7) & 1; m += v; pb[7] = v?m:0;
+    }
   }
   for(i = c*8; i != 256; i++) rmap[i] = ++m;
-  ip = in+c; m--;
+  m--;
 
   if(outlen >= 32)
     while(op < out+(outlen-32)) {
@@ -174,7 +177,7 @@ unsigned _trled(const unsigned char *__restrict _in, unsigned char *__restrict o
 	  rmemset(op,c,i); 														__builtin_prefetch(ip+512, 0);												
     } 
 
-  while(op < oe) {					    		
+  while(op < out+outlen) {					    		
     if(likely(!(c = rmap[*ip]))) *op++ = *ip++;  	  																	    
     else { 
 	  ip++;										
@@ -184,7 +187,7 @@ unsigned _trled(const unsigned char *__restrict _in, unsigned char *__restrict o
 	  rmemset8(op,c,i); 					
     }								
   }								
-  return ip - _in;
+  return ip - in;
 }
 
 unsigned trled(const unsigned char *__restrict in, unsigned inlen, unsigned char *__restrict out, unsigned outlen) {

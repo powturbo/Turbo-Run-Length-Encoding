@@ -165,20 +165,26 @@ unsigned trlec(const unsigned char *__restrict in, unsigned inlen, unsigned char
 	    m = cnt[i],mi = i;                                      
   if(m) {  														// no unused bytes found 
     PUTC(op, 0);      						    				// 0: srle mode
-	PUTC(op, mi);					    							// _srlec8 escape char
+	PUTC(op, mi);					    						// _srlec8 escape char
     op += _srlec8(in, inlen, op, mi);
     if(op - out < inlen) return op - out;       				// RETURN rle/escape
     memcpy(out, in, inlen);  				    				// no compression, use memcpy 
     return inlen; 						    					// RETURN outlen = inlen (memcpy)
-  }																//else unsigned unused=0; for(i=0;i<a;i++) unused+=cnt[i]==0;  printf("!%d ", unused); 	
+  }																	
   
-  c = (a+7)/8; 								    				// 
+  c = (a+7)/8; 								    				 
   PUTC(op, c);  								    			// c = bitmap length in bytes 
-  memset(op, 0, 32);
-  for(m = i = 0; i != c*8; i++) 								// set bitmap for unused chars
-    if(!cnt[i]) op[i>>3] |= 1<<(i&7), rmap[m++] = i;
+  
+  { unsigned char *q = op;                                      // set level 0+1 bitmap for unused chars 
+    unsigned u = 0;
+    ctou32(op) = 0; op += (c+7)/8;                              // init level 0 
+    for(m = i = 0; i != c*8; i++) {								
+      if(!cnt[i]) u |= 1<<(i&7), rmap[m++] = i;                 // level 1 bitmap
+      if(u && !((i+1)&7)) BIT_SET(q, i/8), *op++=u,u=0;     	// level 0 bitmap
+    }
+  }
   for(; i != 256; i++) rmap[m++] = i;
-  op += c; m--;                                 				// m bytes header overhead 
+  m--;                                 							 
 
   if(inlen > SRLE8+1)                                           // encode    
     while(ip < ie-1-SRLE8) {	

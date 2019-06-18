@@ -139,6 +139,7 @@ unsigned _trled(const unsigned char *__restrict in, unsigned char *__restrict ou
   if(!(c = *ip++)) 
     return _srled8(ip+1, out, outlen, *ip)+2;
 
+    #ifdef TRLEVER2
   for(ip += (c+7)/8, i = 0; i != c; i++) { uint8_t *pb = &rmap[i<<3], *q = in+1; 
     if(BIT_ISSET(q,i)) {
       unsigned u = *ip++,v;                    
@@ -152,6 +153,19 @@ unsigned _trled(const unsigned char *__restrict in, unsigned char *__restrict ou
 	  v = (u >> 7) & 1; m += v; pb[7] = v?m:0;
     }
   }
+    #else
+  for(i = 0; i != c; i++) { uint8_t *pb = &rmap[i<<3]; unsigned u = ip[i],v;
+	v = (u >> 0) & 1; m += v; pb[0] = v?m:0;
+	v = (u >> 1) & 1; m += v; pb[1] = v?m:0;
+	v = (u >> 2) & 1; m += v; pb[2] = v?m:0;
+	v = (u >> 3) & 1; m += v; pb[3] = v?m:0;
+	v = (u >> 4) & 1; m += v; pb[4] = v?m:0;
+	v = (u >> 5) & 1; m += v; pb[5] = v?m:0;
+	v = (u >> 6) & 1; m += v; pb[6] = v?m:0;
+	v = (u >> 7) & 1; m += v; pb[7] = v?m:0;
+  }
+  ip += c; 
+    #endif
   for(i = c*8; i != 256; i++) rmap[i] = ++m;
   m--;
 

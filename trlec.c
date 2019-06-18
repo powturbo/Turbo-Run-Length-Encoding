@@ -174,7 +174,8 @@ unsigned trlec(const unsigned char *__restrict in, unsigned inlen, unsigned char
   
   c = (a+7)/8; 								    				 
   PUTC(op, c);  								    			// c = bitmap length in bytes 
-  
+
+    #ifdef TRLEVER2 
   { unsigned char *q = op;                                      // set level 0+1 bitmap for unused chars 
     unsigned u = 0;
     ctou32(op) = 0; op += (c+7)/8;                              // init level 0 
@@ -183,6 +184,12 @@ unsigned trlec(const unsigned char *__restrict in, unsigned inlen, unsigned char
       if(u && !((i+1)&7)) BIT_SET(q, i/8), *op++=u,u=0;     	// level 0 bitmap
     }
   }
+    #else
+  memset(op, 0, 32);
+  for(m = i = 0; i != c*8; i++) 								// set bitmap for unused chars
+    if(!cnt[i]) op[i>>3] |= 1<<(i&7), rmap[m++] = i;
+  op += c; 
+    #endif
   for(; i != 256; i++) rmap[m++] = i;
   m--;                                 							 
 

@@ -138,6 +138,6 @@ for more info, see also: [Entropy Coder Benchmark](https://sites.google.com/site
   - [Understanding Compression](http://file.allitebooks.com/20160805/Understanding%20Compression.pdf)
   - [Entropy Coder Benchmark](https://sites.google.com/site/powturbo/entropy-coder)
 
-Last update: 16 Jun 2019
+Last update: 18 Jun 2019
 
 

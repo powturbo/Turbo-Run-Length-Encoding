@@ -63,3 +63,4 @@
 #define BIT_CLEAR(p, n) (p[(n)/BITS] &= ~(0x80>>((n)%BITS)))
 #define BIT_ISSET(p, n) (p[(n)/BITS] &   (0x80>>((n)%BITS)))
 
+//#define TRLEVER2 

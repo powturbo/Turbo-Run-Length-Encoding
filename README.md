@@ -90,12 +90,12 @@ CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 6.2, ubuntu 16.10
 
 |C Size|ratio%|C MB/s|D MB/s|Name /             CPU Skylake 3.4 GHz (2019-06)|
 |--------:|-----:|--------:|--------:|-----------------------------------------------|
-|180510948| 18.1|**154**| **132**|**trle + TurboRC,o0** (order 0 bitwise Range Coder)|
+|180510948| 18.1|**154**| **132**|**trle + TurboRC o0** (order 0 bitwise Range Coder)|
 |187099490| 18.7|23|**2560**|**trle + TurboHF 0** (Huffman Coding)|
 |192420471| 19.2|**1527**|**3834**|**trle + TurboANX 12** (Asymmetric Numeral Systems)|
 |193455670| 19.3|**2192**|2986|**trle + TurboHF 12**|
 |197974078| 19.8|1078|1406|trle + fse (Finite State Entropy)|
-|254312056| 25.4|119|105|mrle + TurboRC 0|
+|254312056| 25.4|119|105|mrle + TurboRC o0|
 
 for more info, see also: [Entropy Coder Benchmark](https://sites.google.com/site/powturbo/entropy-coder)
 

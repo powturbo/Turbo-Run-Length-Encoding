@@ -35,10 +35,6 @@
 #include <tmmintrin.h>
   #elif defined(__SSE2__)
 #include <emmintrin.h>
-  #elif defined(__ARM_NEON)
-#define ARM_NEON_ON
-//#define ARM_NEON_ON1
-#include <arm_neon.h>
   #endif
 
 #include "trle.h"
@@ -48,44 +44,38 @@
 #define SRLE8 32 
 #define USIZE 8
 #include "trled.c"
-
+  
   #if SRLE8
 #define rmemset8(_op_, _c_, _i_) while(_i_--) *_op_++ = _c_
-
 unsigned _srled8(const unsigned char *__restrict in, unsigned char *__restrict out, unsigned outlen, unsigned char e) { 
   uint8_t *ip = in, *op = out, c, *oe = out+outlen; 
   uint32_t r;
     
     #ifdef __AVX2__    
   __m256i ev = _mm256_set1_epi8(e);
-    #elif defined(__SSE__)
+    #elif defined(__SSE__) 
   __m128i ev = _mm_set1_epi8(e);
+    #elif  defined(__ARM_NEON)
+  uint8x8_t ev = vdup_n_u8(e);
     #endif 
   if(outlen >= SRLE8)
     while(op < out+(outlen-SRLE8)) {	
-        #ifdef __AVX2__
+        #if defined(__AVX2__) || defined(__SSE__) //|| defined(__ARM_NEON)
       uint32_t mask;
+          #ifdef __AVX2__
       __m256i v = _mm256_loadu_si256((__m256i*)ip); _mm256_storeu_si256((__m256i *)op, v); mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(v, ev)); if(mask) goto a; op += 32; ip += 32;
-	  																__builtin_prefetch(ip+512, 0);
-      continue;
-      a: r = ctz32(mask);
-      op += r; ip += r+1;											__builtin_prefetch(ip+512, 0);
-        #elif defined(__SSE__)
-      uint32_t mask;
+          #elif defined(__SSE__)
       __m128i v = _mm_loadu_si128((__m128i*)ip); _mm_storeu_si128((__m128i *)op, v); mask = _mm_movemask_epi8(_mm_cmpeq_epi8(v, ev)); if(mask) goto a; ip += 16; op += 16; 
-          #if SRLE8 >= 32
+            #if SRLE8 >= 32
               v = _mm_loadu_si128((__m128i*)ip); _mm_storeu_si128((__m128i *)op, v); mask = _mm_movemask_epi8(_mm_cmpeq_epi8(v, ev)); if(mask) goto a; ip += 16; op += 16; 
+            #endif
           #endif
-	  																__builtin_prefetch(ip+512, 0);
+	  	 															            __builtin_prefetch(ip+512, 0);    
       continue;
-      a: r = ctz32(mask); ip += r+1;                                __builtin_prefetch(ip+512, 0);
+      a: r = ctz32(mask); ip += r+1;                                            __builtin_prefetch(ip+512, 0);
       op += r;                               
         #else
-      if(likely((c = *ip) != e)) {
-	    ip++;
-	    *op++ = c;
-        continue;		
-	  }    
+      if(likely((c = *ip++) != e)) { *op++ = c; continue; }
         #endif     
       vlget32(ip, r);
       if(likely(r) >= 3) { 
@@ -94,7 +84,7 @@ unsigned _srled8(const unsigned char *__restrict in, unsigned char *__restrict o
 	    rmemset(op, c, r);
 	  } else { r++;
 	    rmemset8(op, e, r);
-      } 
+      }
     }
 	 
   while(op < out+outlen) 
@@ -139,21 +129,6 @@ unsigned _trled(const unsigned char *__restrict in, unsigned char *__restrict ou
   if(!(c = *ip++)) 
     return _srled8(ip+1, out, outlen, *ip)+2;
 
-    #ifdef TRLEVER2
-  for(ip += (c+7)/8, i = 0; i != c; i++) { uint8_t *pb = &rmap[i<<3], *q = in+1; 
-    if(BIT_ISSET(q,i)) {
-      unsigned u = *ip++,v;                    
-	  v = (u >> 0) & 1; m += v; pb[0] = v?m:0;
-	  v = (u >> 1) & 1; m += v; pb[1] = v?m:0;
-	  v = (u >> 2) & 1; m += v; pb[2] = v?m:0;
-	  v = (u >> 3) & 1; m += v; pb[3] = v?m:0;
-	  v = (u >> 4) & 1; m += v; pb[4] = v?m:0;
-	  v = (u >> 5) & 1; m += v; pb[5] = v?m:0;
-	  v = (u >> 6) & 1; m += v; pb[6] = v?m:0;
-	  v = (u >> 7) & 1; m += v; pb[7] = v?m:0;
-    }
-  }
-    #else
   for(i = 0; i != c; i++) { uint8_t *pb = &rmap[i<<3]; unsigned u = ip[i],v;
 	v = (u >> 0) & 1; m += v; pb[0] = v?m:0;
 	v = (u >> 1) & 1; m += v; pb[1] = v?m:0;
@@ -165,9 +140,10 @@ unsigned _trled(const unsigned char *__restrict in, unsigned char *__restrict ou
 	v = (u >> 7) & 1; m += v; pb[7] = v?m:0;
   }
   ip += c; 
-    #endif
   for(i = c*8; i != 256; i++) rmap[i] = ++m;
+
   m--;
+  unsigned char ix = *ip++; 
 
   if(outlen >= 32)
     while(op < out+(outlen-32)) {
@@ -186,8 +162,7 @@ unsigned _trled(const unsigned char *__restrict in, unsigned char *__restrict ou
       ip += z; op += z;
       c = rmap[*ip++]; 
 	  vlzget(ip, i, m, c-1);
-	  c  = *ip++;       					
-	  i += TMIN; 							     
+	  if(i&1) c = ix; else c = *ip++; i = (i>>1) + TMIN; 							     
 	  rmemset(op,c,i); 														__builtin_prefetch(ip+512, 0);												
     } 
 
@@ -196,8 +171,7 @@ unsigned _trled(const unsigned char *__restrict in, unsigned char *__restrict ou
     else { 
 	  ip++;										
 	  vlzget(ip, i, m, c-1);
-	  c  = *ip++;         
-	  i += TMIN; 								    												
+	  if(i&1) c = ix; else c = *ip++; i = (i>>1) + TMIN; 							     
 	  rmemset8(op,c,i); 					
     }								
   }								
@@ -240,7 +214,7 @@ unsigned trled(const unsigned char *__restrict in, unsigned inlen, unsigned char
  #else // ---------------------------- include 16, 32, 64----------------------------------------------
   #ifdef MEMSAFE
 #define rmemset(_op_, _c_, _i_) while(_i_--) *_op_++ = _c_
-  #elif defined(__SSE__) && USIZE < 64
+  #elif (__SSE__ != 0 || __ARM_NEON != 0) && USIZE < 64
 #define rmemset(_op_, _c_, _i_) do { \
   __m128i *_up = (__m128i *)_op_, cv = TEMPLATE2(_mm_set1_epi, USIZE)(_c_);\
   _op_ += _i_;\
@@ -271,7 +245,7 @@ unsigned TEMPLATE2(_srled, USIZE)(const unsigned char *__restrict in, unsigned c
     #ifdef __AVX2__    
   #define _mm256_set1_epi64 _mm256_set1_epi64x
   __m256i ev = TEMPLATE2(_mm256_set1_epi, USIZE)(e);		  
-    #elif defined(__SSE__)
+    #elif (defined(__SSE__) /*|| defined(__ARM_NEON)*/)
        // #if USIZE != 64
   #define _mm_set1_epi64 _mm_set1_epi64x
   __m128i ev = TEMPLATE2(_mm_set1_epi, USIZE)(e);       
@@ -289,7 +263,7 @@ unsigned TEMPLATE2(_srled, USIZE)(const unsigned char *__restrict in, unsigned c
       a: r = ctz32(mask)/(USIZE/8); 
       op += r; 
       ip += (r+1)*sizeof(uint_t);												__builtin_prefetch(ip+512, 0);			
-        #elif __SSE__ != 0 && USIZE != 64
+        #elif (__SSE__ != 0 /*|| __ARM_NEON != 0*/) && USIZE != 64
       uint32_t mask;  
     __m128i v = _mm_loadu_si128((__m128i*)ip); _mm_storeu_si128((__m128i *)op, v); mask = _mm_movemask_epi8(TEMPLATE2(_mm_cmpeq_epi,USIZE)(v, ev)); if(mask) goto a; ip += 16; op += 128/USIZE;
             v = _mm_loadu_si128((__m128i*)ip); _mm_storeu_si128((__m128i *)op, v); mask = _mm_movemask_epi8(TEMPLATE2(_mm_cmpeq_epi,USIZE)(v, ev)); if(mask) goto a; ip += 16; op += 128/USIZE;

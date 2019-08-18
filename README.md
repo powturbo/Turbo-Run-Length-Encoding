@@ -29,6 +29,7 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 - BMP File: [girl.bmp in RLE64Samples](http://sourceforge.net/projects/nikkhokkho/files/RLE64/3.00/)
 
 (bold = pareto)  MB=1.000.000
+
 |C Size|ratio%|C MB/s|D MB/s|Name|File  2019-08|
 |--------:|-----:|--------:|--------:|----------------|
 |2623680|  0.6|**2074.35**|**11112.89**|**trle**|
@@ -40,6 +41,7 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 |403920054|100.0|13977.92|**14000.70**|**memcpy**|
 
 - Checkers program "End Game Table Base": [1034.db](http://encode.su/threads/2077-EGTB-compression?p=41392&viewfull=1#post41392)
+
 |C Size|ratio%|C MB/s|D MB/s|Name|File 2019-08|
 |--------:|-----:|--------:|--------:|----------------|
 |73108990| 17.4|**754.08**|**2983.03**|**trle**|
@@ -70,6 +72,8 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
   - **MRLE**: Mespotine RLE [MRLE](http://encode.su/threads/2121-No-more-encoding-overhead-in-Run-Length-Encoding-Read-about-Mespotine-RLE-here-)
   - **RLE64**: Run Length Encoding - [RLE64](http://sourceforge.net/projects/nikkhokkho/files/RLE64/)
 <p>
+
+
 |C Size|ratio%|C MB/s|D MB/s|Name / 2018-06|
 |--------:|-----:|--------:|--------:|----------------|
 |3289669|  0.8|**2122**|**10499**|**trle**|

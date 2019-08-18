@@ -15,7 +15,7 @@ LDFLAGS+= -lrt
 endif
 endif
 
-CFLAGS=-march=native -minline-all-stringops
+CFLAGS=-march=native -minline-all-stringops -w 
 
 all: trle
 

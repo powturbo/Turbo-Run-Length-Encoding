@@ -22,7 +22,7 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 ## Benchmark:
 - with [TurboBench](https://github.com/powturbo/TurboBench)
 - Single thread
-- Realistic and practical benchmark with large files
+- Realistic and practical benchmark with large files and different distributions
 
 ------------------------------------------------------------------------
 #### CPU: Skylake i7-6700 3.4GHz, gcc 8.3 

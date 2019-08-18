@@ -62,7 +62,7 @@ static unsigned cntcalc32(const unsigned char *__restrict in, unsigned inlen, cn
   return a;
 }
 
-//------------------------------ speed optimized RLE 8 with escape char. SSE/AVX2 slower than scalar ------------------------------------------------
+//------------------------------ speed optimized RLE 8 with escape char. SSE/AVX2 slower than scalar in encoding ----------------------------------------
 #define SRLE8   (__WORDSIZE/2)
 
 #define USIZE 8
@@ -116,7 +116,7 @@ unsigned _srlec8(const unsigned char *__restrict in, unsigned inlen, unsigned ch
   #endif
 
 unsigned srlec(const unsigned char *__restrict in, unsigned inlen, unsigned char *__restrict out) { // Automatic escape char determination
-  unsigned cnt[256] = {0}, a, m = -1, mi = 0, i; 
+  unsigned cnt[256] = {0}, a, m = -1, im = 0, i; 
   unsigned l;
   if(!inlen) return 0; 
 
@@ -125,13 +125,13 @@ unsigned srlec(const unsigned char *__restrict in, unsigned inlen, unsigned char
     *out = *in;
     return 1;                        					// RETURN 1 = memset 
   }
-  if(a < 256) mi = a;                					// determine escape char (min frequency)
+  if(a < 256) im = a;                					// determine escape char (min frequency)
   else 
 	for(i = 0; i < a; i++)
       if(cnt[i] < m) 
-		m = cnt[i],mi = i;
-  *out = mi; 
-  if((l = _srlec8(in, inlen, out+1, mi)+1) < inlen) 
+		m = cnt[i],im = i;
+  *out = im; 
+  if((l = _srlec8(in, inlen, out+1, im)+1) < inlen) 
     return l;
   memcpy(out, in, inlen);
   return inlen;
@@ -142,56 +142,50 @@ unsigned srlec(const unsigned char *__restrict in, unsigned inlen, unsigned char
   int _r_ = (ip - pp)+1;\
   if(_r_ >= TMIN) { \
     unsigned char *q = op; /*checkpoint*/\
-    vlzput(op, _r_ - TMIN, m, rmap); *op++ = pp[0]; \
+    if(pp[0] == ix) { unsigned _r = (_r_ - TMIN)<<1|1; vlzput(op, _r, m, rmap); } else { unsigned _r = (_r_ - TMIN)<<1; vlzput(op, _r, m, rmap); *op++ = pp[0]; }\
     if(op-q >= _r_) { op = q; while(_r_--) *op++ = pp[0]; }  /*rollback rle*/\
   } else while(_r_--) *op++ = pp[0];\
 } while(0)
 
 unsigned trlec(const unsigned char *__restrict in, unsigned inlen, unsigned char *__restrict out) {
-  unsigned      cnt[256] = {0}, m=-1, mi, i, a, c; 
-  unsigned char rmap[256], *op=out, *ie = in+inlen, *ip = in,*pp = in;
+  unsigned      cnt[256] = {0}, m=-1, x=0, im, i, a, c; 
+  unsigned char rmap[256], *op=out, *ie = in+inlen, *ip = in,*pp = in, ix;
   if(!inlen) return 0; 											// RETURN 0 = zero length
 
   a = cntcalc32(in, inlen, cnt);  		
   if(cnt[a-1] == inlen) {
     *out = *in;
     return 1;          											// RETURN 1 = memset
-  }
-
-  if(a != 256) m = 0, mi = a;                   				// determine escape char
-  else 
-    for(i = 0; i < a; i++)
-      if(cnt[i] < m) 
-	    m = cnt[i],mi = i;                                      
+  }															
+  
+  if(a != 256) { m = 0, im = a;                   				// determine escape char
+    for(i = 0; i < a; i++) {
+      if(cnt[i] > x) x = cnt[i],ix = i;
+    }
+  } else 
+    for(i = 0; i < a; i++) {
+      if(cnt[i] < m) m = cnt[i],im = i;  						// minimum for ESC char
+      if(cnt[i] > x) x = cnt[i],ix = i;                         // maximum for embeding in the run length
+    } 
   if(m) {  														// no unused bytes found 
     PUTC(op, 0);      						    				// 0: srle mode
-	PUTC(op, mi);					    						// _srlec8 escape char
-    op += _srlec8(in, inlen, op, mi);
+	PUTC(op, im);					    						// _srlec8 escape char
+    op += _srlec8(in, inlen, op, im);
     if(op - out < inlen) return op - out;       				// RETURN rle/escape
     memcpy(out, in, inlen);  				    				// no compression, use memcpy 
     return inlen; 						    					// RETURN outlen = inlen (memcpy)
   }																	
-  
+ 
   c = (a+7)/8; 								    				 
   PUTC(op, c);  								    			// c = bitmap length in bytes 
-
-    #ifdef TRLEVER2 
-  { unsigned char *q = op;                                      // set level 0+1 bitmap for unused chars 
-    unsigned u = 0;
-    ctou32(op) = 0; op += (c+7)/8;                              // init level 0 
-    for(m = i = 0; i != c*8; i++) {								
-      if(!cnt[i]) u |= 1<<(i&7), rmap[m++] = i;                 // level 1 bitmap
-      if(u && !((i+1)&7)) BIT_SET(q, i/8), *op++=u,u=0;     	// level 0 bitmap
-    }
-  }
-    #else
   memset(op, 0, 32);
   for(m = i = 0; i != c*8; i++) 								// set bitmap for unused chars
     if(!cnt[i]) op[i>>3] |= 1<<(i&7), rmap[m++] = i;
   op += c; 
-    #endif
   for(; i != 256; i++) rmap[m++] = i;
+
   m--;                                 							 
+  PUTC(op, ix);   
 
   if(inlen > SRLE8+1)                                           // encode    
     while(ip < ie-1-SRLE8) {	

@@ -67,7 +67,7 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 ------------------------------------------------------------------------
 #### CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 6.2
 
-###### Functions benchmarked
+###### External functions benchmarked
   - **MRLE**: Mespotine RLE [MRLE](http://encode.su/threads/2121-No-more-encoding-overhead-in-Run-Length-Encoding-Read-about-Mespotine-RLE-here-)
   - **RLE64**: Run Length Encoding - [RLE64](http://sourceforge.net/projects/nikkhokkho/files/RLE64/)
 <p>

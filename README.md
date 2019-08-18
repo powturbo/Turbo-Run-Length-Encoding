@@ -31,8 +31,8 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 (bold = pareto)  MB=1.000.000
 
 
-|C Size|ratio%|C MB/s|D MB/s|Name|File  2019-08|
-|--------:|-----:|--------:|--------:|----------------|
+|C Size|ratio%|C MB/s|D MB/s|Name|File / 2019-08|
+|--------:|-----:|--------:|--------:|--------------------------|
 |2623680|  0.6|**2074.35**|**11112.89**|**trle**|
 |4744806|  1.2|**10765.75**|**12342.86**|**srle 8**|
 |4744807|  1.2|2067.30|**12374.24**|**srle 0**|
@@ -43,8 +43,8 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 
 - Checkers program "End Game Table Base": [1034.db](http://encode.su/threads/2077-EGTB-compression?p=41392&viewfull=1#post41392)
 
-|C Size|ratio%|C MB/s|D MB/s|Name|File 2019-08|
-|--------:|-----:|--------:|--------:|----------------|
+|C Size|ratio%|C MB/s|D MB/s|Name|File / 2019-08|
+|--------:|-----:|--------:|--------:|----------------------------|
 |73108990| 17.4|**754.08**|**2983.03**|**trle**|
 |92369164| 22.0|**1018.80**|**5860.34**|**srle 8**|
 |92369165| 22.0|739.48|5860.10|srle 0|
@@ -53,11 +53,10 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 |165547365| 39.5|**5972.39**|**10120.11**|**srle 64**|
 |419225625|100.0|**13937.49**|**14017.17**|**memcpy**|
 
-- Text File: [enwik9bwt](http://mattmahoney.net/dc/textdata.html) enwik9 bwt generated w.<br>
-[libdivsufsort](https://code.google.com/p/libdivsufsort/)
+- Text File: [enwik9bwt](http://mattmahoney.net/dc/textdata.html) enwik9 bwt generated w. [libdivsufsort](https://code.google.com/p/libdivsufsort/)
 
-|C Size|ratio%|C MB/s|D MB/s|Name|File 2019-08|
-|--------:|-----:|--------:|--------:|----------------|----------------|
+|C Size|ratio%|C MB/s|D MB/s|Name|File / 2019-08|
+|--------:|-----:|--------:|--------:|----------------|--------------------------|
 |375094084| 37.5|**470.28**|**1742.31**|**trle**|enwik9bwt|
 |419263924| 41.9|**538.40**|**4256.44**|**srle 8**|enwik9bwt|
 |419263925| 41.9|450.03|4254.72|srle 0|enwik9bwt|

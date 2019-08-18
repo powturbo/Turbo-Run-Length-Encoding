@@ -30,6 +30,7 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 
 (bold = pareto)  MB=1.000.000
 
+
 |C Size|ratio%|C MB/s|D MB/s|Name|File  2019-08|
 |--------:|-----:|--------:|--------:|----------------|
 |2623680|  0.6|**2074.35**|**11112.89**|**trle**|

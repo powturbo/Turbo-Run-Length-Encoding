@@ -20,8 +20,7 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
   - **SRLE**: TurboRLE Escape - Fast Run Length Encoding with automatic escape determination 
 
 ## Benchmark:
-- with [TurboBench](https://github.com/powturbo/TurboBench)
-- Single thread
+- Single thread with [TurboBench](https://github.com/powturbo/TurboBench)
 - Realistic and practical benchmark with large files and different distributions
 
 ------------------------------------------------------------------------

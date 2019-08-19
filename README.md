@@ -23,6 +23,9 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 - Single thread with [TurboBench](https://github.com/powturbo/TurboBench)
 - Realistic and practical benchmark with large files and different distributions
 
+###### External functions benchmarked
+  - **MRLE**: Mespotine RLE [MRLE](http://encode.su/threads/2121-No-more-encoding-overhead-in-Run-Length-Encoding-Read-about-Mespotine-RLE-here-)
+  - **RLE8**: A fast 8 bit Run Length Encoding (SSE/AVX2)- [RLE8](https://github.com/rainerzufalldererste/rle8)
 ------------------------------------------------------------------------
 #### CPU: Skylake i7-6700 3.4GHz, gcc 8.3 (2019-08)
 - BMP File: [girl.bmp in RLE64Samples](http://sourceforge.net/projects/nikkhokkho/files/RLE64/3.00/)
@@ -32,8 +35,10 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 |C Size|ratio%|C MB/s|D MB/s|Name / 2019-08|
 |--------:|-----:|--------:|--------:|----------------|
 |2623680|  0.6|**2074**|**11113**|**trle**|
-|4148455|  1.0|2063|**12126**|**srle 0** (auto escape)|
+|4148455|  1.0|2063|**12245**|**srle 0** (auto escape)|
+|4482384|  1.1|378|**12302**|**mrle**|
 |4744806|  1.2|**10766**|**12343**|**srle 8**|
+|5901235|  1.5|861 |12092|   rle8 1|
 |8431844|  2.1|7368|**12693**|**srle 16**|
 |13722311|  3.4|**11090**|**13188**|**srle 32**|
 |19839711|  4.9|**16269**|**13733**|**srle 64**|
@@ -44,7 +49,9 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 |C Size|ratio%|C MB/s|D MB/s|Name / 2019-08|
 |--------:|-----:|--------:|--------:|----------------|
 |73108990| 17.4|**754**|**2983**|**trle**|
-|84671759| 20.2|741|**5065**|**srle 0**|
+|84671759| 20.2|741|**5088**|**srle 0**|
+|88055360| 21.0| 262|1491|   mrle|
+|88666372| 21.2| 456| 2669| rle8 1|
 |92369164| 22.0|**1019**|**5860**|**srle 8**|
 |113561548| 27.1|**2028**|**7114**|**srle 16**|
 |136918311| 32.7|**3588**|**9026**|**srle 32**|
@@ -55,73 +62,17 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 
 |C Size|ratio%|C MB/s|D MB/s|Name / 2019-08|
 |--------:|-----:|--------:|--------:|----------------|
-|375094084| 37.5|**470**|**1742**|**trle**|enwik9bwt|
-|415597104| 41.6|448|**3486**|**srle 0**|enwik9bwt|
+|375094084| 37.5|**472**|**1743**|**trle**|enwik9bwt|
+|415597104| 41.6|450|**3559**|**srle 0**|enwik9bwt|
 |419263924| 41.9|**538**|**4256**|**srle 8**|enwik9bwt|
 |487430623| 48.7|**1347**|**6287**|**srle 16**|enwik9bwt|
 |549202860| 54.9|**2780**|**8238**|**srle 32**|enwik9bwt|
+|576619941| 57.7|207|     553|   mrle|
+|577685250| 57.8|260|   675|   rle8 1|
 |605759578| 60.6|**5356**|**9471**|**srle 64**|enwik9bwt|
 |1000000008|100.0|**13931**|**13926**|**memcpy**|enwik9bwt|
 
 ------------------------------------------------------------------------
-#### CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 6.2 
-
-###### External functions benchmarked
-  - **MRLE**: Mespotine RLE [MRLE](http://encode.su/threads/2121-No-more-encoding-overhead-in-Run-Length-Encoding-Read-about-Mespotine-RLE-here-)
-  - **RLE64**: Run Length Encoding - [RLE64](http://sourceforge.net/projects/nikkhokkho/files/RLE64/)
-<p>
-
-- BMP File: [girl.bmp in RLE64Samples](http://sourceforge.net/projects/nikkhokkho/files/RLE64/3.00/)
-
-|C Size|ratio%|C MB/s|D MB/s|Name / 2018-06|
-|--------:|-----:|--------:|--------:|----------------|
-|3289669|  0.8|**2122**|**10499**|**trle**|
-|4482388|  1.1|346|3467|mrle|
-|4732081|  1.2|**7971**|10156|**srle 8**|
-|4732082|  1.2|2110|10494|srle 0 |
-|8431853|  2.1|4848|10272|srle 16|
-|8832647|  2.2|1274|2921|rle64 8|
-|9265516|  2.3|2241|5722|rle64 16|
-|13727062|  3.4|**8515**|10421|**srle 32**|
-|15175482|  3.8|4609|9360|rle64 32|
-|19844801|  4.9|**14114**|**10611**|**srle 64**|
-|21910714|  5.4|8301|10232|rle64 64|
-|403920058|100.0|9391|9161|memcpy|
-
-- Checkers program "End Game Table Base": [1034.db](http://encode.ru/threads/2077-EGTB-compression?p=41392&viewfull=1#post41392)
-
-|C Size|ratio%|C MB/s|D MB/s|Name  /       2018-06|
-|--------:|-----:|--------:|--------:|------------------------|
-|82421332| 19.7|**801**|**4145**|**trle**|
-|88055364| 21.0|273|1255|mrle|
-|92422320| 22.0|**814**|**5936**|**srle 0**|
-|92423009| 22.0|**1178**|**6697**|**srle 8**|
-|93905327| 22.4|780|1660|rle64 8|
-|113620895| 27.1|**1906**|5550|**srle 16**|
-|117590491| 28.0|1341|2826|rle64 16|
-|136948765| 32.7|**3581**|**8360**|**srle 32**|
-|143953177| 34.3|2971|5506|rle64 32|
-|165561604| 39.5|**5924**|**8953**|**srle 64**|
-|176442237| 42.1|5090|7872|rle64 64|
-|419225629|100.0|**9323**|**9179**|**memcpy**|
-
-- Text File: [enwik9bwt](http://mattmahoney.net/dc/textdata.html) enwik9 bwt
-
-|C Size|ratio%|C MB/s|D MB/s|Name /     2018-06 |
-|--------:|-----:|--------:|--------:|----------------------|
-|378377069| 37.8|**500**|**2090**|**trle**|
-|419339698| 41.9|**506**|**5937**|**srle 0**|
-|419340318| 41.9|**626**|4408|**srle 8**|
-|422296235| 42.2|558|1364|rle64 8|
-|487461871| 48.7|**1396**|4373|**srle 16**|
-|498420792| 49.8|1113|2511|rle64 16|
-|549214826| 54.9|**2778**|**7540**|**srle 32**|
-|563503744| 56.4|2730|5074|rle64 32|
-|576619945| 57.7|217|793|mrle|
-|605764304| 60.6|**4998**|**7784**|**srle 64**|
-|620676412| 62.1|**5247**|7376|**rle64 64**|
-|1000000012|100.0|**9364**|**9184**|**memcpy**|
-
 - Post-processing with entropy coding<br> 
   direct entropy encoding after "trle" (no additional "move to front" or other transformation)
 
@@ -132,6 +83,7 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 |192420471| 19.2|**1527**|**3834**|**trle + TurboANX 12** (Asymmetric Numeral Systems)|
 |193455670| 19.3|**2192**|2986|**trle + TurboHF 12**|
 |197974078| 19.8|1078|1406|trle + fse (Finite State Entropy)|
+|229693376| 23.0|126|106|rle8 + TurboRC o0|
 |254312056| 25.4|119|105|mrle + TurboRC o0|
 
 for more info, see also: [Entropy Coder Benchmark](https://sites.google.com/site/powturbo/entropy-coder)

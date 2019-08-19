@@ -25,47 +25,47 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 - Realistic and practical benchmark with large files and different distributions
 
 ------------------------------------------------------------------------
-#### CPU: Skylake i7-6700 3.4GHz, gcc 8.3 
+#### CPU: Skylake i7-6700 3.4GHz, gcc 8.3 (2019-08)
 - BMP File: [girl.bmp in RLE64Samples](http://sourceforge.net/projects/nikkhokkho/files/RLE64/3.00/)
 
 (bold = pareto)  MB=1.000.000
 
 |C Size|ratio%|C MB/s|D MB/s|Name / 2019-08|
 |--------:|-----:|--------:|--------:|----------------|
-|2623680|  0.6|**2074.35**|**11112.89**|**trle**|
-|4744806|  1.2|**10765.75**|**12342.86**|**srle 8**|
-|4744807|  1.2|2067.30|**12374.24**|**srle 0** (auto escape)|
-|8431844|  2.1|7368.11|**12692.71**|**srle 16**|
-|13722311|  3.4|**11089.70**|**13188.36**|**srle 32**|
-|19839711|  4.9|**16268.73**|**13732.71**|**srle 64**|
-|403920054|100.0|13977.92|**14000.70**|**memcpy**|
+|2623680|  0.6|**20745**|**11113**|**trle**|
+|4148455|  1.0|2063|**12126**|**srle 0** (auto escape)|
+|4744806|  1.2|**10766**|**12343**|**srle 8**|
+|8431844|  2.1|7368|**12693**|**srle 16**|
+|13722311|  3.4|**11090**|**13188**|**srle 32**|
+|19839711|  4.9|**16269**|**13733**|**srle 64**|
+|403920054|100.0|13978|**14001**|**memcpy**|
 
 - Checkers program "End Game Table Base": [1034.db](http://encode.su/threads/2077-EGTB-compression?p=41392&viewfull=1#post41392)
 
 |C Size|ratio%|C MB/s|D MB/s|Name / 2019-08|
 |--------:|-----:|--------:|--------:|----------------|
-|73108990| 17.4|**754.08**|**2983.03**|**trle**|
-|92369164| 22.0|**1018.80**|**5860.34**|**srle 8**|
-|92369165| 22.0|739.48|5860.10|srle 0|
-|113561548| 27.1|**2027.71**|**7113.72**|**srle 16**|
-|136918311| 32.7|**3587.63**|**9026.28**|**srle 32**|
-|165547365| 39.5|**5972.39**|**10120.11**|**srle 64**|
-|419225625|100.0|**13937.49**|**14017.17**|**memcpy**|
+|73108990| 17.4|**754**|**2983**|**trle**|
+|84671759| 20.2|741|5065|srle 0|
+|92369164| 22.0|**1019**|**5860**|**srle 8**|
+|113561548| 27.1|**2028**|**7114**|**srle 16**|
+|136918311| 32.7|**3588**|**9026**|**srle 32**|
+|165547365| 39.5|**5972**|**10120**|**srle 64**|
+|419225625|100.0|**13938**|**14017**|**memcpy**|
 
 - Text File: [enwik9bwt](http://mattmahoney.net/dc/textdata.html) enwik9 bwt generated w. [libdivsufsort](https://code.google.com/p/libdivsufsort/)
 
 |C Size|ratio%|C MB/s|D MB/s|Name / 2019-08|
 |--------:|-----:|--------:|--------:|----------------|
-|375094084| 37.5|**470.28**|**1742.31**|**trle**|enwik9bwt|
-|419263924| 41.9|**538.40**|**4256.44**|**srle 8**|enwik9bwt|
-|419263925| 41.9|450.03|4254.72|srle 0|enwik9bwt|
-|487430623| 48.7|**1347.36**|**6286.70**|**srle 16**|enwik9bwt|
-|549202860| 54.9|**2780.33**|**8238.25**|**srle 32**|enwik9bwt|
-|605759578| 60.6|**5356.30**|**9471.04**|**srle 64**|enwik9bwt|
-|1000000008|100.0|**13931.07**|**13925.83**|**memcpy**|enwik9bwt|
+|375094084| 37.5|**470**|**1742**|**trle**|enwik9bwt|
+|415597104| 41.6|448|3486|srle 0|enwik9bwt|
+|419263924| 41.9|**538**|**4256**|**srle 8**|enwik9bwt|
+|487430623| 48.7|**1347**|**6287**|**srle 16**|enwik9bwt|
+|549202860| 54.9|**2780**|**8238**|**srle 32**|enwik9bwt|
+|605759578| 60.6|**5356**|**9471**|**srle 64**|enwik9bwt|
+|1000000008|100.0|**13931**|**13926**|**memcpy**|enwik9bwt|
 
 ------------------------------------------------------------------------
-#### CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 6.2
+#### CPU: Sandy bridge i7-2600k at 4.2GHz, gcc 6.2 
 
 ###### External functions benchmarked
   - **MRLE**: Mespotine RLE [MRLE](http://encode.su/threads/2121-No-more-encoding-overhead-in-Run-Length-Encoding-Read-about-Mespotine-RLE-here-)
@@ -176,6 +176,5 @@ for more info, see also: [Entropy Coder Benchmark](https://sites.google.com/site
   - [Understanding Compression](http://file.allitebooks.com/20160805/Understanding%20Compression.pdf)
   - [Entropy Coder Benchmark](https://sites.google.com/site/powturbo/entropy-coder)
 
-Last update: 18 Aug 2019
-
+Last update: 19 Aug 2019
 

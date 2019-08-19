@@ -73,6 +73,7 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 |605759578| 60.6|**5356**|**9471**|**srle 64**|
 |1000000008|100.0|**13931**|**13926**|**memcpy**|
 
+------------------------------------------------------------------------
 #### CPU: ARM A73-ODROID-N2 1.8GHz, gcc 8.3 (2019-08)
 - BMP File: [girl.bmp in RLE64Samples](http://sourceforge.net/projects/nikkhokkho/files/RLE64/3.00/)
 

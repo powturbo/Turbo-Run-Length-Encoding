@@ -75,6 +75,7 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 
 #### CPU: ARM A73-ODROID-N2 1.8GHz, gcc 8.3 (2019-08)
 
+
 |C Size|ratio%|C MB/s|D MB/s|Name|File|
 |--------:|-----:|--------:|--------:|----------------|
 |2623680|  0.6|**594.19**|**3399.40**|**trle**|
@@ -85,6 +86,7 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 |13722311|  3.4|1771.32|**4573.06**|**srle 32**|
 |19839711|  4.9|**4184.05**|**6019.58**|**srle 64**|
 |403920054|100.0|3344.93|3375.71|memcpy|
+
 
 |C Size|ratio%|C MB/s|D MB/s|Name|File|
 |--------:|-----:|--------:|--------:|----------------|

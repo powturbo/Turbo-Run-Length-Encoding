@@ -76,7 +76,7 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 #### CPU: ARM A73-ODROID-N2 1.8GHz, gcc 8.3 (2019-08)
 - BMP File: [girl.bmp in RLE64Samples](http://sourceforge.net/projects/nikkhokkho/files/RLE64/3.00/)
 
-|C Size|ratio%|C MB/s|D MB/s|Name|File|
+|C Size|ratio%|C MB/s|D MB/s|Name / 2019-08|
 |--------:|-----:|--------:|--------:|----------------|
 |2623680|  0.6|**594.19**|**3399.40**|**trle**|
 |4148455|  1.0|588.46|**3798.81**|**srle 0**|
@@ -89,7 +89,7 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 
 - Text File: [enwik9bwt](http://mattmahoney.net/dc/textdata.html) enwik9 bwt generated w. [libdivsufsort](https://code.google.com/p/libdivsufsort/)
 
-|C Size|ratio%|C MB/s|D MB/s|Name|File|
+|C Size|ratio%|C MB/s|D MB/s|Name / 2019-08|
 |--------:|-----:|--------:|--------:|----------------|
 |375094084| 37.5|**183.81**|**721.59**|**trle**|
 |415597104| 41.6|180.41|681.15|srle 0|
@@ -155,5 +155,5 @@ for more info, see also: [Entropy Coder Benchmark](https://sites.google.com/site
   - [Understanding Compression](http://file.allitebooks.com/20160805/Understanding%20Compression.pdf)
   - [Entropy Coder Benchmark](https://sites.google.com/site/powturbo/entropy-coder)
 
-Last update: 19 Aug 2019
+Last update: 20 Aug 2019
 

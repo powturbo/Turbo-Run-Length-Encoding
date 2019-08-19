@@ -35,7 +35,10 @@
 #include <tmmintrin.h>
   #elif defined(__SSE2__)
 #include <emmintrin.h>
+  #elif defined(__ARM_NEON)
+#include <arm_neon.h>
   #endif
+#include "sse_neon.h"
 
 #include "trle.h"
 #include "trle_.h"        
@@ -55,8 +58,6 @@ unsigned _srled8(const unsigned char *__restrict in, unsigned char *__restrict o
   __m256i ev = _mm256_set1_epi8(e);
     #elif defined(__SSE__) 
   __m128i ev = _mm_set1_epi8(e);
-    #elif  defined(__ARM_NEON)
-  uint8x8_t ev = vdup_n_u8(e);
     #endif 
   if(outlen >= SRLE8)
     while(op < out+(outlen-SRLE8)) {	
@@ -272,7 +273,7 @@ unsigned trled(const unsigned char *__restrict in, unsigned inlen, unsigned char
 #include "trled.c"
 #undef rmemset
 #undef USIZE
-  
+ 
  #else // ---------------------------- include 16, 32, 64----------------------------------------------
   #ifdef MEMSAFE
 #define rmemset(_op_, _c_, _i_) while(_i_--) *_op_++ = _c_

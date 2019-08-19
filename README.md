@@ -74,7 +74,7 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 |1000000008|100.0|**13931**|**13926**|**memcpy**|
 
 #### CPU: ARM A73-ODROID-N2 1.8GHz, gcc 8.3 (2019-08)
-
+- BMP File: [girl.bmp in RLE64Samples](http://sourceforge.net/projects/nikkhokkho/files/RLE64/3.00/)
 
 |C Size|ratio%|C MB/s|D MB/s|Name|File|
 |--------:|-----:|--------:|--------:|----------------|
@@ -87,6 +87,7 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 |19839711|  4.9|**4184.05**|**6019.58**|**srle 64**|
 |403920054|100.0|3344.93|3375.71|memcpy|
 
+- Text File: [enwik9bwt](http://mattmahoney.net/dc/textdata.html) enwik9 bwt generated w. [libdivsufsort](https://code.google.com/p/libdivsufsort/)
 
 |C Size|ratio%|C MB/s|D MB/s|Name|File|
 |--------:|-----:|--------:|--------:|----------------|

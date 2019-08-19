@@ -102,20 +102,77 @@ unsigned _srled8(const unsigned char *__restrict in, unsigned char *__restrict o
     }													 
   return ip - in;
 } 
+
+static inline unsigned _srled8x(const unsigned char *__restrict in, unsigned char *__restrict out, unsigned outlen, unsigned char e, unsigned char ix) {
+  uint8_t *ip = in, *op = out, c, *oe = out+outlen; 
+  uint32_t r;
+    
+    #ifdef __AVX2__    
+  __m256i ev = _mm256_set1_epi8(e);
+    #elif defined(__SSE__) 
+  __m128i ev = _mm_set1_epi8(e);
+    #elif  defined(__ARM_NEON)
+  uint8x8_t ev = vdup_n_u8(e);
+    #endif 
+  if(outlen >= SRLE8)
+    while(op < out+(outlen-SRLE8)) {	
+        #if defined(__AVX2__) || defined(__SSE__) //|| defined(__ARM_NEON)
+      uint32_t mask;
+          #ifdef __AVX2__
+      __m256i v = _mm256_loadu_si256((__m256i*)ip); _mm256_storeu_si256((__m256i *)op, v); mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(v, ev)); if(mask) goto a; op += 32; ip += 32;
+          #elif defined(__SSE__)
+      __m128i v = _mm_loadu_si128((__m128i*)ip); _mm_storeu_si128((__m128i *)op, v); mask = _mm_movemask_epi8(_mm_cmpeq_epi8(v, ev)); if(mask) goto a; ip += 16; op += 16; 
+            #if SRLE8 >= 32
+              v = _mm_loadu_si128((__m128i*)ip); _mm_storeu_si128((__m128i *)op, v); mask = _mm_movemask_epi8(_mm_cmpeq_epi8(v, ev)); if(mask) goto a; ip += 16; op += 16; 
+            #endif
+          #endif
+	  	 															            __builtin_prefetch(ip+512, 0);    
+      continue;
+      a: r = ctz32(mask); ip += r+1;                                            __builtin_prefetch(ip+512, 0);
+      op += r;                               
+        #else
+      if(likely((c = *ip++) != e)) { *op++ = c; continue; }
+        #endif     
+      vlget32(ip, r);
+      
+      int f = r&1; r >>= 1; 
+      if(likely(r) >= 3) { 
+	    uint8_t c = f?ip[0]:ix; ip+=f;
+	    r = r-3+4;
+	    rmemset(op, c, r);
+	  } else { r++;
+	    rmemset8(op, e, r);
+      }
+    }
+	 
+  while(op < out+outlen) 
+    if(likely((c = *ip++) != e)) {                     
+	  *op++ = c; 										 
+	} else { 
+	  vlget32(ip, r); 							 	
+      int f = r&1; r >>= 1; 
+      if(likely(r) >= 3) { 
+	    uint8_t c = f?ip[0]:ix; ip+=f;
+	    r = r-3+4;
+	    rmemset(op, c, r);
+	  } else { r++;
+	    rmemset8(op, e, r);
+      }
+    }													 
+  return ip - in;
+} 
   #endif
 
 unsigned _srled(const unsigned char *__restrict in, unsigned char *__restrict out, unsigned outlen) {
   return _srled8(in+1, out, outlen, *in); 
 }
   
-unsigned srled(const unsigned char *__restrict in, unsigned inlen, unsigned char *__restrict out, unsigned outlen) { unsigned l; unsigned char *ip=in;
+unsigned srled(const unsigned char *__restrict in, unsigned inlen, unsigned char *__restrict out, unsigned outlen) { unsigned l;
   if(inlen == outlen) 
-    memcpy(out, in, outlen); 
+    memcpy(out, in, outlen); 								//No compression	
   else if(inlen == 1) 
-    memset(out, in[0], outlen);
-  else { ip++;															
-    ip += _srled8(ip, out, outlen, *in);							//AS((ip-in) == inlen,"FatalI l>inlen %d ", (ip-in) - inlen); 
-  }
+    memset(out, in[0], outlen);                             //Only 1 char
+  else _srled8x(in+2, out, outlen, in[0], in[1]);							//AS((ip-in) == inlen,"FatalI l>inlen %d ", (ip-in) - inlen); 
   return inlen;
 }
 //------------------------------------- TurboRLE ------------------------------------------
@@ -214,6 +271,12 @@ unsigned trled(const unsigned char *__restrict in, unsigned inlen, unsigned char
  #else // ---------------------------- include 16, 32, 64----------------------------------------------
   #ifdef MEMSAFE
 #define rmemset(_op_, _c_, _i_) while(_i_--) *_op_++ = _c_
+  #elif (__AVX2__ != 0) && USIZE < 64
+#define rmemset(_op_, _c_, _i_) do { \
+  __m256i *_up = (__m256i *)_op_, cv = TEMPLATE2(_mm256_set1_epi, USIZE)(_c_);\
+  _op_ += _i_;\
+  do _mm256_storeu_si256(_up++, cv); while(_up < (__m256i *)_op_);\
+} while(0)
   #elif (__SSE__ != 0 || __ARM_NEON != 0) && USIZE < 64
 #define rmemset(_op_, _c_, _i_) do { \
   __m128i *_up = (__m128i *)_op_, cv = TEMPLATE2(_mm_set1_epi, USIZE)(_c_);\

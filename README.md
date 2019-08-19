@@ -24,8 +24,8 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 - Realistic and practical benchmark with large files and different distributions
 
 ###### External functions benchmarked
-  - **MRLE**: Mespotine RLE [MRLE](http://encode.su/threads/2121-No-more-encoding-overhead-in-Run-Length-Encoding-Read-about-Mespotine-RLE-here-)
-  - **RLE8**: A fast 8 bit Run Length Encoding (SSE/AVX2)- [RLE8](https://github.com/rainerzufalldererste/rle8)
+  - **[MRLE](http://encode.su/threads/2121-No-more-encoding-overhead-in-Run-Length-Encoding-Read-about-Mespotine-RLE-here-)**: Mespotine RLE
+  - **[RLE8](https://github.com/rainerzufalldererste/rle8)**: A fast 8 bit Run Length Encoding (SSE/AVX2)
 ------------------------------------------------------------------------
 #### CPU: Skylake i7-6700 3.4GHz, gcc 8.3 (2019-08)
 - BMP File: [girl.bmp in RLE64Samples](http://sourceforge.net/projects/nikkhokkho/files/RLE64/3.00/)

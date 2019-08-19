@@ -137,11 +137,16 @@ static inline unsigned _srled8x(const unsigned char *__restrict in, unsigned cha
       
       int f = r&1; r >>= 1; 
       if(likely(r) >= 3) { 
-	    uint8_t c = f?ip[0]:ix; ip+=f;
+	    uint8_t y=ip[0],c = f?y:ix; ip+=f;
 	    r = r-3+4;
 	    rmemset(op, c, r);
-	  } else { r++;
-	    rmemset8(op, e, r);
+	  } else { r++;  rmemset8(op, e, r);
+  		/*switch(r) {
+		  case 3: *op++ = c;	
+		  case 2: *op++ = c;	
+		  case 1: *op++ = c;	
+		  case 0: *op++ = c;	
+		}*/ 
       }
     }
 	 
@@ -267,15 +272,14 @@ unsigned trled(const unsigned char *__restrict in, unsigned inlen, unsigned char
 #include "trled.c"
 #undef rmemset
 #undef USIZE
-
+  
  #else // ---------------------------- include 16, 32, 64----------------------------------------------
   #ifdef MEMSAFE
 #define rmemset(_op_, _c_, _i_) while(_i_--) *_op_++ = _c_
   #elif (__AVX2__ != 0) && USIZE < 64
-#define rmemset(_op_, _c_, _i_) do { \
-  __m256i *_up = (__m256i *)_op_, cv = TEMPLATE2(_mm256_set1_epi, USIZE)(_c_);\
-  _op_ += _i_;\
-  do _mm256_storeu_si256(_up++, cv); while(_up < (__m256i *)_op_);\
+#define rmemset(_op_, _c_, _i_) do {\
+  __m256i cv = TEMPLATE2(_mm256_set1_epi, USIZE)(_c_); unsigned char *_p = _op_; _op_ += _i_;\
+  do _mm256_storeu_si256((__m256i *)_p, cv),_p+=32; while(_p < _op_);\
 } while(0)
   #elif (__SSE__ != 0 || __ARM_NEON != 0) && USIZE < 64
 #define rmemset(_op_, _c_, _i_) do { \

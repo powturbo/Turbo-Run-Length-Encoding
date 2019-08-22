@@ -25,7 +25,7 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 - Realistic and practical benchmark with large files and different distributions
 
 ###### External functions benchmarked
-  - **[MRLE](http://encode.su/threads/2121-No-more-encoding-overhead-in-Run-Length-Encoding-Read-about-Mespotine-RLE-here-)**: Mespotine RLE
+  - **[MRLE](http://encode.su/threads/2121-No-more-encoding-overhead-in-Run-Length-Encoding-Read-about-Mespotine-RLE-here-)**: Mespotine RLE: Run Length Encoding
   - **[RLE8](https://github.com/rainerzufalldererste/rle8)**: A fast 8 bit Run Length Encoding (SSE/AVX2)
 ------------------------------------------------------------------------
 #### CPU: Skylake i7-6700 3.4GHz, gcc 8.3 (2019-08)
@@ -38,7 +38,7 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 |2623680|  0.6|**2074**|**11113**|**trle**|
 |4148455|  1.0|2063|**12245**|**srle 0** (auto escape)|
 |4482384|  1.1|378|**12302**|**mrle**|
-|4744806|  1.2|**10766**|**12343**|**srle 8**|
+|4744806|  1.2|**11002**|**12474**|**srle 8**|
 |5901235|  1.5|861 |12092|   rle8 1|
 |8431844|  2.1|7368|**12693**|**srle 16**|
 |13722311|  3.4|**11090**|**13188**|**srle 32**|
@@ -53,7 +53,7 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 |84671759| 20.2|741|**5088**|**srle 0**|
 |88055360| 21.0| 262|1491|   mrle|
 |88666372| 21.2| 456| 2669| rle8 1|
-|92369164| 22.0|**1019**|**5860**|**srle 8**|
+|92369164| 22.0|**1089**|**5860**|**srle 8**|
 |113561548| 27.1|**2028**|**7114**|**srle 16**|
 |136918311| 32.7|**3588**|**9026**|**srle 32**|
 |165547365| 39.5|**5972**|**10120**|**srle 64**|
@@ -102,8 +102,8 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 |1000000008|100.0|**3830**|**3841**|**memcpy**|
 
 ------------------------------------------------------------------------
-- Post-processing with entropy coding<br> 
-  direct entropy encoding after "trle" (no additional "move to front" or other transformation)
+- Post-processing: Entropy Coding after Run Length Encoding<br>
+  Direct entropy encoding after "trle" (no additional "move to front" or other transformation)
 
 |C Size|ratio%|C MB/s|D MB/s|Name /             CPU Skylake 3.4 GHz (2019-06)|
 |--------:|-----:|--------:|--------:|-----------------------------------------------|
@@ -115,7 +115,7 @@ TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powtu
 |229693376| 23.0|126|106|rle8 + TurboRC o0|
 |254312056| 25.4|119|105|mrle + TurboRC o0|
 
-for more info, see also: [Entropy Coder Benchmark](https://sites.google.com/site/powturbo/entropy-coder)
+for more info, see also: [Entropy Coding Benchmark](https://sites.google.com/site/powturbo/entropy-coder)
 
 ### Compile:
 
@@ -134,7 +134,7 @@ for more info, see also: [Entropy Coder Benchmark](https://sites.google.com/site
         or
   		nmake AVX2=1 /f makefile.vs
 
-## Usage:
+## Testing Run Length Encoding libraries:
 
         ./trle file
         ./trle -e# file
@@ -149,12 +149,13 @@ for more info, see also: [Entropy Coder Benchmark](https://sites.google.com/site
 - Intel ICC 19.0
 - Windows: MinGW
 - Windows: Visual c++
+- ARM Aarch64 w/ gcc
 
-#### References
+#### Run Length Encoding References:
   - [Real-Time Compression of IEC 61869-9 Sampled Value Data](https://pure.strath.ac.uk/portal/files/55444712/Blair_etal_AMPS2016_Real_time_compression_of_IEC_61869_9_sampled_value_data.pdf)
   - [Understanding Compression: Data Compression for Modern Developers](https://books.google.de/books?id=2C2rDAAAQBAJ&pg=PA216&lpg=PA216&dq=%22turborle%22&source=bl&ots=TiLU4Qf47s&sig=tkk0Dnk9NnU0JMR3Z6iW4TRquxg&hl=de&sa=X&ved=0ahUKEwjZq-Li5uXSAhXFCJoKHe77B6cQ6AEIyAEwHQ#v=onepage&q=%22turborle%22&f=false)
-  - [Understanding Compression](http://file.allitebooks.com/20160805/Understanding%20Compression.pdf)
+  - [Understanding Compression inl. Run Length Encoding](http://file.allitebooks.com/20160805/Understanding%20Compression.pdf)
   - [Entropy Coder Benchmark](https://sites.google.com/site/powturbo/entropy-coder)
 
-Last update: 20 Aug 2019
+Last update: 22 Aug 2019
 

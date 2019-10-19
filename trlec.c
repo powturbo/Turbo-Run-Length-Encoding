@@ -29,6 +29,12 @@
 #include "trle.h"
 #include "trle_.h"
 
+  #ifdef __ARM_NEON
+#define PREFETCH(_ip_,_rw_)
+  #else
+#define PREFETCH(_ip_,_rw_) __builtin_prefetch(_ip_,_rw_)
+  #endif
+
 //------------------------------------- Fastet Histogram : https://github.com/powturbo/TurboHist -------------------------------------------
 #define cnt_t unsigned
 #define CSIZE (256 + 8)

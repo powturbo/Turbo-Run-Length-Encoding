@@ -144,12 +144,15 @@ for more info, see also: [Entropy Coding Benchmark](https://sites.google.com/sit
 ### Environment:
 
 ###### OS/Compiler (32 + 64 bits):
-- Linux: GNU GCC (>=4.6)
-- clang (>=3.2) 
-- Intel ICC 19.0
-- Windows: MinGW
-- Windows: Visual c++
-- ARM Aarch64 w/ gcc
+- Windows: MinGW-w64 makefile
+- Windows: Visual c++ (>=VS2008) - makefile.vs (for nmake)
+- Windows: Visual Studio project file - vs/vs2017
+- Linux amd64: GNU GCC (>=4.6)
+- Linux amd64: Clang (>=3.2) 
+- Linux arm64: 64 bits aarch64 ARMv8:  gcc (>=6.3)
+- Linux arm64: 64 bits aarch64 ARMv8:  clang
+- MaxOS: XCode (>=9)
+- PowerPC ppc64le (incl. SIMD): gcc (>=8.0)
 
 #### Run Length Encoding References:
   - [Real-Time Compression of IEC 61869-9 Sampled Value Data](https://pure.strath.ac.uk/portal/files/55444712/Blair_etal_AMPS2016_Real_time_compression_of_IEC_61869_9_sampled_value_data.pdf)
@@ -157,5 +160,5 @@ for more info, see also: [Entropy Coding Benchmark](https://sites.google.com/sit
   - [Understanding Compression inl. Run Length Encoding](http://file.allitebooks.com/20160805/Understanding%20Compression.pdf)
   - [Entropy Coder Benchmark](https://sites.google.com/site/powturbo/entropy-coder)
 
-Last update: 19 Oct 2019
+Last update: 23 Oct 2019
 

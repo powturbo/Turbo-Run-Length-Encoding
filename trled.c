@@ -37,8 +37,8 @@
 #include <emmintrin.h>
   #elif defined(__ARM_NEON)
 #include <arm_neon.h>
-  #endif
 #include "sse_neon.h"
+  #endif
 
   #ifdef __ARM_NEON
 #define PREFETCH(_ip_,_rw_)

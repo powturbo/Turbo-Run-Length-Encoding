@@ -1,3 +1,4 @@
+// Copyright (C) powturbo 2015-2020
 #ifdef __cplusplus
 extern "C" {
 #endif

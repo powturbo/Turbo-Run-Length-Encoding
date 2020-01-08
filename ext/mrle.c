@@ -1,4 +1,5 @@
-// Mespotine RLE compressor
+// Mespotine RLE compressor 
+// Copyright (C) powturbo 2015-2020
 // Written by Matt Mahoney. Public domain. Modified to In-Memory by powturbo
 #include "mrle.h"
 #define _putc(__ch, __out) *__out++ = (__ch)

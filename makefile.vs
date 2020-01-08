@@ -1,4 +1,4 @@
-# Copyright (C) powturbo 2015-2018
+# Copyright (C) powturbo 2015-2020
 # nmake "NCODEC1=1" "NCODEC2=1" /f makefile.msc
 # or
 # nmake "AVX2=1" /f makefile.msc

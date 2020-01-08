@@ -1,5 +1,5 @@
 /**
-    Copyright (C) powturbo 2015-2019
+    Copyright (C) powturbo 2015-2020
     GPL v2 License
 
     This program is free software; you can redistribute it and/or modify

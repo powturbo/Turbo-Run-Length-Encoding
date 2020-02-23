@@ -160,5 +160,5 @@ for more info, see also: [Entropy Coding Benchmark](https://sites.google.com/sit
   - [Understanding Compression inl. Run Length Encoding](http://file.allitebooks.com/20160805/Understanding%20Compression.pdf)
   - [Entropy Coder Benchmark](https://sites.google.com/site/powturbo/entropy-coder)
 
-Last update: 08 JAN 2019
+Last update: 23 Feb 2019
 

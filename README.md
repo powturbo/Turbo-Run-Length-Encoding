@@ -1,4 +1,4 @@
-TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powturbo/TurboRLE.svg?branch=master)](https://travis-ci.org/powturbo/TurboRLE)
+TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powturbo/Turbo-Run-Length-Encoding.svg?branch=master)](https://travis-ci.org/powturbo/Turbo-Run-Length-Encoding)
 ===================================
 
 ##### Efficient and fastest **Run Length Encoding** library
@@ -119,8 +119,8 @@ for more info, see also: [Entropy Coding Benchmark](https://sites.google.com/sit
 
 ### Compile:
 
-  		git clone git://github.com/powturbo/TurboRLE.git
-        cd TurboRLE
+  		git clone git://github.com/powturbo/Turbo-Run-Length-Encoding.git
+        cd Turbo-Run-Length-Encoding
 
 ##### Linux + Windows MingW 
  

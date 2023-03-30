@@ -2,8 +2,7 @@ TurboRLE: Turbo Run Length Encoding
 ===================================
 
 ##### Efficient and fastest **Run Length Encoding** library
-  - :new: The fastest now up to 50% more faster incl. SSE/AVX2 + improved compression
-  - :new: ARM NEON support
+  - ARM NEON support
   - 100% C (C++ compatible headers), without inline assembly
   - Most efficient compression 
   - No other RLE compress or decompress faster with better compression

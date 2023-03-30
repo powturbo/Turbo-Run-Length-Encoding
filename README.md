@@ -1,4 +1,4 @@
-TurboRLE: Turbo Run Length Encoding [![Build Status](https://travis-ci.org/powturbo/Turbo-Run-Length-Encoding.svg?branch=master)](https://travis-ci.org/powturbo/Turbo-Run-Length-Encoding)
+TurboRLE: Turbo Run Length Encoding 
 ===================================
 
 ##### Efficient and fastest **Run Length Encoding** library

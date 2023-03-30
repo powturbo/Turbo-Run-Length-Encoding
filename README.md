@@ -119,7 +119,7 @@ for more info, see also: [Entropy Coding Benchmark](https://sites.google.com/sit
 
 ### Compile:
 
-  		git clone git://github.com/powturbo/Turbo-Run-Length-Encoding.git
+  		git clone https://github.com/powturbo/Turbo-Run-Length-Encoding.git
         cd Turbo-Run-Length-Encoding
 
 ##### Linux + Windows MingW 
@@ -160,5 +160,5 @@ for more info, see also: [Entropy Coding Benchmark](https://sites.google.com/sit
   - [Understanding Compression inl. Run Length Encoding](http://file.allitebooks.com/20160805/Understanding%20Compression.pdf)
   - [Entropy Coder Benchmark](https://sites.google.com/site/powturbo/entropy-coder)
 
-Last update: 25 FEB 2020
+Last update: 1 APR 2023
 

@@ -38,7 +38,7 @@
 #endif
 #include "include_/time_.h"
 
-#include "include_/trle.h"  
+#include "include/trle.h"  
 #include "ext/mrle.c"
 
 int memcheck(unsigned char *in, unsigned n, unsigned char *cpy) { 

@@ -1,5 +1,5 @@
-TurboRLE: Turbo Run Length Encoding 
-===================================
+## TurboRLE: Turbo Run Length Encoding
+[![Build ubuntu](https://github.com/powturbo/Turbo-Run-Length-Encoding/actions/workflows/build.yaml/badge.svg)](https://github.com/powturbo/Turbo-Run-Length-Encoding/actions/workflows/build.yaml)
 
 ##### Efficient and fastest **Run Length Encoding** library
   - ARM NEON support

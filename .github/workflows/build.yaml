@@ -36,5 +36,5 @@ jobs:
     - name: make
       run: |
         make
-        ./trle trle
+        ./trle trle.exe
  

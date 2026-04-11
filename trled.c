@@ -312,7 +312,7 @@ unsigned trled(const unsigned char *__restrict in, unsigned inlen, unsigned char
   do {\
     T2(ctou, USIZE)(_up) = _c_; _up += USIZE/8;\
     T2(ctou, USIZE)(_up) = _c_; _up += USIZE/8;\
-  } while(_up < (uint8_t *)_op_);\
+  } while(_up < (uint8_t *)(_op_));\
 } while(0)
   #endif
 

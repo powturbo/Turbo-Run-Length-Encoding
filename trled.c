@@ -292,7 +292,7 @@ unsigned trled(const unsigned char *__restrict in, unsigned inlen, unsigned char
 #define rmemset(_op_, _c_, _i_) while(_i_--) *_op_++ = _c_
   #elif (__AVX2__ != 0) && USIZE < 64
 #define rmemset(_op_, _c_, _i_) do {\
-  __m256i cv = T2(_mm256_set1_epi, USIZE)(_c_); unsigned char *_p = _op_; _op_ += _i_;\
+  __m256i cv = T2(_mm256_set1_epi, USIZE)(_c_); unsigned char *_p = (unsigned char *)_op_; _op_ += _i_;\
   do _mm256_storeu_si256((__m256i *)_p, cv),_p+=32; while(_p < _op_);\
 } while(0)
   #elif (__SSE__ != 0 || __ARM_NEON != 0) && USIZE < 64
@@ -312,7 +312,7 @@ unsigned trled(const unsigned char *__restrict in, unsigned inlen, unsigned char
   do {\
     T2(ctou, USIZE)(_up) = _c_; _up += USIZE/8;\
     T2(ctou, USIZE)(_up) = _c_; _up += USIZE/8;\
-  } while(_up < (uint8_t *)(_op_));\
+  } while(_up < (uint8_t *)_op_);\
 } while(0)
   #endif
 

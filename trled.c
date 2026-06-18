@@ -225,12 +225,12 @@ unsigned _trled(const unsigned char *__restrict in, unsigned char *__restrict ou
     while(op < out+(outlen-32)) {
         #if __WORDSIZE == 64
       uint64_t z = (uint64_t)rmap[ip[7]]<<56 | (uint64_t)rmap[ip[6]] << 48 | (uint64_t)rmap[ip[5]] << 40 | (uint64_t)rmap[ip[4]] << 32 | (uint32_t)rmap[ip[3]] << 24 | (uint32_t)rmap[ip[2]] << 16| (uint32_t)rmap[ip[1]] << 8| rmap[ip[0]];
-      ctou64(op) = ctou64(ip); if(z) goto a; ip += 8; op += 8;
+      stou64(op, ctou64(ip)); if(z) goto a; ip += 8; op += 8;
       continue;
       a: z = ctz64(z)>>3;
         #else
       uint32_t z = (uint32_t)rmap[ip[3]] << 24 | (uint32_t)rmap[ip[2]] << 16| (uint32_t)rmap[ip[1]] << 8| rmap[ip[0]];
-      ctou32(op) = ctou32(ip); if(z) goto a; ip += 4; op += 4;
+      stou32(op, ctou32(ip)); if(z) goto a; ip += 4; op += 4;
       continue;
       a: z = ctz32(z)>>3;
         #endif
@@ -310,8 +310,8 @@ unsigned trled(const unsigned char *__restrict in, unsigned inlen, unsigned char
 #define rmemset(_op_, _c_, _i_) do {  uint64_t _cc; uint8_t *_up = (uint8_t *)_op_; _op_ +=_i_;\
  T2(_cset, USIZE)(_cc,_c_);\
   do {\
-    T2(ctou, USIZE)(_up) = _c_; _up += USIZE/8;\
-    T2(ctou, USIZE)(_up) = _c_; _up += USIZE/8;\
+    T2(stou, USIZE)(_up, _c_); _up += USIZE/8;\
+    T2(stou, USIZE)(_up, _c_); _up += USIZE/8;\
   } while(_up < (uint8_t *)_op_);\
 } while(0)
   #endif

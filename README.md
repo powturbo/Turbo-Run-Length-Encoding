@@ -3,6 +3,7 @@
 
 ##### Efficient and fastest **Run Length Encoding** library
   - ARM NEON support
+  - RISC-V scalar fallback support
   - 100% C (C++ compatible headers), without inline assembly
   - Most efficient compression 
   - No other RLE compress or decompress faster with better compression
@@ -150,6 +151,7 @@ for more info, see also: [Entropy Coding Benchmark](https://sites.google.com/sit
 - Linux amd64: Clang (>=3.2) 
 - Linux arm64: 64 bits aarch64 ARMv8:  gcc (>=6.3)
 - Linux arm64: 64 bits aarch64 ARMv8:  clang
+- Linux riscv64: scalar fallback path with a C99 compiler
 - MaxOS: XCode (>=9)
 - PowerPC ppc64le (incl. SIMD): gcc (>=8.0)
 

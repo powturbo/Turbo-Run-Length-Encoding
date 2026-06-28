@@ -213,8 +213,8 @@ struct _PACKED doubleu   { double   d; };
 #define ctou64(_cp_) ((struct longu     *)(_cp_))->l
 #define ctof64(_cp_) ((struct doubleu   *)(_cp_))->d
 
-#define stou64(_cp_) ((struct longu     *)(_cp_))->l = _x_
-#define stof64(_cp_) ((struct doubleu   *)(_cp_))->d = _x_
+#define stou64(_cp_, _x_) ((struct longu     *)(_cp_))->l = _x_
+#define stof64(_cp_, _x_) ((struct doubleu   *)(_cp_))->d = _x_
 #define ltou64(_px_, _cp_) *(_px_) = ((struct longu *)(_cp_))->l
     #endif
 

@@ -181,6 +181,24 @@ static ALWAYS_INLINE void               stof64(      void *cp, double           
 static ALWAYS_INLINE void               ltou32(unsigned           *x, const void *cp) { memcpy(x, cp, sizeof(*x)); } // ua read into ptr 
 static ALWAYS_INLINE void               ltou64(unsigned long long *x, const void *cp) { memcpy(x, cp, sizeof(*x)); }
 
+  #elif defined(__riscv)
+#include <string.h>
+#define ctou16(_cp_) ({ unsigned short _x; memcpy(&_x, (_cp_), sizeof(_x)); _x; })
+#define ctou32(_cp_) ({ unsigned       _x; memcpy(&_x, (_cp_), sizeof(_x)); _x; })
+#define ctou64(_cp_) ({ uint64_t       _x; memcpy(&_x, (_cp_), sizeof(_x)); _x; })
+#define ctof32(_cp_) ({ float          _x; memcpy(&_x, (_cp_), sizeof(_x)); _x; })
+#define ctof64(_cp_) ({ double         _x; memcpy(&_x, (_cp_), sizeof(_x)); _x; })
+
+#define stou8(_cp_, _x_)  (*((uint8_t *)(_cp_)) = (_x_))
+#define stou16(_cp_, _x_) do { unsigned short _v = (_x_); memcpy((_cp_), &_v, sizeof(_v)); } while(0)
+#define stou32(_cp_, _x_) do { unsigned       _v = (_x_); memcpy((_cp_), &_v, sizeof(_v)); } while(0)
+#define stou64(_cp_, _x_) do { uint64_t       _v = (_x_); memcpy((_cp_), &_v, sizeof(_v)); } while(0)
+#define stof32(_cp_, _x_) do { float          _v = (_x_); memcpy((_cp_), &_v, sizeof(_v)); } while(0)
+#define stof64(_cp_, _x_) do { double         _v = (_x_); memcpy((_cp_), &_v, sizeof(_v)); } while(0)
+
+#define ltou32(_px_, _cp_) do { memcpy((_px_), (_cp_), sizeof(*(_px_))); } while(0)
+#define ltou64(_px_, _cp_) do { memcpy((_px_), (_cp_), sizeof(*(_px_))); } while(0)
+
   #elif defined(__i386__) || defined(__x86_64__) || \
     defined(_M_IX86) || defined(_M_AMD64) || _MSC_VER ||\
     defined(__powerpc__) || defined(__s390__) ||\
@@ -251,6 +269,7 @@ struct _PACKED doubleu   { double             d; };
     defined(__x86_64__) || defined(_M_X64) ||\
     defined(__ia64) || defined(_M_IA64) ||\
     defined(__aarch64__) ||\
+    (defined(__riscv) && (__riscv_xlen == 64)) ||\
     defined(__mips64) ||\
     defined(__powerpc64__) || defined(__ppc64__) || defined(__PPC64__) ||\
     defined(__s390x__)

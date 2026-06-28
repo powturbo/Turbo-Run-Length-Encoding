@@ -40,9 +40,9 @@
 
 #define _vlput32(_op_, _x_, _act_) {\
   if(likely((_x_) < VL_OFS1)){ *_op_++ = (_x_);                                                                  _act_;}\
-  else if  ((_x_) < VL_OFS2) { ctou16(_op_) = bswap16((VL_OFS1<<8)+((_x_)-VL_OFS1));             _op_  += 2;     _act_;}\
-  else if  ((_x_) < VL_OFS3) { *_op_++ = VL_BA2 + (((_x_) -= VL_OFS2) >> 16); ctou16(_op_) = (_x_); _op_  += 2;  _act_;}\
-  else { unsigned _b = (bsr32((_x_))+7)/8; *_op_++ = VL_BA3 + (_b - 3); ctou32(_op_) = (_x_); _op_  += _b; _act_;}\
+  else if  ((_x_) < VL_OFS2) { stou16(_op_, bswap16((VL_OFS1<<8)+((_x_)-VL_OFS1)));             _op_  += 2;     _act_;}\
+  else if  ((_x_) < VL_OFS3) { *_op_++ = VL_BA2 + (((_x_) -= VL_OFS2) >> 16); stou16(_op_, (_x_)); _op_  += 2;  _act_;}\
+  else { unsigned _b = (bsr32((_x_))+7)/8; *_op_++ = VL_BA3 + (_b - 3); stou32(_op_, (_x_)); _op_  += _b; _act_;}\
 }
 
 #define _vlget32(_ip_, _x_, _act_) do { _x_ = *_ip_++;\

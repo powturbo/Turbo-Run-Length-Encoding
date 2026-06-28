@@ -24,7 +24,7 @@
 //      time_.h : parameter free high precision time/benchmark functions
 #include <time.h>
 #include <float.h>
-  #ifdef _WIN32
+  #if defined(_WIN32) && !defined(__riscv)
 #include <windows.h>
     #ifndef sleep
 #define sleep(n) Sleep((n) * 1000)
@@ -104,13 +104,19 @@ static int    tmiszero(tm_t t)              { return !t; }
 #define TM_MBS "MB/s"
 static double TMBS(unsigned l, double t) { return (l/t)/1000000.0; }
 
-  #ifdef _WIN32 //-------- windows 
+  #if defined(_WIN32) && !defined(__riscv) //-------- windows 
 static LARGE_INTEGER tps;
 
 typedef unsigned __int64 tm_t;
 static tm_t   tmtime()                      { LARGE_INTEGER tm; tm_t t; QueryPerformanceCounter(&tm); return tm.QuadPart; }
 static tm_t   tminit()                      { tm_t t0,ts; QueryPerformanceFrequency(&tps); t0 = tmtime(); while((ts = tmtime())==t0) {}; return ts; }
 static double tmdiff(tm_t start, tm_t stop) { return (double)(stop - start)/tps.QuadPart; }
+static int    tmiszero(tm_t t)              { return !t; }
+  #elif defined(__riscv)
+typedef clock_t tm_t;
+static tm_t   tmtime()                      { return clock(); }
+static tm_t   tminit()                      { tm_t t0 = tmtime(), t; while((t = tmtime()) == t0) {}; return t; }
+static double tmdiff(tm_t start, tm_t stop) { return (double)(stop - start) / CLOCKS_PER_SEC; }
 static int    tmiszero(tm_t t)              { return !t; }
   #else        // Linux & compatible / MacOS
     #ifdef __APPLE__

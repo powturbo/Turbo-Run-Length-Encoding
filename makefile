@@ -105,7 +105,7 @@ CFLAGS+=$(DEBUG) -w
 #-Wno-incompatible-pointer-types -pedantic #-Wno-macro-redefined #-Wall -Wno-tautological-constant-out-of-range-compare
 CXXFLAGS+=-w
 
-ifeq ($(OS),$(filter $(OS),Windows Linux GNU/kFreeBSD GNU OpenBSD FreeBSD DragonFly NetBSD MSYS_NT Haiku))
+ifeq ($(OS),$(filter $(OS),Linux GNU/kFreeBSD GNU OpenBSD FreeBSD DragonFly NetBSD MSYS_NT Haiku))
 LDFLAGS+=-lrt -lm
 endif
 

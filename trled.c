@@ -25,26 +25,6 @@
 **/
   #ifndef USIZE
 #include <string.h>
-  #ifdef __AVX2__
-#include <immintrin.h>
-  #elif defined(__AVX__)
-#include <immintrin.h>
-  #elif defined(__SSE4_1__)
-#include <smmintrin.h>
-  #elif defined(__SSSE3__)
-    #ifdef __powerpc64__
-#define __SSE__   1
-#define __SSE2__  1
-#define __SSE3__  1
-#define NO_WARN_X86_INTRINSICS 1
-    #endif
-#include <tmmintrin.h>
-  #elif defined(__SSE2__)
-#include <emmintrin.h>
-  #elif defined(__ARM_NEON)
-#include <arm_neon.h>
-#include "include_/sse_neon.h"
-  #endif
 #include "include_/conf.h"
 #include "include_/trle.h"
 #include "trle_.h"
@@ -225,12 +205,12 @@ unsigned _trled(const unsigned char *__restrict in, unsigned char *__restrict ou
     while(op < out+(outlen-32)) {
         #if __WORDSIZE == 64
       uint64_t z = (uint64_t)rmap[ip[7]]<<56 | (uint64_t)rmap[ip[6]] << 48 | (uint64_t)rmap[ip[5]] << 40 | (uint64_t)rmap[ip[4]] << 32 | (uint32_t)rmap[ip[3]] << 24 | (uint32_t)rmap[ip[2]] << 16| (uint32_t)rmap[ip[1]] << 8| rmap[ip[0]];
-      stou64(op, ctou64(ip)); if(z) goto a; ip += 8; op += 8;
+      ctou64(op) = ctou64(ip); if(z) goto a; ip += 8; op += 8;
       continue;
       a: z = ctz64(z)>>3;
         #else
       uint32_t z = (uint32_t)rmap[ip[3]] << 24 | (uint32_t)rmap[ip[2]] << 16| (uint32_t)rmap[ip[1]] << 8| rmap[ip[0]];
-      stou32(op, ctou32(ip)); if(z) goto a; ip += 4; op += 4;
+      ctou32(op) = ctou32(ip); if(z) goto a; ip += 4; op += 4;
       continue;
       a: z = ctz32(z)>>3;
         #endif
@@ -310,8 +290,8 @@ unsigned trled(const unsigned char *__restrict in, unsigned inlen, unsigned char
 #define rmemset(_op_, _c_, _i_) do {  uint64_t _cc; uint8_t *_up = (uint8_t *)_op_; _op_ +=_i_;\
  T2(_cset, USIZE)(_cc,_c_);\
   do {\
-    T2(stou, USIZE)(_up, _c_); _up += USIZE/8;\
-    T2(stou, USIZE)(_up, _c_); _up += USIZE/8;\
+    T2(ctou, USIZE)(_up) = _c_; _up += USIZE/8;\
+    T2(ctou, USIZE)(_up) = _c_; _up += USIZE/8;\
   } while(_up < (uint8_t *)_op_);\
 } while(0)
   #endif

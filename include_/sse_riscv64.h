@@ -238,7 +238,7 @@ static inline __m128i mm_cmplt_epu64(__m128i u, __m128i v) { return u64v(__riscv
 #define _mm_loadl_epi64( _u64p_)                u64v(__riscv_vle64_v_u64m1((const uint64_t *)(_u64p_), 1))
 #define  mm_loadu_epi64p(_u64p_,_u_)            u64v(__riscv_vslidedown_vx_u64m1(__riscv_vle64_v_u64m1((const uint64_t*)(_u64p_), 1), vu64(_u_), 0, 2))
 
-static inline __m128i _mm_loadu_si128(__m128i const *_ip_) { return i32v(__riscv_vle32_v_i32m1(vi32(_ip_),    4)); }
+static inline __m128i _mm_loadu_si128(__m128i const *_ip_) { return i32v(__riscv_vle32_v_i32m1((const int *)(_ip_),    4)); }
 #define _mm_load_si128(  _ip_)                  i32v(__riscv_vle32_v_i32m1(( const uint32_t*)(_ip_),    4))
 #define _mm_load_ps(     _ip_)                  i32v(__riscv_vle32_v_f32m1(( const float   *)(_ip_),    4))
 #define _mm_loadu_ps(    _ip_)                  i32v(__riscv_vle32_v_f32m1(( const float   *)(_ip_),    4))
